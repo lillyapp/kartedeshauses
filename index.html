@@ -1,1 +1,401 @@
+<!doctype html>
+<html lang="de">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>KARTE DES HAUSES</title>
+  <style>
+    :root {
+      --bg: #ffffff;
+      --fg: #000000;
+      --muted: #6b6b6b;
+      --line: #000000;
+    }
 
+    html, body {
+      margin: 0;
+      padding: 0;
+      background: var(--bg);
+      color: var(--fg);
+      font-family: Helvetica, Arial, sans-serif;
+    }
+
+    body {
+      padding: 32px 24px 40px;
+    }
+
+    main {
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+
+    h1 {
+      font-size: 20px;
+      font-weight: 700;
+      margin: 0 0 18px;
+      letter-spacing: 0.02em;
+    }
+
+    .meta {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px 16px;
+      align-items: baseline;
+      margin-bottom: 20px;
+      font-size: 13px;
+      line-height: 1.4;
+    }
+
+    .meta strong {
+      font-weight: 700;
+    }
+
+    .random-row {
+      display: inline-flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      font-size: 15px;
+      font-weight: 700;
+      letter-spacing: 0.02em;
+    }
+
+    .random-row span {
+      display: inline-block;
+      padding: 2px 0;
+    }
+
+    .controls {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin: 12px 0 18px;
+    }
+
+    button {
+      appearance: none;
+      border: 1px solid var(--line);
+      background: var(--bg);
+      color: var(--fg);
+      padding: 9px 14px;
+      font: inherit;
+      font-size: 13px;
+      cursor: pointer;
+    }
+
+    button:hover {
+      background: #f5f5f5;
+    }
+
+    button:focus-visible {
+      outline: 2px solid var(--fg);
+      outline-offset: 2px;
+    }
+
+    .toggle {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 13px;
+      user-select: none;
+    }
+
+    .toggle input {
+      width: 14px;
+      height: 14px;
+      margin: 0;
+      accent-color: #000;
+    }
+
+    .table-wrap {
+      overflow-x: auto;
+      border-top: 1px solid var(--line);
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      table-layout: auto;
+    }
+
+    thead th {
+      text-align: left;
+      font-size: 12px;
+      font-weight: 700;
+      padding: 12px 10px;
+      border-bottom: 1px solid var(--line);
+      white-space: nowrap;
+    }
+
+    tbody td {
+      font-size: 13px;
+      padding: 10px;
+      border-bottom: 1px solid var(--line);
+      vertical-align: top;
+    }
+
+    tbody tr:hover {
+      background: #f5f5f5;
+    }
+
+    a {
+      color: var(--fg);
+      text-decoration: underline;
+      text-underline-offset: 2px;
+    }
+
+    .status {
+      font-size: 13px;
+      color: var(--muted);
+      margin: 12px 0 0;
+    }
+
+    .error {
+      color: #000;
+      border: 1px solid var(--line);
+      padding: 12px;
+      margin-top: 16px;
+      font-size: 13px;
+    }
+
+    code {
+      font-family: inherit;
+      font-size: 12px;
+    }
+
+    @media (max-width: 700px) {
+      body {
+        padding: 20px 14px 28px;
+      }
+
+      h1 {
+        font-size: 18px;
+      }
+
+      thead th,
+      tbody td {
+        padding-left: 8px;
+        padding-right: 8px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <main>
+    <h1>KARTE DES HAUSES</h1>
+    <div class="meta">
+      <strong>Auswahl der Rezepte:</strong>
+      <div id="randomRows" class="random-row"></div>
+    </div>
+    <div class="controls">
+      <label class="toggle">
+        <input id="filterToggle" type="checkbox">
+        Nur Auswahl anzeigen
+      </label>
+    </div>
+    <div id="status" class="status">Lade Markdown ...</div>
+    <div id="error" class="error" hidden></div>
+    <div class="table-wrap">
+      <table aria-label="Markdown Tabelle">
+        <thead id="tableHead"></thead>
+        <tbody id="tableBody"></tbody>
+      </table>
+    </div>
+  </main>
+
+  <script>
+    const DEFAULT_SOURCE = "./data.md";
+    const sourceUrl = new URLSearchParams(window.location.search).get("source") || DEFAULT_SOURCE;
+
+    const randomRowsEl = document.getElementById("randomRows");
+    const filterToggle = document.getElementById("filterToggle");
+    const statusEl = document.getElementById("status");
+    const errorEl = document.getElementById("error");
+    const tableHead = document.getElementById("tableHead");
+    const tableBody = document.getElementById("tableBody");
+
+    let allHeaders = [];
+    let allRows = [];
+    let selectedRowIndexes = [];
+    let isFiltered = false;
+
+    function splitMarkdownRow(line) {
+      return line
+        .trim()
+        .replace(/^\|/, "")
+        .replace(/\|$/, "")
+        .split("|")
+        .map((cell) => cell.trim());
+    }
+
+    function isSeparatorRow(line) {
+      return /^\s*\|?[:\- ]+\|[:\-\| ]+\s*$/.test(line) && line.includes("-");
+    }
+
+    function parseMarkdownTable(markdown) {
+      const lines = markdown
+        .split(/\r?\n/)
+        .map((line) => line.trimEnd())
+        .filter((line) => line.trim().length > 0);
+
+      const tableStart = lines.findIndex((line, index) => {
+        const next = lines[index + 1];
+        return line.includes("|") && next && isSeparatorRow(next);
+      });
+
+      if (tableStart === -1) {
+        throw new Error("Keine Markdown-Tabelle gefunden.");
+      }
+
+      const headers = splitMarkdownRow(lines[tableStart]);
+      const rows = [];
+
+      for (let i = tableStart + 2; i < lines.length; i += 1) {
+        const line = lines[i];
+        if (!line.includes("|")) break;
+        rows.push(splitMarkdownRow(line));
+      }
+
+      return { headers, rows };
+    }
+
+    function extractCellLink(cell) {
+      const markdownLink = cell.match(/\[([^\]]+)\]\(([^)]+)\)/);
+      if (markdownLink) {
+        return {
+          text: markdownLink[1],
+          href: markdownLink[2]
+        };
+      }
+
+      const plainUrl = cell.match(/https?:\/\/[^\s)]+/);
+      if (plainUrl) {
+        return {
+          text: cell,
+          href: plainUrl[0]
+        };
+      }
+
+      return null;
+    }
+
+    function renderTable(headers, rowEntries, selectedSet) {
+      tableHead.innerHTML = "";
+      tableBody.innerHTML = "";
+
+      const headerRow = document.createElement("tr");
+      const selectedTh = document.createElement("th");
+      selectedTh.textContent = "Auswahl";
+      headerRow.appendChild(selectedTh);
+
+      const indexTh = document.createElement("th");
+      indexTh.textContent = "#";
+      headerRow.appendChild(indexTh);
+
+      headers.forEach((header) => {
+        const th = document.createElement("th");
+        th.textContent = header;
+        headerRow.appendChild(th);
+      });
+      tableHead.appendChild(headerRow);
+
+      rowEntries.forEach(({ row, rowIndex }) => {
+        const tr = document.createElement("tr");
+
+        const selectedTd = document.createElement("td");
+        selectedTd.textContent = selectedSet.has(rowIndex) ? "Ja" : "";
+        tr.appendChild(selectedTd);
+
+        const indexTd = document.createElement("td");
+        indexTd.textContent = String(rowIndex + 1);
+        tr.appendChild(indexTd);
+
+        row.forEach((cell) => {
+          const td = document.createElement("td");
+          const link = extractCellLink(cell);
+          if (link) {
+            const a = document.createElement("a");
+            a.href = link.href;
+            a.textContent = link.text;
+            a.target = "_blank";
+            a.rel = "noopener noreferrer";
+            td.appendChild(a);
+          } else {
+            td.textContent = cell;
+          }
+          tr.appendChild(td);
+        });
+
+        tableBody.appendChild(tr);
+      });
+    }
+
+    function renderCurrentTable() {
+      const selectedSet = new Set(selectedRowIndexes);
+      const rowEntries = (isFiltered ? selectedRowIndexes : allRows.map((_, index) => index))
+        .map((rowIndex) => ({ row: allRows[rowIndex], rowIndex }));
+
+      renderTable(allHeaders, rowEntries, selectedSet);
+      statusEl.textContent = isFiltered
+        ? `Gefiltert: ${rowEntries.length} von ${allRows.length} Zeilen.`
+        : `Geladen: ${allRows.length} Zeilen.`;
+    }
+
+    function pickRandomNumbers(count, max) {
+      const pool = Array.from({ length: max }, (_, index) => index);
+      for (let i = pool.length - 1; i > 0; i -= 1) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [pool[i], pool[j]] = [pool[j], pool[i]];
+      }
+      return pool.slice(0, Math.min(count, pool.length));
+    }
+
+    function renderRandomRows(indices) {
+      randomRowsEl.innerHTML = "";
+      indices.forEach((index, position) => {
+        const span = document.createElement("span");
+        span.textContent = String(index);
+        randomRowsEl.appendChild(span);
+        if (position < indices.length - 1) {
+          const comma = document.createElement("span");
+          comma.textContent = ",";
+          randomRowsEl.appendChild(comma);
+        }
+      });
+    }
+
+    async function init() {
+      try {
+        const response = await fetch(sourceUrl, { cache: "no-store" });
+        if (!response.ok) {
+          throw new Error(`Markdown konnte nicht geladen werden (${response.status}).`);
+        }
+
+        const markdown = await response.text();
+        const { headers, rows } = parseMarkdownTable(markdown);
+        const rowNumbers = pickRandomNumbers(10, rows.length);
+
+        allHeaders = headers;
+        allRows = rows;
+        selectedRowIndexes = rowNumbers;
+        renderRandomRows(rowNumbers);
+        renderCurrentTable();
+      } catch (error) {
+        statusEl.textContent = "Fehler beim Laden.";
+        errorEl.hidden = false;
+        errorEl.textContent = `${error.message}\n\nLege eine Markdown-Datei unter ${DEFAULT_SOURCE} ab oder übergib eine URL mit ?source=https://...`;
+      }
+    }
+
+    filterToggle.addEventListener("change", () => {
+      if (allRows.length === 0) {
+        return;
+      }
+
+      isFiltered = filterToggle.checked;
+      renderCurrentTable();
+    });
+
+    init();
+  </script>
+</body>
+</html>
