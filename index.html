@@ -112,7 +112,7 @@
       justify-content: center;
       width: 28px;
       height: 28px;
-      border: 1px solid var(--line);
+      border: 0;
       color: var(--fg);
       text-decoration: none;
       line-height: 1;
@@ -222,7 +222,7 @@
     </div>
     <div class="controls">
       <label class="toggle">
-        <input id="filterToggle" type="checkbox">
+        <input id="filterToggle" type="checkbox" checked>
         Nur Auswahl anzeigen
       </label>
       <label class="toggle">
@@ -257,8 +257,8 @@
     let allHeaders = [];
     let allRows = [];
     let selectedRowIndexes = [];
-    let isFiltered = false;
-    const CARD_RANGE_COUNT = 6;
+    let isFiltered = true;
+    const CARD_RANGE_COUNT = 10;
 
     function splitMarkdownRow(line) {
       return line
