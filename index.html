@@ -227,7 +227,7 @@
       </label>
       <label class="toggle">
         <input id="cardToggle" type="checkbox" checked>
-        Karten-Range nutzen
+        Warme / kalte Speisen
       </label>
     </div>
     <div id="status" class="status">Lade Markdown ...</div>
@@ -258,7 +258,8 @@
     let allRows = [];
     let selectedRowIndexes = [];
     let isFiltered = true;
-    const CARD_RANGE_COUNT = 10;
+    const WARM_COLD_START_INDEX = 6;
+    const WARM_COLD_END_INDEX = 28;
 
     function splitMarkdownRow(line) {
       return line
@@ -390,8 +391,13 @@
     }
 
     function getSelectionPool() {
-      const limit = cardToggle.checked ? Math.min(CARD_RANGE_COUNT, allRows.length) : allRows.length;
-      return Array.from({ length: limit }, (_, index) => index);
+      if (cardToggle.checked) {
+        const start = Math.min(WARM_COLD_START_INDEX, allRows.length);
+        const end = Math.min(WARM_COLD_END_INDEX, allRows.length);
+        return Array.from({ length: Math.max(0, end - start) }, (_, index) => start + index);
+      }
+
+      return Array.from({ length: allRows.length }, (_, index) => index);
     }
 
     function renderRandomRows(indices) {
