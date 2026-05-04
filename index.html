@@ -191,6 +191,10 @@
         <input id="filterToggle" type="checkbox">
         Nur Auswahl anzeigen
       </label>
+      <label class="toggle">
+        <input id="cardToggle" type="checkbox" checked>
+        Karten-Range nutzen
+      </label>
     </div>
     <div id="status" class="status">Lade Markdown ...</div>
     <div id="error" class="error" hidden></div>
@@ -203,11 +207,12 @@
   </main>
 
   <script>
-    const DEFAULT_SOURCE = "https://raw.githubusercontent.com/lillyapp/kartedeshauses/refs/heads/main/data.md";
+    const DEFAULT_SOURCE = "./data.md";
     const sourceUrl = new URLSearchParams(window.location.search).get("source") || DEFAULT_SOURCE;
 
     const randomRowsEl = document.getElementById("randomRows");
     const filterToggle = document.getElementById("filterToggle");
+    const cardToggle = document.getElementById("cardToggle");
     const statusEl = document.getElementById("status");
     const errorEl = document.getElementById("error");
     const tableHead = document.getElementById("tableHead");
@@ -217,6 +222,7 @@
     let allRows = [];
     let selectedRowIndexes = [];
     let isFiltered = false;
+    const CARD_RANGE_COUNT = 6;
 
     function splitMarkdownRow(line) {
       return line
@@ -349,11 +355,16 @@
       return pool.slice(0, Math.min(count, pool.length));
     }
 
+    function getSelectionPool() {
+      const limit = cardToggle.checked ? Math.min(CARD_RANGE_COUNT, allRows.length) : allRows.length;
+      return Array.from({ length: limit }, (_, index) => index);
+    }
+
     function renderRandomRows(indices) {
       randomRowsEl.innerHTML = "";
       indices.forEach((index, position) => {
         const span = document.createElement("span");
-        span.textContent = String(index);
+        span.textContent = String(index + 1);
         randomRowsEl.appendChild(span);
         if (position < indices.length - 1) {
           const comma = document.createElement("span");
@@ -361,6 +372,14 @@
           randomRowsEl.appendChild(comma);
         }
       });
+    }
+
+    function refreshSelection() {
+      const pool = getSelectionPool();
+      const picked = pickRandomNumbers(10, pool.length);
+      selectedRowIndexes = picked.map((position) => pool[position]);
+      renderRandomRows(selectedRowIndexes);
+      renderCurrentTable();
     }
 
     async function init() {
@@ -372,13 +391,10 @@
 
         const markdown = await response.text();
         const { headers, rows } = parseMarkdownTable(markdown);
-        const rowNumbers = pickRandomNumbers(10, rows.length);
 
         allHeaders = headers;
         allRows = rows;
-        selectedRowIndexes = rowNumbers;
-        renderRandomRows(rowNumbers);
-        renderCurrentTable();
+        refreshSelection();
       } catch (error) {
         statusEl.textContent = "Fehler beim Laden.";
         errorEl.hidden = false;
@@ -393,6 +409,14 @@
 
       isFiltered = filterToggle.checked;
       renderCurrentTable();
+    });
+
+    cardToggle.addEventListener("change", () => {
+      if (allRows.length === 0) {
+        return;
+      }
+
+      refreshSelection();
     });
 
     init();
