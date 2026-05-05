@@ -606,6 +606,10 @@
           <input id="combineToggle" type="checkbox">
           Alles zusammenfassen
         </label>
+        <label class="summary-toggle">
+          <input id="spiceToggle" type="checkbox" checked>
+          Gewürze ausblenden
+        </label>
         <label id="portionScaleWrap" class="summary-portion" hidden>
           Portionen
           <input id="portionScale" type="number" min="1" step="1" value="1" inputmode="numeric">
@@ -645,11 +649,13 @@
     const summaryMeta = document.getElementById("summaryMeta");
     const summaryContent = document.getElementById("summaryContent");
     const combineToggle = document.getElementById("combineToggle");
+    const spiceToggle = document.getElementById("spiceToggle");
     const portionScaleWrap = document.getElementById("portionScaleWrap");
     const portionScaleInput = document.getElementById("portionScale");
     const clearCartButton = document.getElementById("clearCartButton");
 
     const PORTION_SCALE_STORAGE_KEY = "recipe-cart-portion-scale-v1";
+    const SPICE_FILTER_STORAGE_KEY = "recipe-cart-spice-filter-v1";
     const PURCHASED_STORAGE_KEY = "recipe-cart-purchased-v1";
     const EXCLUDED_STORAGE_KEY = "recipe-cart-excluded-v1";
     const REWE_SEARCH_BASE_URL = "https://www.rewe.de/suche/uebersicht?searchTerm=";
@@ -665,6 +671,7 @@
     let isSummaryOpen = false;
     let isCombineAll = false;
     let portionScale = loadPortionScale();
+    let hideSpices = loadHideSpices();
     let summaryRenderToken = 0;
     const reweAvailabilityCache = new Map();
     let purchasedState = loadBooleanMap(PURCHASED_STORAGE_KEY);
@@ -904,6 +911,19 @@
       localStorage.setItem(PORTION_SCALE_STORAGE_KEY, String(portionScale));
     }
 
+    function loadHideSpices() {
+      try {
+        const raw = localStorage.getItem(SPICE_FILTER_STORAGE_KEY);
+        return raw === null ? true : raw === "true";
+      } catch (error) {
+        return true;
+      }
+    }
+
+    function saveHideSpices() {
+      localStorage.setItem(SPICE_FILTER_STORAGE_KEY, hideSpices ? "true" : "false");
+    }
+
     function loadBooleanMap(storageKey) {
       try {
         const raw = localStorage.getItem(storageKey);
@@ -954,6 +974,36 @@
 
     function toggleExcluded(key) {
       setExcluded(key, !isExcluded(key));
+    }
+
+    function isSpiceIngredient(item) {
+      const name = (item.name || "").toLowerCase().trim();
+      return [
+        "salz",
+        "pfeffer",
+        "meersalz",
+        "zimt",
+        "zimtzucker",
+        "currypulver",
+        "muskatnuss",
+        "gemahlene muskatnuss",
+        "koriander",
+        "gemahlener koriander",
+        "kreuzkümmel",
+        "gemahlener kreuzkümmel",
+        "paprikapulver",
+        "geräuchertes paprikapulver",
+        "chiliflocken",
+        "chili",
+        "chilischote",
+        "senf",
+        "dijon senf",
+        "harissa gewürzpaste",
+        "gewürzmischung",
+        "gewürz",
+        "backpulver",
+        "backnatron"
+      ].some((term) => name === term || name.includes(term));
     }
 
     function getRecipeKey(rowIndex) {
@@ -1108,6 +1158,10 @@
       return `${quantity}${unit}${item.name}`.trim();
     }
 
+    function shouldHideIngredient(item) {
+      return hideSpices && isSpiceIngredient(item);
+    }
+
     function getIngredientsForRow(row, rowIndex, scale = 1) {
       const ingredientCell = row[2] || "";
       return ingredientCell
@@ -1132,7 +1186,7 @@
 
       rows.forEach(({ row, rowIndex }) => {
         getIngredientsForRow(row, rowIndex).forEach((parsed) => {
-          if (isExcluded(parsed.instanceKey)) {
+          if (isExcluded(parsed.instanceKey) || shouldHideIngredient(parsed)) {
             return;
           }
 
@@ -1293,6 +1347,7 @@
       summaryCount.textContent = String(selected.length);
       summaryMeta.textContent = `${selected.length} Rezept${selected.length === 1 ? "" : "e"} im Warenkorb${isCombineAll && portionScale > 1 ? ` · ${portionScale}x hochgerechnet` : ""}`;
       portionScaleWrap.hidden = !isCombineAll;
+      spiceToggle.checked = hideSpices;
 
       if (selected.length === 0) {
         summaryContent.innerHTML = '<p class="summary-empty">Noch keine Rezepte im Warenkorb. Klick den Warenkorb neben einem Rezept an, um Zutaten zu sammeln.</p>';
@@ -1339,7 +1394,7 @@
 
       summaryContent.innerHTML = "";
       selected.forEach(({ row, rowIndex }) => {
-        const items = getIngredientsForRow(row, rowIndex, 1);
+        const items = getIngredientsForRow(row, rowIndex, 1).filter((item) => !shouldHideIngredient(item));
         const section = document.createElement("section");
         section.className = "summary-card";
         section.innerHTML = `
@@ -1610,6 +1665,12 @@
 
     combineToggle.addEventListener("change", () => {
       isCombineAll = combineToggle.checked;
+      renderSummary();
+    });
+
+    spiceToggle.addEventListener("change", () => {
+      hideSpices = spiceToggle.checked;
+      saveHideSpices();
       renderSummary();
     });
 
