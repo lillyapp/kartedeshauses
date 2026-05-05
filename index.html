@@ -14,6 +14,12 @@
       --panel-bg: #ffffff;
     }
 
+    *,
+    *::before,
+    *::after {
+      box-sizing: border-box;
+    }
+
     html, body {
       margin: 0;
       padding: 0;
@@ -70,7 +76,10 @@
       z-index: 20;
       display: flex;
       align-items: center;
+      justify-content: flex-end;
+      flex-wrap: wrap;
       gap: 8px;
+      max-width: calc(100vw - 36px);
     }
 
     .icon-button {
@@ -123,6 +132,51 @@
     #summaryButton:hover,
     #summaryButton:focus-visible {
       background: rgba(0, 0, 0, 0.06);
+    }
+
+    .basket-prompt {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      margin: 0 0 16px;
+      padding: 12px 14px;
+      border: 1px solid var(--line);
+      background: #f7f7f3;
+      font-size: 13px;
+      line-height: 1.4;
+    }
+
+    .basket-prompt[hidden] {
+      display: none;
+    }
+
+    .basket-prompt strong {
+      font-weight: 700;
+    }
+
+    .basket-prompt > div:first-child {
+      min-width: 0;
+      overflow-wrap: anywhere;
+    }
+
+    .basket-prompt-actions {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      flex: none;
+    }
+
+    .basket-prompt button {
+      border: 0;
+      padding: 7px 10px;
+      min-height: 32px;
+      background: #fff;
+    }
+
+    .basket-prompt button[data-action="confirm"] {
+      background: #eaf8ee;
+      color: var(--success);
     }
 
     .icon-badge {
@@ -504,7 +558,9 @@
 
     .table-wrap {
       overflow-x: auto;
+      max-width: 100%;
       border-top: 1px solid var(--line);
+      -webkit-overflow-scrolling: touch;
     }
 
     table {
@@ -563,8 +619,28 @@
         padding: 20px 14px 28px;
       }
 
+      main {
+        width: 100%;
+      }
+
       h1 {
         font-size: 18px;
+      }
+
+      .basket-prompt {
+        max-width: 100%;
+      }
+
+      .basket-prompt-actions {
+        flex-wrap: wrap;
+      }
+
+      .basket-prompt-actions button {
+        min-width: 56px;
+      }
+
+      .controls {
+        max-width: 100%;
       }
 
       thead th,
@@ -591,6 +667,7 @@
       <span id="summaryCount" class="icon-badge" hidden>0</span>
       <div id="randomRows" class="random-row" hidden></div>
     </div>
+    <div id="basketPrompt" class="basket-prompt" hidden></div>
     <div class="controls">
       <label class="toggle">
         <input id="filterToggle" type="checkbox" checked>
@@ -607,9 +684,6 @@
           <h2 class="summary-title">Warenkorb</h2>
           <p id="summaryMeta" class="summary-subtitle"></p>
         </div>
-        <button id="summaryCloseButton" class="icon-button" type="button" aria-label="Warenkorb schließen" title="Warenkorb schließen">
-          <i data-lucide="x" aria-hidden="true"></i>
-        </button>
       </div>
       <div class="summary-tools">
         <label class="summary-toggle">
@@ -656,9 +730,9 @@
     const summaryButton = document.getElementById("summaryButton");
     const summaryCount = document.getElementById("summaryCount");
     const summaryPanel = document.getElementById("summaryPanel");
-    const summaryCloseButton = document.getElementById("summaryCloseButton");
     const summaryMeta = document.getElementById("summaryMeta");
     const summaryContent = document.getElementById("summaryContent");
+    const basketPrompt = document.getElementById("basketPrompt");
     const combineToggle = document.getElementById("combineToggle");
     const spiceToggle = document.getElementById("spiceToggle");
     const portionScaleWrap = document.getElementById("portionScaleWrap");
@@ -692,6 +766,7 @@
       fetchedAt: 0,
       promise: null
     };
+    let pendingBasketItem = null;
 
     function splitMarkdownRow(line) {
       return line
@@ -1067,6 +1142,33 @@
       }
     }
 
+    function renderBasketPrompt() {
+      if (!pendingBasketItem) {
+        basketPrompt.hidden = true;
+        basketPrompt.innerHTML = "";
+        return;
+      }
+
+      basketPrompt.hidden = false;
+      basketPrompt.innerHTML = `
+        <div><strong>Produkt ${pendingBasketItem.label}</strong> hinzugefügt?</div>
+        <div class="basket-prompt-actions">
+          <button type="button" data-action="confirm" data-global-key="${pendingBasketItem.globalKey}">Ja</button>
+          <button type="button" data-action="cancel">Nein</button>
+        </div>
+      `;
+    }
+
+    function setPendingBasketItem(item) {
+      pendingBasketItem = item;
+      renderBasketPrompt();
+    }
+
+    function clearPendingBasketItem() {
+      pendingBasketItem = null;
+      renderBasketPrompt();
+    }
+
     function setIngredientExcludedFromKey(key, active) {
       setExcluded(key, active);
       if (isSummaryOpen) {
@@ -1428,6 +1530,7 @@
                     data-action="rewe"
                     data-global-key="${item.globalKey}"
                     data-item-name="${item.name}"
+                    data-item-label="${item.label}"
                     data-available="unknown"
                     aria-label="Im REWE-Warenkorb prüfen: ${item.label}"
                     title="Im REWE-Warenkorb prüfen"
@@ -1470,6 +1573,7 @@
                     data-global-key="${item.globalKey}"
                     data-instance-key="${item.instanceKey}"
                     data-item-name="${item.name}"
+                    data-item-label="${item.label}"
                     data-available="unknown"
                     aria-label="Im REWE-Warenkorb prüfen: ${item.label}"
                     title="Im REWE-Warenkorb prüfen"
@@ -1517,6 +1621,7 @@
 
         const indexTd = document.createElement("td");
         indexTd.textContent = String(rowIndex + 1);
+        indexTd.dataset.label = "#";
         tr.appendChild(indexTd);
 
         row.forEach((cell, cellIndex) => {
@@ -1525,6 +1630,7 @@
           }
 
           const td = document.createElement("td");
+          td.dataset.label = cellIndex === 1 ? "Rezept" : (headers[cellIndex] || "");
           const link = extractCellLink(cell);
           if (cellIndex === 1 && link) {
             const wrapper = document.createElement("div");
@@ -1693,7 +1799,15 @@
 
       if (action === "rewe") {
         const itemName = button.dataset.itemName || "";
+        const itemLabel = button.dataset.itemLabel || itemName;
+        const globalKey = button.dataset.globalKey || "";
         openReweSearchForItem(itemName);
+        if (globalKey) {
+          setPendingBasketItem({
+            globalKey,
+            label: itemLabel || itemName || "Produkt"
+          });
+        }
         renderSummary();
         return;
       }
@@ -1721,8 +1835,21 @@
       setSummaryVisibility(true);
     });
 
-    summaryCloseButton.addEventListener("click", () => {
-      setSummaryVisibility(false);
+    basketPrompt.addEventListener("click", (event) => {
+      const button = event.target.closest("button[data-action]");
+      if (!button || !pendingBasketItem) {
+        return;
+      }
+
+      if (button.dataset.action === "confirm") {
+        setIngredientPurchasedFromKey(pendingBasketItem.globalKey, true);
+        clearPendingBasketItem();
+        return;
+      }
+
+      if (button.dataset.action === "cancel") {
+        clearPendingBasketItem();
+      }
     });
 
     combineToggle.addEventListener("change", () => {
