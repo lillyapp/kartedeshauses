@@ -1228,7 +1228,7 @@
             }
 
             const text = await response.text();
-            if (!/Das haben wir nicht gefunden/i.test(text)) {
+            if (!/nichts gefunden/i.test(text)) {
               reweAvailabilityCache.set(cacheKey, true);
               return true;
             }
