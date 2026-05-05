@@ -12,6 +12,8 @@
       --line: #000000;
       --success: #138a36;
       --panel-bg: #ffffff;
+      --page-max: 1200px;
+      --page-gutter: 24px;
     }
 
     *,
@@ -29,11 +31,12 @@
     }
 
     body {
-      padding: 32px 24px 40px;
+      padding: 32px var(--page-gutter) 40px;
     }
 
     main {
-      max-width: 1200px;
+      position: relative;
+      max-width: var(--page-max);
       margin: 0 auto;
     }
 
@@ -63,23 +66,142 @@
     }
 
     .controls {
-      display: flex;
+      display: none;
       flex-wrap: wrap;
       gap: 10px;
       margin: 12px 0 18px;
     }
 
+    .week-plan {
+      margin: 0 0 18px;
+      max-width: 100%;
+      border-left: 1px solid transparent;
+      border-right: 1px solid transparent;
+    }
+
+    .week-plan[hidden] {
+      display: none;
+    }
+
+    .week-plan-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      margin: 0 0 8px;
+      padding-right: 0;
+    }
+
+    .section-heading {
+      margin: 0;
+      font-size: 12px;
+      font-weight: 700;
+      letter-spacing: 0.06em;
+      color: var(--fg);
+    }
+
+    .week-plan-scroll {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 28px;
+      height: 28px;
+      padding: 0;
+      border: 0;
+      background: transparent;
+      color: var(--fg);
+      border-radius: 999px;
+      box-shadow: none;
+    }
+
+    .week-plan-scroll[hidden] {
+      display: none;
+    }
+
+    .week-plan-scroll:hover,
+    .week-plan-scroll:focus-visible {
+      background: rgba(0, 0, 0, 0.06);
+    }
+
+    .week-plan-scroll svg {
+      width: 18px;
+      height: 18px;
+      stroke-width: 2;
+    }
+
+    .week-plan-viewport {
+      max-width: 100%;
+      overflow-x: hidden;
+      scrollbar-width: none;
+      -webkit-overflow-scrolling: touch;
+    }
+
+    .week-plan-viewport::-webkit-scrollbar {
+      display: none;
+    }
+
+    .week-plan-grid {
+      display: grid;
+      grid-template-columns: repeat(5, minmax(150px, 1fr));
+      align-items: start;
+      gap: 10px;
+      min-width: 800px;
+    }
+
+    .week-plan-column {
+      padding: 12px;
+      border-radius: 10px;
+      background: #f1f1f1;
+      border: 1px solid #f1f1f1;
+    }
+
+    .week-plan-column[data-drag-over="true"] {
+      background: #eaf8ee;
+      border-color: var(--success);
+    }
+
+    .week-plan-title {
+      margin: 0 0 10px;
+      font-size: 12px;
+      font-weight: 700;
+      letter-spacing: 0.06em;
+      color: var(--fg);
+    }
+
+    .week-plan-items {
+      display: grid;
+      gap: 7px;
+    }
+
+    .week-plan-item {
+      width: 100%;
+      padding: 8px 9px;
+      min-height: 0;
+      border: 0;
+      border-radius: 7px;
+      background: #fff;
+      text-align: left;
+      font-size: 13px;
+      line-height: 1.25;
+      cursor: grab;
+      box-shadow: none;
+    }
+
+    .week-plan-item:active {
+      cursor: grabbing;
+    }
+
     .top-actions {
       position: fixed;
       top: 18px;
-      right: 18px;
+      right: max(var(--page-gutter), calc((100vw - var(--page-max)) / 2));
       z-index: 20;
       display: flex;
       align-items: center;
       justify-content: flex-end;
       flex-wrap: wrap;
       gap: 8px;
-      max-width: calc(100vw - 36px);
+      max-width: min(360px, calc(100vw - (var(--page-gutter) * 2)));
     }
 
     .icon-button {
@@ -145,6 +267,7 @@
       background: #f7f7f3;
       font-size: 13px;
       line-height: 1.4;
+      max-width: 100%;
     }
 
     .basket-prompt[hidden] {
@@ -187,11 +310,49 @@
       height: 18px;
       padding: 0 5px;
       border-radius: 999px;
-      background: var(--success);
+      background: var(--fg);
       color: #fff;
       font-size: 11px;
       font-weight: 700;
       line-height: 1;
+    }
+
+    .icon-badge[data-animate="add"] {
+      animation: badge-pop-add 520ms ease-out;
+    }
+
+    .icon-badge[data-animate="remove"] {
+      animation: badge-pop-remove 520ms ease-out;
+    }
+
+    @keyframes badge-pop-add {
+      0% {
+        transform: scale(1);
+        background: var(--fg);
+      }
+      35% {
+        transform: scale(1.35);
+        background: var(--success);
+      }
+      100% {
+        transform: scale(1);
+        background: var(--fg);
+      }
+    }
+
+    @keyframes badge-pop-remove {
+      0% {
+        transform: scale(1);
+        background: var(--fg);
+      }
+      35% {
+        transform: scale(1.35);
+        background: #c62828;
+      }
+      100% {
+        transform: scale(1);
+        background: var(--fg);
+      }
     }
 
     button {
@@ -282,6 +443,66 @@
       flex: none;
     }
 
+    .recipe-header {
+      position: relative;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      white-space: nowrap;
+    }
+
+    .filter-button {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 26px;
+      height: 26px;
+      padding: 0;
+      border: 0;
+      background: transparent;
+      color: var(--fg);
+      border-radius: 999px;
+      box-shadow: none;
+    }
+
+    .filter-button:hover,
+    .filter-button:focus-visible,
+    .filter-button[data-active="true"] {
+      background: rgba(0, 0, 0, 0.06);
+    }
+
+    .filter-button svg {
+      width: 16px;
+      height: 16px;
+      stroke-width: 2;
+    }
+
+    .filter-popover {
+      position: absolute;
+      top: calc(100% + 8px);
+      left: 0;
+      z-index: 15;
+      min-width: 210px;
+      padding: 10px;
+      border: 1px solid var(--line);
+      background: var(--bg);
+      box-shadow: 0 10px 28px rgba(0, 0, 0, 0.12);
+    }
+
+    .filter-popover[hidden] {
+      display: none;
+    }
+
+    .filter-popover .toggle {
+      display: flex;
+      margin: 0 0 8px;
+      white-space: normal;
+    }
+
+    .filter-popover .toggle:last-child {
+      margin-bottom: 0;
+    }
+
     .cart-toggle {
       display: inline-flex;
       align-items: center;
@@ -354,6 +575,36 @@
       flex-wrap: wrap;
       gap: 8px;
       margin: 10px 0 14px;
+    }
+
+    .summary-tools[hidden] {
+      display: none;
+    }
+
+    .summary-filter-button {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 28px;
+      height: 28px;
+      padding: 0;
+      border: 0;
+      background: transparent;
+      color: var(--fg);
+      border-radius: 999px;
+      box-shadow: none;
+    }
+
+    .summary-filter-button:hover,
+    .summary-filter-button:focus-visible,
+    .summary-filter-button[data-active="true"] {
+      background: rgba(0, 0, 0, 0.06);
+    }
+
+    .summary-filter-button svg {
+      width: 17px;
+      height: 17px;
+      stroke-width: 2;
     }
 
     .summary-toggle {
@@ -519,6 +770,16 @@
       stroke-linejoin: round;
     }
 
+    .ingredient-action[data-loading="true"] svg {
+      animation: spin 900ms linear infinite;
+    }
+
+    @keyframes spin {
+      to {
+        transform: rotate(360deg);
+      }
+    }
+
     .ingredient-main {
       flex: 1;
       min-width: 0;
@@ -560,7 +821,13 @@
       overflow-x: auto;
       max-width: 100%;
       border-top: 1px solid var(--line);
+      border-left: 1px solid var(--line);
+      border-right: 1px solid var(--line);
       -webkit-overflow-scrolling: touch;
+    }
+
+    .table-heading {
+      margin: 0 0 8px;
     }
 
     table {
@@ -615,8 +882,12 @@
     }
 
     @media (max-width: 700px) {
+      :root {
+        --page-gutter: 14px;
+      }
+
       body {
-        padding: 20px 14px 28px;
+        padding: 20px var(--page-gutter) 28px;
       }
 
       main {
@@ -641,6 +912,24 @@
 
       .controls {
         max-width: 100%;
+      }
+
+      .week-plan-header {
+        display: none;
+      }
+
+      .week-plan-grid {
+        grid-template-columns: 1fr;
+        min-width: 0;
+      }
+
+      .week-plan-viewport {
+        overflow-x: visible;
+      }
+
+      .filter-popover {
+        left: auto;
+        right: 0;
       }
 
       thead th,
@@ -678,14 +967,28 @@
         Warme / kalte Speisen
       </label>
     </div>
+    <section id="weekPlan" class="week-plan" hidden aria-label="Wochenplanübersicht">
+      <div class="week-plan-header">
+        <h2 class="section-heading">10-TAGE PLAN</h2>
+        <button id="weekPlanScrollButton" class="week-plan-scroll" type="button" aria-label="Wochenplan verschieben" title="Wochenplan verschieben">
+          <i data-lucide="arrow-left-right" aria-hidden="true"></i>
+        </button>
+      </div>
+      <div id="weekPlanViewport" class="week-plan-viewport">
+        <div id="weekPlanGrid" class="week-plan-grid"></div>
+      </div>
+    </section>
     <section id="summaryPanel" class="summary-panel" hidden aria-label="Warenkorb">
       <div class="summary-header">
         <div>
           <h2 class="summary-title">Warenkorb</h2>
           <p id="summaryMeta" class="summary-subtitle"></p>
         </div>
+        <button id="summaryFilterButton" class="summary-filter-button" type="button" aria-label="Warenkorb-Filter anzeigen" aria-expanded="false" title="Filter">
+          <i data-lucide="list-filter" aria-hidden="true"></i>
+        </button>
       </div>
-      <div class="summary-tools">
+      <div id="summaryTools" class="summary-tools" hidden>
         <label class="summary-toggle">
           <input id="combineToggle" type="checkbox">
           Alles zusammenfassen
@@ -704,6 +1007,7 @@
     </section>
     <div id="status" class="status"></div>
     <div id="error" class="error" hidden></div>
+    <h2 class="section-heading table-heading">REZEPTSAMMLUNG</h2>
     <div class="table-wrap">
       <table aria-label="Markdown Tabelle">
         <thead id="tableHead"></thead>
@@ -718,6 +1022,7 @@
     const DEFAULT_SOURCE = "./data.md";
     const sourceUrl = new URLSearchParams(window.location.search).get("source") || DEFAULT_SOURCE;
     const CART_STORAGE_KEY = "recipe-cart-state-v1";
+    const WEEK_PLAN_STORAGE_KEY = "recipe-week-plan-v1";
 
     const randomRowsEl = document.getElementById("randomRows");
     const filterToggle = document.getElementById("filterToggle");
@@ -732,7 +1037,13 @@
     const summaryPanel = document.getElementById("summaryPanel");
     const summaryMeta = document.getElementById("summaryMeta");
     const summaryContent = document.getElementById("summaryContent");
+    const summaryFilterButton = document.getElementById("summaryFilterButton");
+    const summaryTools = document.getElementById("summaryTools");
     const basketPrompt = document.getElementById("basketPrompt");
+    const weekPlan = document.getElementById("weekPlan");
+    const weekPlanViewport = document.getElementById("weekPlanViewport");
+    const weekPlanGrid = document.getElementById("weekPlanGrid");
+    const weekPlanScrollButton = document.getElementById("weekPlanScrollButton");
     const combineToggle = document.getElementById("combineToggle");
     const spiceToggle = document.getElementById("spiceToggle");
     const portionScaleWrap = document.getElementById("portionScaleWrap");
@@ -754,8 +1065,10 @@
     const WARM_COLD_START_INDEX = 6;
     const WARM_COLD_END_INDEX = 28;
     let cartState = loadCartState();
+    let weekPlanState = loadWeekPlanState();
     let isSummaryOpen = false;
     let isCombineAll = false;
+    let isSummaryFilterOpen = false;
     let portionScale = loadPortionScale();
     let hideSpices = loadHideSpices();
     let summaryRenderToken = 0;
@@ -766,7 +1079,11 @@
       fetchedAt: 0,
       promise: null
     };
-    let pendingBasketItem = null;
+    let pendingPrompt = null;
+    let activeBasketText = "";
+    let isBasketLoading = false;
+    let basketCheckToken = 0;
+    let isFilterPopoverOpen = false;
 
     function splitMarkdownRow(line) {
       return line
@@ -988,6 +1305,20 @@
       localStorage.setItem(CART_STORAGE_KEY, JSON.stringify(cartState));
     }
 
+    function loadWeekPlanState() {
+      try {
+        const raw = localStorage.getItem(WEEK_PLAN_STORAGE_KEY);
+        const parsed = raw ? JSON.parse(raw) : {};
+        return parsed && typeof parsed === "object" ? parsed : {};
+      } catch (error) {
+        return {};
+      }
+    }
+
+    function saveWeekPlanState() {
+      localStorage.setItem(WEEK_PLAN_STORAGE_KEY, JSON.stringify(weekPlanState));
+    }
+
     function loadPortionScale() {
       try {
         const raw = localStorage.getItem(PORTION_SCALE_STORAGE_KEY);
@@ -1110,16 +1441,28 @@
       return Boolean(cartState[getRecipeKey(rowIndex)]);
     }
 
+    function animateCartCount(type) {
+      summaryCount.dataset.animate = "";
+      window.requestAnimationFrame(() => {
+        summaryCount.dataset.animate = type;
+      });
+    }
+
     function setCartState(rowIndex, active) {
       const key = getRecipeKey(rowIndex);
+      const wasActive = Boolean(cartState[key]);
       if (active) {
         cartState[key] = true;
       } else {
         delete cartState[key];
       }
       saveCartState();
+      if (wasActive !== active) {
+        animateCartCount(active ? "add" : "remove");
+      }
       renderCurrentTable();
       renderSummary();
+      renderWeekPlan();
     }
 
     function toggleCart(rowIndex) {
@@ -1133,6 +1476,144 @@
       saveCartState();
       renderCurrentTable();
       renderSummary();
+      renderWeekPlan();
+    }
+
+    function hasPlanningData() {
+      return Object.keys(cartState).length > 0
+        || Object.keys(weekPlanState).length > 0
+        || Object.keys(purchasedState).length > 0
+        || Object.keys(excludedState).length > 0;
+    }
+
+    function clearPlanningData() {
+      cartState = {};
+      weekPlanState = {};
+      purchasedState = {};
+      excludedState = {};
+      saveCartState();
+      saveWeekPlanState();
+      saveBooleanMap(PURCHASED_STORAGE_KEY, purchasedState);
+      saveBooleanMap(EXCLUDED_STORAGE_KEY, excludedState);
+      clearPendingPrompt();
+    }
+
+    function runMagicSelection({ overwrite = false } = {}) {
+      if (selectedRowIndexes.length === 0) {
+        return;
+      }
+
+      if (hasPlanningData()) {
+        if (!overwrite) {
+          setPendingOverwritePrompt();
+          return;
+        }
+
+        clearPlanningData();
+      }
+
+      refreshSelection();
+      addSelectionToCart();
+      portionScale = 5;
+      portionScaleInput.value = String(portionScale);
+      savePortionScale();
+      setSummaryVisibility(true);
+    }
+
+    function getCartRecipeEntries() {
+      return Object.entries(cartState)
+        .filter(([, active]) => active)
+        .map(([rowIndex]) => {
+          const index = Number(rowIndex);
+          const row = allRows[index];
+          return row ? { row, rowIndex: index } : null;
+        })
+        .filter(Boolean)
+        .sort((a, b) => a.rowIndex - b.rowIndex);
+    }
+
+    function syncWeekPlanState(entries) {
+      const activeKeys = new Set(entries.map(({ rowIndex }) => String(rowIndex)));
+      Object.keys(weekPlanState).forEach((key) => {
+        if (!activeKeys.has(key)) {
+          delete weekPlanState[key];
+        }
+      });
+
+      entries.forEach(({ rowIndex }, index) => {
+        const key = String(rowIndex);
+        if (!Number.isInteger(weekPlanState[key]) || weekPlanState[key] < 0 || weekPlanState[key] > 4) {
+          weekPlanState[key] = index % 5;
+        }
+      });
+
+      saveWeekPlanState();
+    }
+
+    function renderWeekPlan() {
+      const entries = getCartRecipeEntries();
+      if (entries.length < 5) {
+        weekPlan.hidden = true;
+        weekPlanGrid.innerHTML = "";
+        return;
+      }
+
+      syncWeekPlanState(entries);
+      const titles = ["TAG 1 · 2", "TAG 3 · 4", "TAG 5 · 6", "TAG 7 · 8", "TAG 9 · 10"];
+      weekPlan.hidden = false;
+      weekPlanGrid.innerHTML = titles.map((title, slot) => `
+        <section class="week-plan-column" data-slot="${slot}">
+          <h2 class="week-plan-title">${title}</h2>
+          <div class="week-plan-items">
+            ${entries
+              .filter(({ rowIndex }) => weekPlanState[String(rowIndex)] === slot)
+              .map(({ row, rowIndex }) => `
+                <button class="week-plan-item" type="button" draggable="true" data-row-index="${rowIndex}">
+                  ${row[0]}
+                </button>
+              `).join("")}
+          </div>
+        </section>
+      `).join("");
+
+      if (window.lucide && typeof window.lucide.createIcons === "function") {
+        window.lucide.createIcons();
+      }
+      updateWeekPlanScrollButton();
+    }
+
+    function updateWeekPlanScrollButton() {
+      if (weekPlan.hidden) {
+        weekPlanScrollButton.hidden = true;
+        return;
+      }
+
+      window.requestAnimationFrame(() => {
+        weekPlanScrollButton.hidden = weekPlanViewport.scrollWidth <= weekPlanViewport.clientWidth + 1;
+      });
+    }
+
+    function scrollWeekPlanToOppositeSide() {
+      const maxScroll = Math.max(0, weekPlanViewport.scrollWidth - weekPlanViewport.clientWidth);
+      const isNearEnd = weekPlanViewport.scrollLeft >= maxScroll - 8;
+      weekPlanViewport.scrollTo({
+        left: isNearEnd ? 0 : maxScroll,
+        behavior: "smooth"
+      });
+    }
+
+    function autoScrollWeekPlan(event) {
+      if (window.matchMedia("(max-width: 700px)").matches) {
+        return;
+      }
+
+      const bounds = weekPlanViewport.getBoundingClientRect();
+      const edge = 72;
+      if (event.clientX < bounds.left + edge) {
+        weekPlanViewport.scrollLeft -= 24;
+      } else if (event.clientX > bounds.right - edge) {
+        weekPlanViewport.scrollLeft += 24;
+      }
     }
 
     function setIngredientPurchasedFromKey(key, active) {
@@ -1142,8 +1623,8 @@
       }
     }
 
-    function renderBasketPrompt() {
-      if (!pendingBasketItem) {
+    function renderPrompt() {
+      if (!pendingPrompt) {
         basketPrompt.hidden = true;
         basketPrompt.innerHTML = "";
         return;
@@ -1151,22 +1632,34 @@
 
       basketPrompt.hidden = false;
       basketPrompt.innerHTML = `
-        <div><strong>Produkt ${pendingBasketItem.label}</strong> hinzugefügt?</div>
+        <div>${pendingPrompt.message}</div>
         <div class="basket-prompt-actions">
-          <button type="button" data-action="confirm" data-global-key="${pendingBasketItem.globalKey}">Ja</button>
+          <button type="button" data-action="confirm">Ja</button>
           <button type="button" data-action="cancel">Nein</button>
         </div>
       `;
     }
 
     function setPendingBasketItem(item) {
-      pendingBasketItem = item;
-      renderBasketPrompt();
+      pendingPrompt = {
+        type: "basket",
+        globalKey: item.globalKey,
+        message: `<strong>Produkt ${item.label}</strong> hinzugefügt?`
+      };
+      renderPrompt();
     }
 
-    function clearPendingBasketItem() {
-      pendingBasketItem = null;
-      renderBasketPrompt();
+    function setPendingOverwritePrompt() {
+      pendingPrompt = {
+        type: "overwrite",
+        message: "<strong>Vorhandene Planung</strong> überschreiben?"
+      };
+      renderPrompt();
+    }
+
+    function clearPendingPrompt() {
+      pendingPrompt = null;
+      renderPrompt();
     }
 
     function setIngredientExcludedFromKey(key, active) {
@@ -1348,6 +1841,14 @@
     }
 
     function createIconMarkup(name) {
+      if (name === "loader") {
+        return `
+          <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+            <path d="M21 12a9 9 0 1 1-6.2-8.6"></path>
+          </svg>
+        `;
+      }
+
       if (name === "truck") {
         return `
           <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
@@ -1444,8 +1945,8 @@
 
     async function refreshReweButtons(card, items, token) {
       const buttons = Array.from(card.querySelectorAll('.ingredient-action[data-action="rewe"]'));
-      const basketText = await loadReweBasketSnapshot();
-      await Promise.all(items.map(async (item, index) => {
+      const basketText = activeBasketText;
+      items.forEach((item, index) => {
         const button = buttons[index];
         if (!button) {
           return;
@@ -1456,28 +1957,34 @@
           return;
         }
 
+        if (isBasketLoading) {
+          button.dataset.active = "false";
+          button.dataset.available = "unknown";
+          button.dataset.basket = "false";
+          button.dataset.loading = "true";
+          button.innerHTML = createIconMarkup("loader");
+          const listItem = button.closest("li");
+          if (listItem) {
+            listItem.dataset.basket = "false";
+          }
+          return;
+        }
+
         button.dataset.active = available ? "true" : "false";
         button.dataset.available = available ? "true" : "false";
         button.dataset.basket = available ? "true" : "false";
+        button.dataset.loading = "false";
         button.innerHTML = createIconMarkup(available ? "truck" : "question-circle");
 
         const listItem = button.closest("li");
         if (listItem) {
           listItem.dataset.basket = available ? "true" : "false";
         }
-      }));
+      });
     }
 
     function getSelectedRecipeEntries() {
-      return Object.entries(cartState)
-        .filter(([, active]) => active)
-        .map(([rowIndex]) => {
-          const index = Number(rowIndex);
-          const row = allRows[index];
-          return row ? { row, rowIndex: index } : null;
-        })
-        .filter(Boolean)
-        .sort((a, b) => a.rowIndex - b.rowIndex);
+      return getCartRecipeEntries();
     }
 
     function setSummaryVisibility(visible) {
@@ -1489,7 +1996,21 @@
         portionScaleInput.value = String(portionScale);
       }
       if (visible) {
+        const token = ++basketCheckToken;
+        activeBasketText = "";
+        isBasketLoading = true;
         renderSummary();
+        loadReweBasketSnapshot(true).then((text) => {
+          if (!isSummaryOpen || token !== basketCheckToken) {
+            return;
+          }
+
+          isBasketLoading = false;
+          activeBasketText = text;
+          renderSummary();
+        });
+      } else {
+        isBasketLoading = false;
       }
     }
 
@@ -1498,7 +2019,10 @@
       const selected = getSelectedRecipeEntries();
       summaryCount.hidden = selected.length === 0;
       summaryCount.textContent = String(selected.length);
-      summaryMeta.textContent = `${selected.length} Rezept${selected.length === 1 ? "" : "e"} im Warenkorb${isCombineAll && portionScale > 1 ? ` · ${portionScale}x hochgerechnet` : ""}`;
+      summaryMeta.textContent = "";
+      summaryTools.hidden = !isSummaryFilterOpen;
+      summaryFilterButton.dataset.active = isSummaryFilterOpen ? "true" : "false";
+      summaryFilterButton.setAttribute("aria-expanded", isSummaryFilterOpen ? "true" : "false");
       portionScaleWrap.hidden = !isCombineAll;
       spiceToggle.checked = hideSpices;
 
@@ -1601,17 +2125,58 @@
       tableHead.innerHTML = "";
       tableBody.innerHTML = "";
 
-      const visibleHeaders = headers.filter((header) => header !== "Zutaten für 1 Portion");
       const ingredientColumnIndex = headers.indexOf("Zutaten für 1 Portion");
+      const linkColumnIndex = headers.indexOf("Link");
+      const kcalColumnIndex = headers.indexOf("kcal pro Portion");
+      const visibleColumnIndexes = headers
+        .map((_, index) => index)
+        .filter((index) => index !== ingredientColumnIndex);
+
+      if (linkColumnIndex !== -1 && kcalColumnIndex !== -1) {
+        const linkPosition = visibleColumnIndexes.indexOf(linkColumnIndex);
+        const kcalPosition = visibleColumnIndexes.indexOf(kcalColumnIndex);
+        if (linkPosition !== -1 && kcalPosition !== -1) {
+          [visibleColumnIndexes[linkPosition], visibleColumnIndexes[kcalPosition]] = [visibleColumnIndexes[kcalPosition], visibleColumnIndexes[linkPosition]];
+        }
+      }
 
       const headerRow = document.createElement("tr");
       const indexTh = document.createElement("th");
       indexTh.textContent = "#";
       headerRow.appendChild(indexTh);
 
-      visibleHeaders.forEach((header) => {
+      visibleColumnIndexes.forEach((columnIndex) => {
+        const header = headers[columnIndex];
         const th = document.createElement("th");
-        th.textContent = header;
+        if (columnIndex === linkColumnIndex) {
+          th.innerHTML = `
+            <div class="recipe-header">
+              <button
+                type="button"
+                class="filter-button"
+                data-action="toggle-table-filters"
+                data-active="${isFilterPopoverOpen ? "true" : "false"}"
+                aria-label="Filter anzeigen"
+                aria-expanded="${isFilterPopoverOpen ? "true" : "false"}"
+                title="Filter"
+              >
+                <i data-lucide="list-filter" aria-hidden="true"></i>
+              </button>
+              <div class="filter-popover" ${isFilterPopoverOpen ? "" : "hidden"}>
+                <label class="toggle">
+                  <input type="checkbox" data-filter-control="selection" ${isFiltered ? "checked" : ""}>
+                  Nur Auswahl anzeigen
+                </label>
+                <label class="toggle">
+                  <input type="checkbox" data-filter-control="warm-cold" ${cardToggle.checked ? "checked" : ""}>
+                  Warme / kalte Speisen
+                </label>
+              </div>
+            </div>
+          `;
+        } else {
+          th.textContent = header;
+        }
         headerRow.appendChild(th);
       });
       tableHead.appendChild(headerRow);
@@ -1624,15 +2189,12 @@
         indexTd.dataset.label = "#";
         tr.appendChild(indexTd);
 
-        row.forEach((cell, cellIndex) => {
-          if (cellIndex === ingredientColumnIndex) {
-            return;
-          }
-
+        visibleColumnIndexes.forEach((cellIndex) => {
+          const cell = row[cellIndex] || "";
           const td = document.createElement("td");
-          td.dataset.label = cellIndex === 1 ? "Rezept" : (headers[cellIndex] || "");
+          td.dataset.label = cellIndex === linkColumnIndex ? "Link" : (headers[cellIndex] || "");
           const link = extractCellLink(cell);
-          if (cellIndex === 1 && link) {
+          if (cellIndex === linkColumnIndex && link) {
             const wrapper = document.createElement("div");
             wrapper.className = "recipe-actions";
 
@@ -1718,7 +2280,7 @@
 
     function refreshSelection() {
       const pool = getSelectionPool();
-      const picked = pickRandomNumbers(10, pool.length);
+      const picked = pickRandomNumbers(5, pool.length);
       selectedRowIndexes = picked.map((position) => pool[position]);
       renderRandomRows(selectedRowIndexes);
       renderCurrentTable();
@@ -1738,6 +2300,7 @@
         allRows = rows;
         recipeRows = rows;
         refreshSelection();
+        renderWeekPlan();
         renderSummary();
       } catch (error) {
         statusEl.textContent = "Fehler beim Laden.";
@@ -1763,6 +2326,35 @@
       refreshSelection();
     });
 
+    tableHead.addEventListener("click", (event) => {
+      const filterButton = event.target.closest('[data-action="toggle-table-filters"]');
+      if (!filterButton) {
+        return;
+      }
+
+      isFilterPopoverOpen = !isFilterPopoverOpen;
+      renderCurrentTable();
+    });
+
+    tableHead.addEventListener("change", (event) => {
+      const control = event.target.closest("[data-filter-control]");
+      if (!control) {
+        return;
+      }
+
+      if (control.dataset.filterControl === "selection") {
+        filterToggle.checked = control.checked;
+        isFiltered = control.checked;
+        renderCurrentTable();
+        return;
+      }
+
+      if (control.dataset.filterControl === "warm-cold") {
+        cardToggle.checked = control.checked;
+        refreshSelection();
+      }
+    });
+
     tableBody.addEventListener("click", (event) => {
       const button = event.target.closest(".cart-toggle");
       if (!button) {
@@ -1775,6 +2367,63 @@
       }
 
       toggleCart(rowIndex);
+    });
+
+    weekPlan.addEventListener("dragstart", (event) => {
+      const item = event.target.closest(".week-plan-item");
+      if (!item) {
+        return;
+      }
+
+      event.dataTransfer.effectAllowed = "move";
+      event.dataTransfer.setData("text/plain", item.dataset.rowIndex || "");
+    });
+
+    weekPlan.addEventListener("dragover", (event) => {
+      autoScrollWeekPlan(event);
+      const column = event.target.closest(".week-plan-column");
+      if (!column) {
+        return;
+      }
+
+      event.preventDefault();
+      column.dataset.dragOver = "true";
+    });
+
+    weekPlan.addEventListener("dragleave", (event) => {
+      const column = event.target.closest(".week-plan-column");
+      if (!column || column.contains(event.relatedTarget)) {
+        return;
+      }
+
+      column.dataset.dragOver = "false";
+    });
+
+    weekPlan.addEventListener("drop", (event) => {
+      const column = event.target.closest(".week-plan-column");
+      if (!column) {
+        return;
+      }
+
+      event.preventDefault();
+      column.dataset.dragOver = "false";
+      const rowIndex = event.dataTransfer.getData("text/plain");
+      const slot = Number(column.dataset.slot);
+      if (!rowIndex || Number.isNaN(slot)) {
+        return;
+      }
+
+      weekPlanState[rowIndex] = slot;
+      saveWeekPlanState();
+      renderWeekPlan();
+    });
+
+    weekPlanScrollButton.addEventListener("click", () => {
+      scrollWeekPlanToOppositeSide();
+    });
+
+    window.addEventListener("resize", () => {
+      updateWeekPlanScrollButton();
     });
 
     summaryContent.addEventListener("click", (event) => {
@@ -1826,29 +2475,44 @@
       setSummaryVisibility(!isSummaryOpen);
     });
 
-    selectionCartButton.addEventListener("click", () => {
-      if (selectedRowIndexes.length === 0) {
-        return;
-      }
+    summaryCount.addEventListener("animationend", () => {
+      summaryCount.dataset.animate = "";
+    });
 
-      addSelectionToCart();
-      setSummaryVisibility(true);
+    summaryFilterButton.addEventListener("click", () => {
+      isSummaryFilterOpen = !isSummaryFilterOpen;
+      renderSummary();
+    });
+
+    selectionCartButton.addEventListener("click", () => {
+      runMagicSelection();
     });
 
     basketPrompt.addEventListener("click", (event) => {
       const button = event.target.closest("button[data-action]");
-      if (!button || !pendingBasketItem) {
+      if (!button || !pendingPrompt) {
         return;
       }
 
       if (button.dataset.action === "confirm") {
-        setIngredientPurchasedFromKey(pendingBasketItem.globalKey, true);
-        clearPendingBasketItem();
+        if (pendingPrompt.type === "basket") {
+          setIngredientPurchasedFromKey(pendingPrompt.globalKey, true);
+          clearPendingPrompt();
+          return;
+        }
+
+        if (pendingPrompt.type === "overwrite") {
+          clearPendingPrompt();
+          runMagicSelection({ overwrite: true });
+          return;
+        }
+
+        clearPendingPrompt();
         return;
       }
 
       if (button.dataset.action === "cancel") {
-        clearPendingBasketItem();
+        clearPendingPrompt();
       }
     });
 
@@ -1875,12 +2539,20 @@
 
     clearCartButton.addEventListener("click", () => {
       cartState = {};
+      weekPlanState = {};
       purchasedState = {};
       excludedState = {};
+      activeBasketText = "";
+      isBasketLoading = false;
+      reweBasketSnapshot.text = "";
+      reweBasketSnapshot.fetchedAt = 0;
+      clearPendingPrompt();
       saveCartState();
+      saveWeekPlanState();
       saveBooleanMap(PURCHASED_STORAGE_KEY, purchasedState);
       saveBooleanMap(EXCLUDED_STORAGE_KEY, excludedState);
       renderCurrentTable();
+      renderWeekPlan();
       renderSummary();
     });
 
