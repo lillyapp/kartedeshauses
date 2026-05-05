@@ -358,6 +358,30 @@
       line-height: 1.55;
     }
 
+    .summary-ingredients {
+      display: grid;
+      gap: 6px;
+      margin: 0;
+      padding: 0;
+      list-style: none;
+      font-size: 13px;
+      line-height: 1.5;
+    }
+
+    .summary-ingredients li {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 12px;
+      border-bottom: 1px dotted rgba(0, 0, 0, 0.18);
+      padding-bottom: 6px;
+    }
+
+    .summary-ingredients-item {
+      min-width: 0;
+      flex: 1;
+    }
+
     .summary-aggregate {
       display: grid;
       gap: 6px;
@@ -945,41 +969,51 @@
       return String(rounded).replace(/\.0+$/, "").replace(/(\.\d*[1-9])0+$/, "$1");
     }
 
+    function formatIngredientLabel(item, scale = 1) {
+      const quantity = item.quantity === null ? "" : `${formatAmount(item.quantity * scale)} `;
+      const unit = item.unit ? `${item.unit} ` : "";
+      return `${quantity}${unit}${item.name}`.trim();
+    }
+
+    function getIngredientsForRow(row, scale = 1) {
+      const ingredientCell = row[2] || "";
+      return ingredientCell
+        .split(/<br\s*\/?>/i)
+        .map((part) => part.trim())
+        .filter(Boolean)
+        .map((line) => {
+          const parsed = parseIngredientLine(line);
+          return {
+            ...parsed,
+            label: formatIngredientLabel(parsed, scale)
+          };
+        });
+    }
+
     function mergeIngredientDetails(rows, scale = 1) {
       const grouped = new Map();
 
       rows.forEach(({ row }) => {
-        const ingredientCell = row[2] || "";
-        ingredientCell
-          .split(/<br\s*\/?>/i)
-          .map((part) => part.trim())
-          .filter(Boolean)
-          .forEach((line) => {
-            const parsed = parseIngredientLine(line);
-            const existing = grouped.get(parsed.key);
-            if (!existing) {
-              grouped.set(parsed.key, { ...parsed, quantity: parsed.quantity || null, recipes: new Set() });
-              return;
-            }
+        getIngredientsForRow(row).forEach((parsed) => {
+          const existing = grouped.get(parsed.key);
+          if (!existing) {
+            grouped.set(parsed.key, { ...parsed, quantity: parsed.quantity || null, recipes: new Set() });
+            return;
+          }
 
-            existing.recipes = existing.recipes || new Set();
-            if (parsed.quantity !== null && existing.quantity !== null && parsed.unit === existing.unit) {
-              existing.quantity += parsed.quantity;
-            } else if (existing.quantity === null && parsed.quantity !== null) {
-              existing.quantity = parsed.quantity;
-            }
-          });
+          existing.recipes = existing.recipes || new Set();
+          if (parsed.quantity !== null && existing.quantity !== null && parsed.unit === existing.unit) {
+            existing.quantity += parsed.quantity;
+          } else if (existing.quantity === null && parsed.quantity !== null) {
+            existing.quantity = parsed.quantity;
+          }
+        });
       });
 
-      return Array.from(grouped.values()).map((item) => {
-        const quantity = item.quantity === null ? "" : `${formatAmount(item.quantity * scale)} `;
-        const unit = item.unit ? `${item.unit} ` : "";
-        const label = `${quantity}${unit}${item.name}`.trim();
-        return {
-          ...item,
-          label
-        };
-      }).sort((a, b) => a.label.localeCompare(b.label, "de"));
+      return Array.from(grouped.values()).map((item) => ({
+        ...item,
+        label: formatIngredientLabel(item, scale)
+      })).sort((a, b) => a.label.localeCompare(b.label, "de"));
     }
 
     function mergeIngredients(rows, scale = 1) {
@@ -1125,10 +1159,22 @@
 
       summaryContent.innerHTML = "";
       selected.forEach(({ row }) => {
+        const items = getIngredientsForRow(row, 1);
         const section = document.createElement("section");
         section.className = "summary-card";
-        section.innerHTML = `<h3>${row[0]}</h3>`;
+        section.innerHTML = `
+          <h3>${row[0]}</h3>
+          <ul class="summary-ingredients">
+            ${items.map((item) => `
+              <li>
+                <span class="summary-ingredients-item">${item.label}</span>
+                <span class="rewe-badge" hidden aria-label="Bei REWE gefunden" title="Bei REWE gefunden"></span>
+              </li>
+            `).join("")}
+          </ul>
+        `;
         summaryContent.appendChild(section);
+        refreshReweBadges(section, items, renderToken);
       });
     }
 
