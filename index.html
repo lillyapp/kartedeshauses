@@ -53,17 +53,7 @@
     }
 
     .random-row {
-      display: inline-flex;
-      flex-wrap: wrap;
-      gap: 8px;
-      font-size: 15px;
-      font-weight: 700;
-      letter-spacing: 0.02em;
-    }
-
-    .random-row span {
-      display: inline-block;
-      padding: 2px 0;
+      display: none;
     }
 
     .controls {
@@ -79,6 +69,7 @@
       right: 18px;
       z-index: 20;
       display: flex;
+      align-items: center;
       gap: 8px;
     }
 
@@ -107,6 +98,14 @@
       width: 17px;
       height: 17px;
       stroke-width: 1.9;
+    }
+
+    #selectionCartButton,
+    .top-actions > a.icon-button {
+      border: 0;
+      background: transparent;
+      box-shadow: none;
+      padding: 0;
     }
 
     #summaryButton {
@@ -574,24 +573,16 @@
     <h1>KARTE DES HAUSES</h1>
     <div class="top-actions">
       <button id="selectionCartButton" class="icon-button" type="button" aria-label="Auswahl in den Warenkorb legen" title="Auswahl in den Warenkorb legen">
-        <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
-          <path d="M5 19h14"></path>
-          <path d="M8 16l8-8 2 2-8 8H8v-2z"></path>
-          <path d="M14.5 6.5l2 2"></path>
-          <path d="M11 11l2 2"></path>
-        </svg>
+        <i data-lucide="wand-sparkles" aria-hidden="true"></i>
       </button>
       <a class="icon-button" href="https://account.rewe.de/realms/sso/protocol/openid-connect/auth?response_type=code&client_id=ecom&scope=openid%20profile&state=6pX-affIVEX-YblZbZXGS1k16wcIwiqp0Q24jo8llV0%3D&redirect_uri=https://www.rewe.de/login/oauth2/code/sso&nonce=5a0WIhTJB9LhN0L8jHdRabYR_By2KLcZrACfKT7ENow&code_challenge=SznV9eLZlrdAvYyxbZnDQVewk7q0lBBnoLiV6Yq-w3I&code_challenge_method=S256" aria-label="REWE Login öffnen" title="REWE Login öffnen">
         <i data-lucide="arrow-up-right" aria-hidden="true"></i>
       </a>
       <button id="summaryButton" class="icon-button" type="button" aria-label="Warenkorb öffnen" aria-expanded="false" title="Warenkorb öffnen">
         <i data-lucide="receipt-text" aria-hidden="true"></i>
-        <span id="summaryCount" class="icon-badge" hidden>0</span>
       </button>
-    </div>
-    <div class="meta">
-      <strong>Auswahl der Rezepte:</strong>
-      <div id="randomRows" class="random-row"></div>
+      <span id="summaryCount" class="icon-badge" hidden>0</span>
+      <div id="randomRows" class="random-row" hidden></div>
     </div>
     <div class="controls">
       <label class="toggle">
@@ -671,8 +662,8 @@
     const SPICE_FILTER_STORAGE_KEY = "recipe-cart-spice-filter-v1";
     const PURCHASED_STORAGE_KEY = "recipe-cart-purchased-v1";
     const EXCLUDED_STORAGE_KEY = "recipe-cart-excluded-v1";
-    const REWE_SEARCH_BASE_URL = "https://www.rewe.de/suche/uebersicht?searchTerm=";
-    const REWE_PROXY_BASE_URL = "https://r.jina.ai/http://www.rewe.de/suche/uebersicht?searchTerm=";
+    const REWE_SEARCH_BASE_URL = "https://www.rewe.de/shop/productList?search=";
+    const REWE_PROXY_BASE_URL = "https://r.jina.ai/http://www.rewe.de/shop/productList?search=";
     let allHeaders = [];
     let allRows = [];
     let recipeRows = [];
@@ -1019,6 +1010,11 @@
       ].some((term) => name === term || name.includes(term));
     }
 
+    function isAlwaysOmittedIngredient(item) {
+      const name = (item.name || "").toLowerCase().trim();
+      return name === "wasser";
+    }
+
     function getRecipeKey(rowIndex) {
       return String(rowIndex);
     }
@@ -1181,7 +1177,7 @@
     }
 
     function shouldHideIngredient(item) {
-      return hideSpices && isSpiceIngredient(item);
+      return isAlwaysOmittedIngredient(item) || (hideSpices && isSpiceIngredient(item));
     }
 
     function getIngredientsForRow(row, rowIndex, scale = 1) {
@@ -1304,7 +1300,7 @@
             }
 
             const text = await response.text();
-            if (!/nichts gefunden/i.test(text)) {
+            if (!/keine Treffer/i.test(text)) {
               reweAvailabilityCache.set(cacheKey, true);
               return true;
             }
