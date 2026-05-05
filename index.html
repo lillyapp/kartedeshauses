@@ -1671,7 +1671,7 @@
 
     function openReweSearchForItem(itemName) {
       const normalized = itemName.trim();
-      const term = /^ja!/i.test(normalized) ? normalized : `JA! ${normalized}&sorting=PRICE_ASC`;
+      const term = /^ja!/i.test(normalized) ? normalized : `JA! ${normalized}` + "&sorting=PRICE_ASC";
       window.open(`${REWE_SEARCH_BASE_URL}${encodeURIComponent(term)}`, "_blank", "noopener,noreferrer");
     }
 
