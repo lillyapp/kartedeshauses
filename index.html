@@ -108,6 +108,23 @@
       stroke-width: 1.9;
     }
 
+    #summaryButton {
+      border: 0;
+      background: transparent;
+      box-shadow: none;
+      padding: 0;
+      min-width: 0;
+      min-height: 0;
+      width: 28px;
+      height: 28px;
+      border-radius: 999px;
+    }
+
+    #summaryButton:hover,
+    #summaryButton:focus-visible {
+      background: rgba(0, 0, 0, 0.06);
+    }
+
     .icon-badge {
       display: inline-flex;
       align-items: center;
@@ -354,6 +371,35 @@
     .summary-aggregate li {
       border-bottom: 1px dotted rgba(0, 0, 0, 0.18);
       padding-bottom: 6px;
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 12px;
+    }
+
+    .summary-aggregate-item {
+      min-width: 0;
+      flex: 1;
+    }
+
+    .rewe-badge {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 18px;
+      height: 18px;
+      flex: none;
+      color: var(--success);
+    }
+
+    .rewe-badge svg {
+      width: 18px;
+      height: 18px;
+      stroke-width: 2.2;
+      fill: none;
+      stroke: currentColor;
+      stroke-linecap: round;
+      stroke-linejoin: round;
     }
 
     .summary-empty {
@@ -452,7 +498,7 @@
   <main>
     <h1>KARTE DES HAUSES</h1>
     <div class="top-actions">
-      <button id="summaryButton" class="icon-button" type="button" aria-label="Rezeptübersicht öffnen" aria-expanded="false" title="Rezeptübersicht öffnen">
+      <button id="summaryButton" class="icon-button" type="button" aria-label="Warenkorb öffnen" aria-expanded="false" title="Warenkorb öffnen">
         <i data-lucide="receipt-text" aria-hidden="true"></i>
         <span id="summaryCount" class="icon-badge" hidden>0</span>
       </button>
@@ -471,13 +517,13 @@
         Warme / kalte Speisen
       </label>
     </div>
-    <section id="summaryPanel" class="summary-panel" hidden aria-label="Rezeptübersicht">
+    <section id="summaryPanel" class="summary-panel" hidden aria-label="Warenkorb">
       <div class="summary-header">
         <div>
-          <h2 class="summary-title">Rezept-Übersicht</h2>
+          <h2 class="summary-title">Warenkorb</h2>
           <p id="summaryMeta" class="summary-subtitle"></p>
         </div>
-        <button id="summaryCloseButton" class="icon-button" type="button" aria-label="Übersicht schließen" title="Übersicht schließen">
+        <button id="summaryCloseButton" class="icon-button" type="button" aria-label="Warenkorb schließen" title="Warenkorb schließen">
           <i data-lucide="x" aria-hidden="true"></i>
         </button>
       </div>
@@ -530,6 +576,8 @@
     const clearCartButton = document.getElementById("clearCartButton");
 
     const PORTION_SCALE_STORAGE_KEY = "recipe-cart-portion-scale-v1";
+    const REWE_SEARCH_BASE_URL = "https://www.rewe.de/suche/uebersicht?searchTerm=";
+    const REWE_PROXY_BASE_URL = "https://r.jina.ai/http://www.rewe.de/suche/uebersicht?searchTerm=";
     let allHeaders = [];
     let allRows = [];
     let recipeRows = [];
@@ -541,6 +589,8 @@
     let isSummaryOpen = false;
     let isCombineAll = false;
     let portionScale = loadPortionScale();
+    let summaryRenderToken = 0;
+    const reweAvailabilityCache = new Map();
 
     function splitMarkdownRow(line) {
       return line
@@ -895,7 +945,7 @@
       return String(rounded).replace(/\.0+$/, "").replace(/(\.\d*[1-9])0+$/, "$1");
     }
 
-    function mergeIngredients(rows, scale = 1) {
+    function mergeIngredientDetails(rows, scale = 1) {
       const grouped = new Map();
 
       rows.forEach(({ row }) => {
@@ -924,8 +974,95 @@
       return Array.from(grouped.values()).map((item) => {
         const quantity = item.quantity === null ? "" : `${formatAmount(item.quantity * scale)} `;
         const unit = item.unit ? `${item.unit} ` : "";
-        return `${quantity}${unit}${item.name}`.trim();
-      }).sort((a, b) => a.localeCompare(b, "de"));
+        const label = `${quantity}${unit}${item.name}`.trim();
+        return {
+          ...item,
+          label
+        };
+      }).sort((a, b) => a.label.localeCompare(b.label, "de"));
+    }
+
+    function mergeIngredients(rows, scale = 1) {
+      return mergeIngredientDetails(rows, scale).map((item) => item.label);
+    }
+
+    function buildReweSearchTerms(item) {
+      const term = item.name.trim();
+      const terms = [term];
+      if (!/^ja!/i.test(term)) {
+        terms.push(`JA! ${term}`);
+      }
+      return terms;
+    }
+
+    async function checkReweAvailability(item) {
+      const cacheKey = item.key;
+      if (reweAvailabilityCache.has(cacheKey)) {
+        return reweAvailabilityCache.get(cacheKey);
+      }
+
+      const terms = buildReweSearchTerms(item);
+      for (const term of terms) {
+        const urls = [
+          `${REWE_SEARCH_BASE_URL}${encodeURIComponent(term)}`,
+          `${REWE_PROXY_BASE_URL}${encodeURIComponent(term)}`
+        ];
+
+        for (const url of urls) {
+          try {
+            const response = await fetch(url, { cache: "no-store" });
+            if (!response.ok) {
+              continue;
+            }
+
+            const text = await response.text();
+            if (!/Das haben wir nicht gefunden/i.test(text)) {
+              reweAvailabilityCache.set(cacheKey, true);
+              return true;
+            }
+          } catch (error) {
+            // Try the next URL/term.
+          }
+        }
+      }
+
+      reweAvailabilityCache.set(cacheKey, false);
+      return false;
+    }
+
+    function renderReweBadge(span, available) {
+      if (!span) {
+        return;
+      }
+
+      span.hidden = !available;
+      if (!available) {
+        return;
+      }
+
+      span.innerHTML = `
+        <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+          <circle cx="12" cy="12" r="9"></circle>
+          <path d="M8.5 12.3 10.8 14.6 15.8 9.4"></path>
+        </svg>
+      `;
+    }
+
+    async function refreshReweBadges(card, items, token) {
+      const badges = Array.from(card.querySelectorAll(".rewe-badge"));
+      await Promise.all(items.map(async (item, index) => {
+        const badge = badges[index];
+        if (!badge) {
+          return;
+        }
+
+        const available = await checkReweAvailability(item);
+        if (token !== summaryRenderToken || !badge.isConnected) {
+          return;
+        }
+
+        renderReweBadge(badge, available);
+      }));
     }
 
     function getSelectedRecipeEntries() {
@@ -954,6 +1091,7 @@
     }
 
     function renderSummary() {
+      const renderToken = ++summaryRenderToken;
       const selected = getSelectedRecipeEntries();
       summaryCount.hidden = selected.length === 0;
       summaryCount.textContent = String(selected.length);
@@ -966,17 +1104,22 @@
       }
 
       if (isCombineAll) {
-        const merged = mergeIngredients(selected, portionScale);
+        const merged = mergeIngredientDetails(selected, portionScale);
         const section = document.createElement("section");
         section.className = "summary-card";
         section.innerHTML = `
-          <h3>Zusammengefasste Einkaufsliste</h3>
           <ul class="summary-aggregate">
-            ${merged.map((item) => `<li>${item}</li>`).join("")}
+            ${merged.map((item) => `
+              <li>
+                <span class="summary-aggregate-item">${item.label}</span>
+                <span class="rewe-badge" hidden aria-label="Bei REWE gefunden" title="Bei REWE gefunden"></span>
+              </li>
+            `).join("")}
           </ul>
         `;
         summaryContent.innerHTML = "";
         summaryContent.appendChild(section);
+        refreshReweBadges(section, merged, renderToken);
         return;
       }
 
