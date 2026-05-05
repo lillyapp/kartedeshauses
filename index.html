@@ -291,6 +291,23 @@
       accent-color: var(--success);
     }
 
+    .summary-portion {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 13px;
+    }
+
+    .summary-portion input {
+      width: 72px;
+      padding: 8px 10px;
+      border: 1px solid var(--line);
+      background: var(--card-bg);
+      color: var(--text);
+      border-radius: 10px;
+      font: inherit;
+    }
+
     .summary-list {
       display: grid;
       gap: 12px;
@@ -463,6 +480,10 @@
           <input id="combineToggle" type="checkbox">
           Alles zusammenfassen
         </label>
+        <label id="portionScaleWrap" class="summary-portion" hidden>
+          Portionen
+          <input id="portionScale" type="number" min="1" step="1" value="1" inputmode="numeric">
+        </label>
         <button id="clearCartButton" type="button">Alle entfernen</button>
       </div>
       <div id="summaryContent" class="summary-list"></div>
@@ -498,8 +519,11 @@
     const summaryMeta = document.getElementById("summaryMeta");
     const summaryContent = document.getElementById("summaryContent");
     const combineToggle = document.getElementById("combineToggle");
+    const portionScaleWrap = document.getElementById("portionScaleWrap");
+    const portionScaleInput = document.getElementById("portionScale");
     const clearCartButton = document.getElementById("clearCartButton");
 
+    const PORTION_SCALE_STORAGE_KEY = "recipe-cart-portion-scale-v1";
     let allHeaders = [];
     let allRows = [];
     let recipeRows = [];
@@ -510,6 +534,7 @@
     let cartState = loadCartState();
     let isSummaryOpen = false;
     let isCombineAll = false;
+    let portionScale = loadPortionScale();
 
     function splitMarkdownRow(line) {
       return line
@@ -731,6 +756,20 @@
       localStorage.setItem(CART_STORAGE_KEY, JSON.stringify(cartState));
     }
 
+    function loadPortionScale() {
+      try {
+        const raw = localStorage.getItem(PORTION_SCALE_STORAGE_KEY);
+        const parsed = Number.parseInt(raw || "1", 10);
+        return Number.isFinite(parsed) && parsed > 0 ? parsed : 1;
+      } catch (error) {
+        return 1;
+      }
+    }
+
+    function savePortionScale() {
+      localStorage.setItem(PORTION_SCALE_STORAGE_KEY, String(portionScale));
+    }
+
     function getRecipeKey(rowIndex) {
       return String(rowIndex);
     }
@@ -850,7 +889,7 @@
       return String(rounded).replace(/\.0+$/, "").replace(/(\.\d*[1-9])0+$/, "$1");
     }
 
-    function mergeIngredients(rows) {
+    function mergeIngredients(rows, scale = 1) {
       const grouped = new Map();
 
       rows.forEach(({ row }) => {
@@ -877,7 +916,7 @@
       });
 
       return Array.from(grouped.values()).map((item) => {
-        const quantity = item.quantity === null ? "" : `${formatAmount(item.quantity)} `;
+        const quantity = item.quantity === null ? "" : `${formatAmount(item.quantity * scale)} `;
         const unit = item.unit ? `${item.unit} ` : "";
         return `${quantity}${unit}${item.name}`.trim();
       }).sort((a, b) => a.localeCompare(b, "de"));
@@ -900,6 +939,9 @@
       summaryPanel.hidden = !visible;
       summaryButton.dataset.active = visible ? "true" : "false";
       summaryButton.setAttribute("aria-expanded", visible ? "true" : "false");
+      if (portionScaleInput.value !== String(portionScale)) {
+        portionScaleInput.value = String(portionScale);
+      }
       if (visible) {
         renderSummary();
       }
@@ -909,7 +951,8 @@
       const selected = getSelectedRecipeEntries();
       summaryCount.hidden = selected.length === 0;
       summaryCount.textContent = String(selected.length);
-      summaryMeta.textContent = `${selected.length} Rezept${selected.length === 1 ? "" : "e"} im Warenkorb`;
+      summaryMeta.textContent = `${selected.length} Rezept${selected.length === 1 ? "" : "e"} im Warenkorb${isCombineAll && portionScale > 1 ? ` · ${portionScale}x hochgerechnet` : ""}`;
+      portionScaleWrap.hidden = !isCombineAll;
 
       if (selected.length === 0) {
         summaryContent.innerHTML = '<p class="summary-empty">Noch keine Rezepte im Warenkorb. Klick den Warenkorb neben einem Rezept an, um Zutaten zu sammeln.</p>';
@@ -917,7 +960,7 @@
       }
 
       if (isCombineAll) {
-        const merged = mergeIngredients(selected);
+        const merged = mergeIngredients(selected, portionScale);
         const section = document.createElement("section");
         section.className = "summary-card";
         section.innerHTML = `
@@ -1122,6 +1165,16 @@
     combineToggle.addEventListener("change", () => {
       isCombineAll = combineToggle.checked;
       renderSummary();
+    });
+
+    portionScaleInput.addEventListener("change", () => {
+      const parsed = Number.parseInt(portionScaleInput.value, 10);
+      portionScale = Number.isFinite(parsed) && parsed > 0 ? parsed : 1;
+      portionScaleInput.value = String(portionScale);
+      savePortionScale();
+      if (isSummaryOpen) {
+        renderSummary();
+      }
     });
 
     clearCartButton.addEventListener("click", () => {
