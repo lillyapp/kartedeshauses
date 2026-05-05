@@ -10,6 +10,8 @@
       --fg: #000000;
       --muted: #6b6b6b;
       --line: #000000;
+      --success: #138a36;
+      --panel-bg: #ffffff;
     }
 
     html, body {
@@ -71,6 +73,56 @@
       margin: 12px 0 18px;
     }
 
+    .top-actions {
+      position: fixed;
+      top: 18px;
+      right: 18px;
+      z-index: 20;
+      display: flex;
+      gap: 8px;
+    }
+
+    .icon-button {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      min-width: 42px;
+      min-height: 42px;
+      padding: 0 12px;
+      border: 1px solid var(--line);
+      background: var(--bg);
+      color: var(--fg);
+      box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.65) inset;
+    }
+
+    .icon-button[data-active="true"] {
+      background: #eaf8ee;
+      border-color: var(--success);
+      color: var(--success);
+    }
+
+    .icon-button svg {
+      width: 17px;
+      height: 17px;
+      stroke-width: 1.9;
+    }
+
+    .icon-badge {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-width: 18px;
+      height: 18px;
+      padding: 0 5px;
+      border-radius: 999px;
+      background: var(--success);
+      color: #fff;
+      font-size: 11px;
+      font-weight: 700;
+      line-height: 1;
+    }
+
     button {
       appearance: none;
       border: 1px solid var(--line);
@@ -126,6 +178,148 @@
       width: 15px;
       height: 15px;
       stroke-width: 1.9;
+    }
+
+    .recipe-actions {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      white-space: nowrap;
+    }
+
+    .cart-toggle {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 28px;
+      height: 28px;
+      border: 1px solid var(--line);
+      background: var(--bg);
+      color: var(--fg);
+    }
+
+    .cart-toggle:hover,
+    .cart-toggle:focus-visible {
+      background: #f5f5f5;
+    }
+
+    .cart-toggle[data-active="true"] {
+      background: #eaf8ee;
+      border-color: var(--success);
+      color: var(--success);
+    }
+
+    .cart-toggle svg {
+      width: 15px;
+      height: 15px;
+      stroke-width: 2;
+    }
+
+    .summary-panel {
+      position: fixed;
+      top: 18px;
+      right: 18px;
+      z-index: 30;
+      width: min(460px, calc(100vw - 36px));
+      max-height: calc(100vh - 36px);
+      overflow: auto;
+      border: 1px solid var(--line);
+      background: var(--panel-bg);
+      box-shadow: 0 18px 50px rgba(0, 0, 0, 0.12);
+      padding: 16px;
+    }
+
+    .summary-panel[hidden] {
+      display: none;
+    }
+
+    .summary-header {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 12px;
+      margin-bottom: 14px;
+    }
+
+    .summary-title {
+      font-size: 16px;
+      font-weight: 700;
+      margin: 0;
+    }
+
+    .summary-subtitle {
+      margin: 4px 0 0;
+      color: var(--muted);
+      font-size: 12px;
+      line-height: 1.4;
+    }
+
+    .summary-tools {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin: 10px 0 14px;
+    }
+
+    .summary-toggle {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 13px;
+    }
+
+    .summary-toggle input {
+      margin: 0;
+      accent-color: var(--success);
+    }
+
+    .summary-list {
+      display: grid;
+      gap: 12px;
+    }
+
+    .summary-card {
+      border-top: 1px solid var(--line);
+      padding-top: 12px;
+    }
+
+    .summary-card:first-child {
+      border-top: 0;
+      padding-top: 0;
+    }
+
+    .summary-card h3 {
+      margin: 0 0 6px;
+      font-size: 14px;
+    }
+
+    .summary-card ul {
+      margin: 0;
+      padding-left: 18px;
+      font-size: 13px;
+      line-height: 1.55;
+    }
+
+    .summary-aggregate {
+      display: grid;
+      gap: 6px;
+      margin: 0;
+      padding: 0;
+      list-style: none;
+      font-size: 13px;
+      line-height: 1.5;
+    }
+
+    .summary-aggregate li {
+      border-bottom: 1px dotted rgba(0, 0, 0, 0.18);
+      padding-bottom: 6px;
+    }
+
+    .summary-empty {
+      color: var(--muted);
+      font-size: 13px;
+      line-height: 1.5;
+      margin: 0;
     }
 
     .sr-only {
@@ -216,6 +410,12 @@
 <body>
   <main>
     <h1>KARTE DES HAUSES</h1>
+    <div class="top-actions">
+      <button id="summaryButton" class="icon-button" type="button" aria-label="Rezeptübersicht öffnen" title="Rezeptübersicht öffnen">
+        <i data-lucide="receipt-text" aria-hidden="true"></i>
+        <span id="summaryCount" class="icon-badge" hidden>0</span>
+      </button>
+    </div>
     <div class="meta">
       <strong>Auswahl der Rezepte:</strong>
       <div id="randomRows" class="random-row"></div>
@@ -240,11 +440,32 @@
     </div>
   </main>
 
+  <aside id="summaryPanel" class="summary-panel" hidden aria-label="Rezeptübersicht">
+    <div class="summary-header">
+      <div>
+        <h2 class="summary-title">Rezept-Übersicht</h2>
+        <p id="summaryMeta" class="summary-subtitle"></p>
+      </div>
+      <button id="summaryCloseButton" class="icon-button" type="button" aria-label="Übersicht schließen" title="Übersicht schließen">
+        <i data-lucide="x" aria-hidden="true"></i>
+      </button>
+    </div>
+    <div class="summary-tools">
+      <label class="summary-toggle">
+        <input id="combineToggle" type="checkbox">
+        Alles zusammenfassen
+      </label>
+      <button id="clearCartButton" type="button">Alle entfernen</button>
+    </div>
+    <div id="summaryContent" class="summary-list"></div>
+  </aside>
+
   <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
 
   <script>
     const DEFAULT_SOURCE = "./data.md";
     const sourceUrl = new URLSearchParams(window.location.search).get("source") || DEFAULT_SOURCE;
+    const CART_STORAGE_KEY = "recipe-cart-state-v1";
 
     const randomRowsEl = document.getElementById("randomRows");
     const filterToggle = document.getElementById("filterToggle");
@@ -253,13 +474,25 @@
     const errorEl = document.getElementById("error");
     const tableHead = document.getElementById("tableHead");
     const tableBody = document.getElementById("tableBody");
+    const summaryButton = document.getElementById("summaryButton");
+    const summaryCount = document.getElementById("summaryCount");
+    const summaryPanel = document.getElementById("summaryPanel");
+    const summaryCloseButton = document.getElementById("summaryCloseButton");
+    const summaryMeta = document.getElementById("summaryMeta");
+    const summaryContent = document.getElementById("summaryContent");
+    const combineToggle = document.getElementById("combineToggle");
+    const clearCartButton = document.getElementById("clearCartButton");
 
     let allHeaders = [];
     let allRows = [];
+    let recipeRows = [];
     let selectedRowIndexes = [];
     let isFiltered = true;
     const WARM_COLD_START_INDEX = 6;
     const WARM_COLD_END_INDEX = 28;
+    let cartState = loadCartState();
+    let isSummaryOpen = false;
+    let isCombineAll = false;
 
     function splitMarkdownRow(line) {
       return line
@@ -321,6 +554,244 @@
       return null;
     }
 
+    function getStoredCart() {
+      try {
+        const raw = localStorage.getItem(CART_STORAGE_KEY);
+        return raw ? JSON.parse(raw) : {};
+      } catch (error) {
+        return {};
+      }
+    }
+
+    function loadCartState() {
+      return getStoredCart();
+    }
+
+    function saveCartState() {
+      localStorage.setItem(CART_STORAGE_KEY, JSON.stringify(cartState));
+    }
+
+    function getRecipeKey(rowIndex) {
+      return String(rowIndex);
+    }
+
+    function isInCart(rowIndex) {
+      return Boolean(cartState[getRecipeKey(rowIndex)]);
+    }
+
+    function setCartState(rowIndex, active) {
+      const key = getRecipeKey(rowIndex);
+      if (active) {
+        cartState[key] = true;
+      } else {
+        delete cartState[key];
+      }
+      saveCartState();
+      renderCurrentTable();
+      renderSummary();
+    }
+
+    function toggleCart(rowIndex) {
+      setCartState(rowIndex, !isInCart(rowIndex));
+    }
+
+    function parseFractionToken(token) {
+      const FRACTIONS = {
+        "1/2": 0.5,
+        "1/4": 0.25,
+        "3/4": 0.75,
+        "1/3": 1 / 3,
+        "2/3": 2 / 3,
+        "1/8": 0.125,
+        "3/8": 0.375,
+        "5/8": 0.625,
+        "7/8": 0.875
+      };
+
+      if (FRACTIONS[token] !== undefined) {
+        return FRACTIONS[token];
+      }
+
+      if (/^\d+(?:\.\d+)?$/.test(token)) {
+        return Number(token);
+      }
+
+      return null;
+    }
+
+    function parseIngredientLine(line) {
+      const cleanLine = line.replace(/\s+\(zum Servieren\)|\s+\(optional\)|\s+\(zum Garnieren\)|\s+\(zum Anbraten\)|\s+\(zum Bestäuben\)/gi, "").trim();
+      const match = cleanLine.match(/^((?:\d+\s+)?(?:\d+\/\d+|\d+(?:\.\d+)?)|[¼½¾⅓⅔⅛⅜⅝⅞])\s+(.+)$/);
+      if (!match) {
+        return {
+          quantity: null,
+          unit: "",
+          name: cleanLine,
+          key: cleanLine.toLowerCase()
+        };
+      }
+
+      const rawQuantity = match[1].trim();
+      const rest = match[2].trim();
+      const quantityParts = rawQuantity.split(/\s+/);
+      let quantity = 0;
+      quantityParts.forEach((part) => {
+        const parsed = parseFractionToken(part);
+        if (parsed !== null) {
+          quantity += parsed;
+        }
+      });
+
+      if (!quantity) {
+        quantity = parseFractionToken(rawQuantity);
+      }
+
+      const countUnits = new Set([
+        "Ei", "Eier", "Zehe", "Zehen", "Zwiebel", "Zwiebeln", "Banane", "Bananen", "Birne", "Birnen",
+        "Tomate", "Tomaten", "Kiwi", "Kiwis", "Avocado", "Avocados", "Limette", "Limetten",
+        "Zitrone", "Zitronen", "Karotte", "Karotten", "Kartoffel", "Kartoffeln", "Scheibe", "Scheiben",
+        "Stange", "Stangen", "Zweig", "Zweige", "Blatt", "Blätter", "Stück", "Stueck", "Dose", "Dosen",
+        "Packung", "Packungen", "Handvoll", "Brötchen", "Brötchen", "Paprika", "Pitabrote", "Würstchen",
+        "Wiener", "Hähnchenbrustfilets", "Tortellini", "Gnocchi", "Hot-Dog-Brötchen", "Süßkartoffeln",
+        "Karotten", "Rote Bete", "Zucchini", "Kichererbsen", "Essiggurken", "Sandwich", "Roggenbrot"
+      ]);
+
+      const restParts = rest.split(/\s+/);
+      const firstWord = restParts[0];
+      let unit = "";
+      let name = rest;
+
+      if (/^(g|kg|ml|l|TL|EL|Prise|cm|mm|mL|cl|oz|cup|cups)$/i.test(firstWord)) {
+        unit = firstWord;
+        name = restParts.slice(1).join(" ");
+      } else if (countUnits.has(firstWord)) {
+        unit = "Stück";
+        name = rest;
+      } else if (restParts.length === 1) {
+        unit = "Stück";
+        name = rest;
+      }
+
+      const normalizedName = name
+        .replace(/\s*\(.*?\)\s*/g, " ")
+        .replace(/\s+/g, " ")
+        .trim()
+        .toLowerCase();
+
+      return {
+        quantity,
+        unit,
+        name: name.trim(),
+        key: `${normalizedName}|${unit.toLowerCase()}`
+      };
+    }
+
+    function formatAmount(value) {
+      const rounded = Math.round(value * 100) / 100;
+      if (Number.isInteger(rounded)) {
+        return String(rounded);
+      }
+      return String(rounded).replace(/\.0+$/, "").replace(/(\.\d*[1-9])0+$/, "$1");
+    }
+
+    function mergeIngredients(rows) {
+      const grouped = new Map();
+
+      rows.forEach(({ row }) => {
+        const ingredientCell = row[2] || "";
+        ingredientCell
+          .split(/<br\s*\/?>/i)
+          .map((part) => part.trim())
+          .filter(Boolean)
+          .forEach((line) => {
+            const parsed = parseIngredientLine(line);
+            const existing = grouped.get(parsed.key);
+            if (!existing) {
+              grouped.set(parsed.key, { ...parsed, quantity: parsed.quantity || null, recipes: new Set() });
+              return;
+            }
+
+            existing.recipes = existing.recipes || new Set();
+            if (parsed.quantity !== null && existing.quantity !== null && parsed.unit === existing.unit) {
+              existing.quantity += parsed.quantity;
+            } else if (existing.quantity === null && parsed.quantity !== null) {
+              existing.quantity = parsed.quantity;
+            }
+          });
+      });
+
+      return Array.from(grouped.values()).map((item) => {
+        const quantity = item.quantity === null ? "" : `${formatAmount(item.quantity)} `;
+        const unit = item.unit ? `${item.unit} ` : "";
+        return `${quantity}${unit}${item.name}`.trim();
+      }).sort((a, b) => a.localeCompare(b, "de"));
+    }
+
+    function getSelectedRecipeEntries() {
+      return Object.entries(cartState)
+        .filter(([, active]) => active)
+        .map(([rowIndex]) => {
+          const index = Number(rowIndex);
+          const row = allRows[index];
+          return row ? { row, rowIndex: index } : null;
+        })
+        .filter(Boolean)
+        .sort((a, b) => a.rowIndex - b.rowIndex);
+    }
+
+    function setSummaryVisibility(visible) {
+      isSummaryOpen = visible;
+      summaryPanel.hidden = !visible;
+      summaryButton.dataset.active = visible ? "true" : "false";
+      if (visible) {
+        renderSummary();
+      }
+    }
+
+    function renderSummary() {
+      const selected = getSelectedRecipeEntries();
+      summaryCount.hidden = selected.length === 0;
+      summaryCount.textContent = String(selected.length);
+      summaryMeta.textContent = `${selected.length} Rezept${selected.length === 1 ? "" : "e"} im Warenkorb`;
+
+      if (selected.length === 0) {
+        summaryContent.innerHTML = '<p class="summary-empty">Noch keine Rezepte im Warenkorb. Klick den Warenkorb neben einem Rezept an, um Zutaten zu sammeln.</p>';
+        return;
+      }
+
+      if (isCombineAll) {
+        const merged = mergeIngredients(selected);
+        const section = document.createElement("section");
+        section.className = "summary-card";
+        section.innerHTML = `
+          <h3>Zusammengefasste Einkaufsliste</h3>
+          <ul class="summary-aggregate">
+            ${merged.map((item) => `<li>${item}</li>`).join("")}
+          </ul>
+        `;
+        summaryContent.innerHTML = "";
+        summaryContent.appendChild(section);
+        return;
+      }
+
+      summaryContent.innerHTML = "";
+      selected.forEach(({ row }) => {
+        const section = document.createElement("section");
+        section.className = "summary-card";
+        const ingredients = (row[2] || "")
+          .split(/<br\s*\/?>/i)
+          .map((part) => part.trim())
+          .filter(Boolean);
+        section.innerHTML = `
+          <h3>${row[0]}</h3>
+          <ul>
+            ${ingredients.map((ingredient) => `<li>${ingredient}</li>`).join("")}
+          </ul>
+        `;
+        summaryContent.appendChild(section);
+      });
+    }
+
     function renderTable(headers, rowEntries) {
       tableHead.innerHTML = "";
       tableBody.innerHTML = "";
@@ -347,7 +818,10 @@
         row.forEach((cell, cellIndex) => {
           const td = document.createElement("td");
           const link = extractCellLink(cell);
-          if (cellIndex === row.length - 1 && link) {
+          if (cellIndex === 1 && link) {
+            const wrapper = document.createElement("div");
+            wrapper.className = "recipe-actions";
+
             const a = document.createElement("a");
             a.href = link.href;
             a.target = "_blank";
@@ -356,9 +830,23 @@
             a.setAttribute("aria-label", `Rezept öffnen: ${row[0]}`);
             a.setAttribute("title", `Rezept öffnen: ${row[0]}`);
             a.innerHTML = '<i data-lucide="link-2" aria-hidden="true"></i><span class="sr-only">Link öffnen</span>';
-            td.appendChild(a);
+
+            const cartButton = document.createElement("button");
+            cartButton.type = "button";
+            cartButton.className = "cart-toggle";
+            cartButton.dataset.active = isInCart(rowIndex) ? "true" : "false";
+            cartButton.dataset.rowIndex = String(rowIndex);
+            cartButton.setAttribute("aria-label", isInCart(rowIndex) ? `Aus Warenkorb entfernen: ${row[0]}` : `Zum Warenkorb hinzufügen: ${row[0]}`);
+            cartButton.setAttribute("title", isInCart(rowIndex) ? `Aus Warenkorb entfernen: ${row[0]}` : `Zum Warenkorb hinzufügen: ${row[0]}`);
+            cartButton.innerHTML = isInCart(rowIndex)
+              ? '<i data-lucide="shopping-cart" aria-hidden="true"></i><span class="sr-only">Im Warenkorb</span>'
+              : '<i data-lucide="shopping-cart" aria-hidden="true"></i><span class="sr-only">Zum Warenkorb hinzufügen</span>';
+
+            wrapper.appendChild(a);
+            wrapper.appendChild(cartButton);
+            td.appendChild(wrapper);
           } else {
-            td.textContent = cell;
+            td.innerHTML = cell;
           }
           tr.appendChild(td);
         });
@@ -434,7 +922,9 @@
 
         allHeaders = headers;
         allRows = rows;
+        recipeRows = rows;
         refreshSelection();
+        renderSummary();
       } catch (error) {
         statusEl.textContent = "Fehler beim Laden.";
         errorEl.hidden = false;
@@ -457,6 +947,40 @@
       }
 
       refreshSelection();
+    });
+
+    tableBody.addEventListener("click", (event) => {
+      const button = event.target.closest(".cart-toggle");
+      if (!button) {
+        return;
+      }
+
+      const rowIndex = Number(button.dataset.rowIndex);
+      if (Number.isNaN(rowIndex)) {
+        return;
+      }
+
+      toggleCart(rowIndex);
+    });
+
+    summaryButton.addEventListener("click", () => {
+      setSummaryVisibility(!isSummaryOpen);
+    });
+
+    summaryCloseButton.addEventListener("click", () => {
+      setSummaryVisibility(false);
+    });
+
+    combineToggle.addEventListener("change", () => {
+      isCombineAll = combineToggle.checked;
+      renderSummary();
+    });
+
+    clearCartButton.addEventListener("click", () => {
+      cartState = {};
+      saveCartState();
+      renderCurrentTable();
+      renderSummary();
     });
 
     init();
