@@ -627,15 +627,124 @@
       stroke-linejoin: round;
     }
 
+    .summary-row {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) 420px;
+      gap: 14px;
+      margin: 0 0 18px;
+      align-items: start;
+    }
+
+    .summary-row[hidden] {
+      display: none;
+    }
+
+    @media (max-width: 900px) {
+      .summary-row {
+        grid-template-columns: 1fr;
+      }
+    }
+
     .summary-panel {
       width: 100%;
       border: 1px solid var(--line);
       background: var(--panel-bg);
       padding: 16px;
-      margin: 0 0 18px;
     }
 
     .summary-panel[hidden] {
+      display: none;
+    }
+
+    .rewe-panel {
+      border: 1px solid var(--line);
+      background: var(--panel-bg);
+      display: flex;
+      flex-direction: column;
+      height: 600px;
+      position: sticky;
+      top: 16px;
+    }
+
+    .rewe-panel-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 10px 12px;
+      border-bottom: 1px solid var(--line);
+      flex: none;
+    }
+
+    .rewe-panel-title {
+      font-size: 12px;
+      font-weight: 700;
+      letter-spacing: 0.06em;
+    }
+
+    .rewe-panel-close {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 26px;
+      height: 26px;
+      padding: 0;
+      border: 0;
+      background: transparent;
+      color: var(--fg);
+      border-radius: 999px;
+      box-shadow: none;
+    }
+
+    .rewe-panel-close:hover,
+    .rewe-panel-close:focus-visible {
+      background: rgba(0,0,0,0.06);
+    }
+
+    .rewe-panel-close svg {
+      width: 15px;
+      height: 15px;
+      stroke-width: 2;
+    }
+
+    .rewe-panel-body {
+      flex: 1;
+      min-height: 0;
+      position: relative;
+    }
+
+    .rewe-placeholder {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 12px;
+      height: 100%;
+      padding: 24px;
+      text-align: center;
+      color: var(--muted);
+    }
+
+    .rewe-placeholder svg {
+      width: 32px;
+      height: 32px;
+      stroke-width: 1.5;
+      opacity: 0.4;
+    }
+
+    .rewe-placeholder p {
+      font-size: 13px;
+      line-height: 1.5;
+      margin: 0;
+    }
+
+    .rewe-iframe {
+      width: 100%;
+      height: 100%;
+      border: 0;
+      display: block;
+    }
+
+    .rewe-iframe[hidden] {
       display: none;
     }
 
@@ -1068,33 +1177,50 @@
         <div id="weekPlanGrid" class="week-plan-grid"></div>
       </div>
     </section>
-    <section id="summaryPanel" class="summary-panel" hidden aria-label="Warenkorb">
-      <div class="summary-header">
-        <div>
-          <h2 class="summary-title">Warenkorb</h2>
-          <p id="summaryMeta" class="summary-subtitle"></p>
+    <div id="summaryRow" class="summary-row" hidden>
+      <section id="summaryPanel" class="summary-panel" aria-label="Warenkorb">
+        <div class="summary-header">
+          <div>
+            <h2 class="summary-title">Warenkorb</h2>
+            <p id="summaryMeta" class="summary-subtitle"></p>
+          </div>
+          <button id="summaryFilterButton" class="summary-filter-button" type="button" aria-label="Warenkorb-Filter anzeigen" aria-expanded="false" title="Filter">
+            <i data-lucide="list-filter" aria-hidden="true"></i>
+          </button>
         </div>
-        <button id="summaryFilterButton" class="summary-filter-button" type="button" aria-label="Warenkorb-Filter anzeigen" aria-expanded="false" title="Filter">
-          <i data-lucide="list-filter" aria-hidden="true"></i>
-        </button>
+        <div id="summaryTools" class="summary-tools" hidden>
+          <label class="summary-toggle">
+            <input id="combineToggle" type="checkbox" checked>
+            Alles zusammenfassen
+          </label>
+          <label class="summary-toggle">
+            <input id="spiceToggle" type="checkbox" checked>
+            Gewürze ausblenden
+          </label>
+          <label id="portionScaleWrap" class="summary-portion" hidden>
+            Portionen
+            <input id="portionScale" type="number" min="1" step="1" value="1" inputmode="numeric">
+          </label>
+          <button id="clearCartButton" type="button">Alle entfernen</button>
+        </div>
+        <div id="summaryContent" class="summary-list"></div>
+      </section>
+      <div id="rewePanel" class="rewe-panel">
+        <div class="rewe-panel-header">
+          <span class="rewe-panel-title">REWE</span>
+          <button id="rewePanelClose" class="rewe-panel-close" type="button" title="REWE-Panel schließen" aria-label="REWE-Panel schließen">
+            <i data-lucide="x" aria-hidden="true"></i>
+          </button>
+        </div>
+        <div class="rewe-panel-body">
+          <div id="reweIframePlaceholder" class="rewe-placeholder">
+            <i data-lucide="shopping-cart" aria-hidden="true"></i>
+            <p>Klicke auf ein Produkt im Warenkorb, um es hier bei REWE zu suchen.</p>
+          </div>
+          <iframe id="reweIframe" class="rewe-iframe" title="REWE Produktsuche" sandbox="allow-scripts allow-same-origin allow-forms allow-popups" hidden></iframe>
+        </div>
       </div>
-      <div id="summaryTools" class="summary-tools" hidden>
-        <label class="summary-toggle">
-          <input id="combineToggle" type="checkbox">
-          Alles zusammenfassen
-        </label>
-        <label class="summary-toggle">
-          <input id="spiceToggle" type="checkbox" checked>
-          Gewürze ausblenden
-        </label>
-        <label id="portionScaleWrap" class="summary-portion" hidden>
-          Portionen
-          <input id="portionScale" type="number" min="1" step="1" value="1" inputmode="numeric">
-        </label>
-        <button id="clearCartButton" type="button">Alle entfernen</button>
-      </div>
-      <div id="summaryContent" class="summary-list"></div>
-    </section>
+    </div>
     <div id="status" class="status"></div>
     <div id="error" class="error" hidden></div>
     <h2 class="section-heading table-heading">REZEPTSAMMLUNG</h2>
@@ -1124,12 +1250,17 @@
     const selectionCartButton = document.getElementById("selectionCartButton");
     const summaryButton = document.getElementById("summaryButton");
     const summaryCount = document.getElementById("summaryCount");
+    const summaryRow = document.getElementById("summaryRow");
     const summaryPanel = document.getElementById("summaryPanel");
     const summaryMeta = document.getElementById("summaryMeta");
     const summaryContent = document.getElementById("summaryContent");
     const summaryFilterButton = document.getElementById("summaryFilterButton");
     const summaryTools = document.getElementById("summaryTools");
     const basketPrompt = document.getElementById("basketPrompt");
+    const rewePanel = document.getElementById("rewePanel");
+    const reweIframe = document.getElementById("reweIframe");
+    const reweIframePlaceholder = document.getElementById("reweIframePlaceholder");
+    const rewePanelClose = document.getElementById("rewePanelClose");
     const weekPlan = document.getElementById("weekPlan");
     const weekPlanViewport = document.getElementById("weekPlanViewport");
     const weekPlanGrid = document.getElementById("weekPlanGrid");
@@ -1158,7 +1289,7 @@
     let cartState = loadCartState();
     let weekPlanState = loadWeekPlanState();
     let isSummaryOpen = false;
-    let isCombineAll = false;
+    let isCombineAll = true;
     let isSummaryFilterOpen = false;
     let portionScale = loadPortionScale();
     let hideSpices = loadHideSpices();
@@ -1830,7 +1961,10 @@
     function openReweSearchForItem(itemName) {
       const normalized = itemName.trim();
       const term = /^ja!/i.test(normalized) ? normalized : `JA! ${normalized}`;
-      window.open(`${REWE_SEARCH_BASE_URL}${encodeURIComponent(term)}`, "_blank", "noopener,noreferrer");
+      const url = `${REWE_SEARCH_BASE_URL}${encodeURIComponent(term)}`;
+      reweIframe.src = url;
+      reweIframe.hidden = false;
+      reweIframePlaceholder.hidden = true;
     }
 
     function parseFractionToken(token) {
@@ -2147,7 +2281,7 @@
 
     function setSummaryVisibility(visible) {
       isSummaryOpen = visible;
-      summaryPanel.hidden = !visible;
+      summaryRow.hidden = !visible;
       summaryButton.dataset.active = visible ? "true" : "false";
       summaryButton.setAttribute("aria-expanded", visible ? "true" : "false");
       if (portionScaleInput.value !== String(portionScale)) {
@@ -2182,6 +2316,7 @@
       summaryFilterButton.dataset.active = isSummaryFilterOpen ? "true" : "false";
       summaryFilterButton.setAttribute("aria-expanded", isSummaryFilterOpen ? "true" : "false");
       portionScaleWrap.hidden = !isCombineAll;
+      combineToggle.checked = isCombineAll;
       spiceToggle.checked = hideSpices;
 
       if (selected.length === 0) {
@@ -2702,6 +2837,12 @@
     combineToggle.addEventListener("change", () => {
       isCombineAll = combineToggle.checked;
       renderSummary();
+    });
+
+    rewePanelClose.addEventListener("click", () => {
+      reweIframe.hidden = true;
+      reweIframe.src = "";
+      reweIframePlaceholder.hidden = false;
     });
 
     spiceToggle.addEventListener("change", () => {
