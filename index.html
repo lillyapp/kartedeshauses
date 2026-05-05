@@ -222,8 +222,8 @@
     }
 
     .recipe-text-link svg {
-      width: 15px;
-      height: 15px;
+      width: 17px;
+      height: 17px;
       stroke-width: 1.9;
       flex: none;
     }
@@ -253,8 +253,8 @@
     }
 
     .cart-toggle svg {
-      width: 15px;
-      height: 15px;
+      width: 17px;
+      height: 17px;
       stroke-width: 2;
       fill: none;
       stroke: currentColor;
@@ -449,8 +449,8 @@
     }
 
     .ingredient-action svg {
-      width: 16px;
-      height: 16px;
+      width: 18px;
+      height: 18px;
       stroke-width: 2;
       fill: none;
       stroke: currentColor;
@@ -995,7 +995,9 @@
     }
 
     function openReweSearchForItem(itemName) {
-      window.open(`${REWE_SEARCH_BASE_URL}${encodeURIComponent(itemName)}`, "_blank", "noopener,noreferrer");
+      const normalized = itemName.trim();
+      const term = /^ja!/i.test(normalized) ? normalized : `JA! ${normalized}`;
+      window.open(`${REWE_SEARCH_BASE_URL}${encodeURIComponent(term)}`, "_blank", "noopener,noreferrer");
     }
 
     function parseFractionToken(token) {
