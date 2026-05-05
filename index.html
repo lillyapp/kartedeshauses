@@ -379,6 +379,7 @@
 
     .summary-ingredients li[data-purchased="true"],
     .summary-ingredients li[data-excluded="true"],
+    .summary-ingredients li[data-basket="true"],
     .summary-aggregate li[data-purchased="true"] {
       color: var(--muted);
       text-decoration: line-through;
@@ -407,6 +408,12 @@
       align-items: flex-start;
       justify-content: space-between;
       gap: 12px;
+    }
+
+    .summary-aggregate li[data-basket="true"] {
+      color: var(--muted);
+      text-decoration: line-through;
+      text-decoration-thickness: 1px;
     }
 
     .summary-aggregate-item {
@@ -1325,7 +1332,13 @@
 
         button.dataset.active = available ? "true" : "false";
         button.dataset.available = available ? "true" : "false";
+        button.dataset.basket = available ? "true" : "false";
         button.innerHTML = createIconMarkup(available ? "truck" : "question-circle");
+
+        const listItem = button.closest("li");
+        if (listItem) {
+          listItem.dataset.basket = available ? "true" : "false";
+        }
       }));
     }
 
@@ -1375,7 +1388,7 @@
         section.innerHTML = `
           <ul class="summary-aggregate">
             ${merged.map((item) => `
-              <li data-purchased="${isPurchased(item.globalKey) ? "true" : "false"}">
+              <li data-purchased="${isPurchased(item.globalKey) ? "true" : "false"}" data-basket="false">
                 <button
                   type="button"
                   class="ingredient-main"
@@ -1415,7 +1428,7 @@
           <h3>${row[0]}</h3>
           <ul class="summary-ingredients">
             ${items.map((item) => `
-              <li data-purchased="${isPurchased(item.globalKey) ? "true" : "false"}" data-excluded="${isExcluded(item.instanceKey) ? "true" : "false"}">
+              <li data-purchased="${isPurchased(item.globalKey) ? "true" : "false"}" data-excluded="${isExcluded(item.instanceKey) ? "true" : "false"}" data-basket="false">
                 <button
                   type="button"
                   class="ingredient-main"
@@ -1655,6 +1668,8 @@
       }
 
       if (action === "rewe") {
+        const itemName = button.dataset.itemName || "";
+        openReweSearchForItem(itemName);
         renderSummary();
         return;
       }
