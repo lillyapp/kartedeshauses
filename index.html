@@ -1300,7 +1300,7 @@
             }
 
             const text = await response.text();
-            if (!/keine Treffer/i.test(text)) {
+            if (/Deine Suche nach/i.test(text) || !/keine Treffer/i.test(text)) {
               reweAvailabilityCache.set(cacheKey, true);
               return true;
             }
