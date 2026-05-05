@@ -4,46 +4,63 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>KARTE DES HAUSES</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;700;800&family=Lilita+One&display=swap" rel="stylesheet">
   <style>
     :root {
-      --bg: #ffffff;
-      --fg: #000000;
-      --muted: #6b6b6b;
-      --line: #000000;
+      --page: #ffffff;
+      --bg: #f0f1f5;
+      --ink: #111111;
+      --muted: #686868;
+      --line: rgba(17, 17, 17, 0.14);
+      --soft: rgba(17, 17, 17, 0.04);
     }
 
-    html, body {
+    html,
+    body {
       margin: 0;
       padding: 0;
       background: var(--bg);
-      color: var(--fg);
-      font-family: Helvetica, Arial, sans-serif;
+      color: var(--ink);
+      font-family: "DM Sans", Helvetica, Arial, sans-serif;
     }
 
     body {
-      padding: 32px 24px 40px;
+      padding: 0;
     }
 
-    main {
-      max-width: 1200px;
+    .page {
+      max-width: 600px;
       margin: 0 auto;
+      background: var(--page);
+      min-height: 100vh;
+      box-sizing: border-box;
     }
 
-    h1 {
-      font-size: 20px;
-      font-weight: 700;
+    .inner {
+      padding: 22px 24px 28px;
+      box-sizing: border-box;
+    }
+
+    .title {
       margin: 0 0 18px;
-      letter-spacing: 0.02em;
+      font-family: "DM Sans", Helvetica, Arial, sans-serif;
+      font-size: clamp(34px, 5.8vw, 48px);
+      line-height: 0.9;
+      letter-spacing: -0.06em;
+      font-weight: 800;
+      white-space: nowrap;
     }
 
     .meta {
       display: flex;
       flex-wrap: wrap;
-      gap: 10px 16px;
       align-items: baseline;
-      margin-bottom: 20px;
+      gap: 8px 12px;
+      margin-bottom: 14px;
       font-size: 13px;
-      line-height: 1.4;
+      line-height: 1.35;
     }
 
     .meta strong {
@@ -53,49 +70,28 @@
     .random-row {
       display: inline-flex;
       flex-wrap: wrap;
-      gap: 8px;
-      font-size: 15px;
+      gap: 6px;
       font-weight: 700;
-      letter-spacing: 0.02em;
+      letter-spacing: 0.01em;
     }
 
     .random-row span {
       display: inline-block;
-      padding: 2px 0;
+      min-width: 14px;
     }
 
     .controls {
       display: flex;
       flex-wrap: wrap;
-      gap: 10px;
-      margin: 12px 0 18px;
-    }
-
-    button {
-      appearance: none;
-      border: 1px solid var(--line);
-      background: var(--bg);
-      color: var(--fg);
-      padding: 9px 14px;
-      font: inherit;
+      gap: 10px 16px;
+      margin: 0 0 18px;
       font-size: 13px;
-      cursor: pointer;
-    }
-
-    button:hover {
-      background: #f5f5f5;
-    }
-
-    button:focus-visible {
-      outline: 2px solid var(--fg);
-      outline-offset: 2px;
     }
 
     .toggle {
       display: inline-flex;
       align-items: center;
       gap: 8px;
-      font-size: 13px;
       user-select: none;
     }
 
@@ -106,26 +102,139 @@
       accent-color: #000;
     }
 
+    .status {
+      margin: 0 0 14px;
+      font-size: 13px;
+      color: var(--muted);
+    }
+
+    .scene {
+      display: grid;
+      grid-template-columns: 1.12fr 0.88fr;
+      gap: 18px;
+      align-items: start;
+      margin-bottom: 18px;
+    }
+
+    .art-panel {
+      position: relative;
+      min-height: 264px;
+      border-radius: 22px;
+      background:
+        radial-gradient(circle at 15% 22%, transparent 0 18px, var(--ink) 19px 22px, transparent 23px),
+        radial-gradient(circle at 52% 20%, transparent 0 22px, var(--ink) 23px 25px, transparent 26px),
+        radial-gradient(circle at 18% 72%, transparent 0 18px, var(--ink) 19px 22px, transparent 23px),
+        radial-gradient(circle at 58% 74%, transparent 0 21px, var(--ink) 22px 24px, transparent 25px),
+        linear-gradient(90deg, transparent 0 64%, var(--ink) 64% 72%, transparent 72%);
+      border: 1px solid var(--line);
+      overflow: hidden;
+    }
+
+    .art-panel::before,
+    .art-panel::after {
+      content: "";
+      position: absolute;
+      inset: auto;
+      border: 2px solid var(--ink);
+      border-radius: 50%;
+      opacity: 0.95;
+    }
+
+    .art-panel::before {
+      width: 92px;
+      height: 132px;
+      left: 18px;
+      top: 24px;
+      border-radius: 45% 55% 50% 50% / 55% 50% 45% 50%;
+      transform: rotate(8deg);
+      box-shadow:
+        114px 6px 0 -2px transparent,
+        118px 6px 0 -2px transparent;
+    }
+
+    .art-panel::after {
+      width: 96px;
+      height: 128px;
+      right: 22px;
+      top: 22px;
+      border-radius: 44% 56% 54% 46% / 60% 48% 52% 40%;
+      transform: rotate(-8deg);
+    }
+
+    .drip {
+      position: absolute;
+      right: 22px;
+      top: 8px;
+      width: 42px;
+      height: 230px;
+      background: var(--ink);
+      border-radius: 42px;
+      filter: contrast(105%);
+    }
+
+    .section {
+      margin-bottom: 22px;
+    }
+
+    .section-title {
+      margin: 0 0 12px;
+      font-family: "Lilita One", "DM Sans", Helvetica, Arial, sans-serif;
+      font-size: clamp(30px, 5vw, 42px);
+      line-height: 0.95;
+      font-weight: 400;
+      letter-spacing: -0.02em;
+      text-transform: lowercase;
+    }
+
+    .menu-list {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+      display: grid;
+      gap: 7px;
+    }
+
+    .recipe-line {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 10px;
+      font-size: clamp(15px, 2.65vw, 19px);
+      line-height: 1.35;
+      font-weight: 700;
+    }
+
+    .recipe-text {
+      min-width: 0;
+      flex: 1 1 auto;
+    }
+
+    .recipe-text sup {
+      font-size: 0.58em;
+      top: -0.42em;
+      position: relative;
+    }
+
     .recipe-link {
       display: inline-flex;
       align-items: center;
       justify-content: center;
-      width: 28px;
-      height: 28px;
-      border: 0;
-      color: var(--fg);
+      width: 26px;
+      height: 26px;
+      color: var(--ink);
       text-decoration: none;
       line-height: 1;
+      flex: 0 0 auto;
     }
 
     .recipe-link:hover {
-      background: #f5f5f5;
+      background: var(--soft);
     }
 
     .recipe-link svg {
-      width: 15px;
-      height: 15px;
-      stroke-width: 1.9;
+      width: 14px;
+      height: 14px;
+      stroke-width: 2;
     }
 
     .sr-only {
@@ -140,108 +249,137 @@
       border: 0;
     }
 
-    .table-wrap {
-      overflow-x: auto;
-      border-top: 1px solid var(--line);
-    }
-
-    table {
-      width: 100%;
-      border-collapse: collapse;
-      table-layout: auto;
-    }
-
-    thead th {
-      text-align: left;
-      font-size: 12px;
-      font-weight: 700;
-      padding: 12px 10px;
-      border-bottom: 1px solid var(--line);
-      white-space: nowrap;
-    }
-
-    tbody td {
-      font-size: 13px;
-      padding: 10px;
-      border-bottom: 1px solid var(--line);
-      vertical-align: top;
-    }
-
-    tbody tr:hover {
-      background: #f5f5f5;
-    }
-
-    a {
-      color: var(--fg);
-      text-decoration: underline;
-      text-underline-offset: 2px;
-    }
-
-    .status {
-      font-size: 13px;
-      color: var(--muted);
-      margin: 12px 0 0;
-    }
-
-    .error {
-      color: #000;
+    .oats-card {
+      margin-top: 18px;
       border: 1px solid var(--line);
-      padding: 12px;
-      margin-top: 16px;
-      font-size: 13px;
+      background: #000;
+      color: #fff;
+      border-radius: 18px;
+      min-height: 320px;
+      padding: 24px 20px 22px;
+      box-sizing: border-box;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      overflow: hidden;
     }
 
-    code {
-      font-family: inherit;
-      font-size: 12px;
+    .oats-title {
+      font-family: "Lilita One", "DM Sans", Helvetica, Arial, sans-serif;
+      font-size: clamp(36px, 6vw, 44px);
+      text-align: center;
+      line-height: 0.95;
+      margin-top: 6px;
+      font-weight: 400;
+      letter-spacing: -0.03em;
+      text-transform: lowercase;
+    }
+
+    .oats-note {
+      text-align: center;
+      font-size: 16px;
+      line-height: 1.35;
+      margin-top: 24px;
+    }
+
+    .oats-tail {
+      text-align: center;
+      font-family: "Lilita One", "DM Sans", Helvetica, Arial, sans-serif;
+      font-size: clamp(30px, 5vw, 36px);
+      line-height: 1;
+      margin-bottom: 2px;
+      font-weight: 400;
+      letter-spacing: -0.03em;
+      text-transform: lowercase;
+    }
+
+    .hidden {
+      display: none !important;
+    }
+
+    .footer-space {
+      height: 8px;
     }
 
     @media (max-width: 700px) {
-      body {
-        padding: 20px 14px 28px;
+      .inner {
+        padding: 20px 14px 24px;
       }
 
-      h1 {
-        font-size: 18px;
+      .scene {
+        grid-template-columns: 1fr;
       }
 
-      thead th,
-      tbody td {
-        padding-left: 8px;
-        padding-right: 8px;
+      .art-panel {
+        min-height: 220px;
+      }
+
+      .oats-card {
+        min-height: 280px;
       }
     }
   </style>
 </head>
 <body>
-  <main>
-    <h1>KARTE DES HAUSES</h1>
-    <div class="meta">
-      <strong>Auswahl der Rezepte:</strong>
-      <div id="randomRows" class="random-row"></div>
-    </div>
-    <div class="controls">
-      <label class="toggle">
-        <input id="filterToggle" type="checkbox" checked>
-        Nur Auswahl anzeigen
-      </label>
-      <label class="toggle">
-        <input id="cardToggle" type="checkbox" checked>
-        Warme / kalte Speisen
-      </label>
-    </div>
-    <div id="status" class="status">Lade Markdown ...</div>
-    <div id="error" class="error" hidden></div>
-    <div class="table-wrap">
-      <table aria-label="Markdown Tabelle">
-        <thead id="tableHead"></thead>
-        <tbody id="tableBody"></tbody>
-      </table>
+  <main class="page">
+    <div class="inner">
+      <h1 class="title">KARTE DES HAUSES</h1>
+
+      <div class="meta">
+        <strong>Auswahl der Rezepte:</strong>
+        <div id="randomRows" class="random-row"></div>
+      </div>
+
+      <div class="controls">
+        <label class="toggle">
+          <input id="filterToggle" type="checkbox" checked>
+          Nur Auswahl anzeigen
+        </label>
+        <label class="toggle">
+          <input id="cardToggle" type="checkbox" checked>
+          Warme / kalte Speisen
+        </label>
+      </div>
+
+      <div id="status" class="status">Lade Markdown ...</div>
+
+      <section class="scene" aria-label="Menükarte">
+        <div>
+          <div class="art-panel" aria-hidden="true">
+            <div class="drip"></div>
+          </div>
+
+          <section class="section" id="sidesSection">
+            <h2 class="section-title">sides and oats</h2>
+            <ul class="menu-list" id="sidesList"></ul>
+          </section>
+
+          <article class="oats-card" aria-label="Overnight oats">
+            <div class="oats-title">overnight<br>oats</div>
+            <div class="oats-note">Beeren, Nüsse<br>oder Kakao</div>
+            <div class="oats-tail">UVM.</div>
+          </article>
+        </div>
+
+        <div>
+          <section class="section" id="coldSection">
+            <h2 class="section-title">kalte speisen</h2>
+            <ul class="menu-list" id="coldList"></ul>
+          </section>
+
+          <section class="section" id="warmSection">
+            <h2 class="section-title">warme speisen</h2>
+            <ul class="menu-list" id="warmList"></ul>
+          </section>
+        </div>
+      </section>
+
+      <div id="error" class="error hidden"></div>
+      <div class="footer-space"></div>
     </div>
   </main>
 
   <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
-
   <script>
     const DEFAULT_SOURCE = "./data.md";
     const sourceUrl = new URLSearchParams(window.location.search).get("source") || DEFAULT_SOURCE;
@@ -251,15 +389,19 @@
     const cardToggle = document.getElementById("cardToggle");
     const statusEl = document.getElementById("status");
     const errorEl = document.getElementById("error");
-    const tableHead = document.getElementById("tableHead");
-    const tableBody = document.getElementById("tableBody");
+    const sidesSection = document.getElementById("sidesSection");
+    const coldSection = document.getElementById("coldSection");
+    const warmSection = document.getElementById("warmSection");
+    const sidesList = document.getElementById("sidesList");
+    const coldList = document.getElementById("coldList");
+    const warmList = document.getElementById("warmList");
 
-    let allHeaders = [];
-    let allRows = [];
-    let selectedRowIndexes = [];
-    let isFiltered = true;
     const WARM_COLD_START_INDEX = 6;
     const WARM_COLD_END_INDEX = 28;
+
+    let recipes = [];
+    let selectedRowIndexes = [];
+    let isFiltered = true;
 
     function splitMarkdownRow(line) {
       return line
@@ -321,66 +463,6 @@
       return null;
     }
 
-    function renderTable(headers, rowEntries) {
-      tableHead.innerHTML = "";
-      tableBody.innerHTML = "";
-
-      const headerRow = document.createElement("tr");
-      const indexTh = document.createElement("th");
-      indexTh.textContent = "#";
-      headerRow.appendChild(indexTh);
-
-      headers.forEach((header) => {
-        const th = document.createElement("th");
-        th.textContent = header;
-        headerRow.appendChild(th);
-      });
-      tableHead.appendChild(headerRow);
-
-      rowEntries.forEach(({ row, rowIndex }) => {
-        const tr = document.createElement("tr");
-
-        const indexTd = document.createElement("td");
-        indexTd.textContent = String(rowIndex + 1);
-        tr.appendChild(indexTd);
-
-        row.forEach((cell, cellIndex) => {
-          const td = document.createElement("td");
-          const link = extractCellLink(cell);
-          if (cellIndex === row.length - 1 && link) {
-            const a = document.createElement("a");
-            a.href = link.href;
-            a.target = "_blank";
-            a.rel = "noopener noreferrer";
-            a.className = "recipe-link";
-            a.setAttribute("aria-label", `Rezept öffnen: ${row[0]}`);
-            a.setAttribute("title", `Rezept öffnen: ${row[0]}`);
-            a.innerHTML = '<i data-lucide="link-2" aria-hidden="true"></i><span class="sr-only">Link öffnen</span>';
-            td.appendChild(a);
-          } else {
-            td.textContent = cell;
-          }
-          tr.appendChild(td);
-        });
-
-        tableBody.appendChild(tr);
-      });
-
-      if (window.lucide && typeof window.lucide.createIcons === "function") {
-        window.lucide.createIcons();
-      }
-    }
-
-    function renderCurrentTable() {
-      const rowEntries = (isFiltered ? selectedRowIndexes : allRows.map((_, index) => index))
-        .map((rowIndex) => ({ row: allRows[rowIndex], rowIndex }));
-
-      renderTable(allHeaders, rowEntries);
-      statusEl.textContent = isFiltered
-        ? `Gefiltert: ${rowEntries.length} von ${allRows.length} Zeilen.`
-        : `Geladen: ${allRows.length} Zeilen.`;
-    }
-
     function pickRandomNumbers(count, max) {
       const pool = Array.from({ length: max }, (_, index) => index);
       for (let i = pool.length - 1; i > 0; i -= 1) {
@@ -392,12 +474,12 @@
 
     function getSelectionPool() {
       if (cardToggle.checked) {
-        const start = Math.min(WARM_COLD_START_INDEX, allRows.length);
-        const end = Math.min(WARM_COLD_END_INDEX, allRows.length);
+        const start = Math.min(WARM_COLD_START_INDEX, recipes.length);
+        const end = Math.min(WARM_COLD_END_INDEX, recipes.length);
         return Array.from({ length: Math.max(0, end - start) }, (_, index) => start + index);
       }
 
-      return Array.from({ length: allRows.length }, (_, index) => index);
+      return Array.from({ length: recipes.length }, (_, index) => index);
     }
 
     function renderRandomRows(indices) {
@@ -419,7 +501,70 @@
       const picked = pickRandomNumbers(10, pool.length);
       selectedRowIndexes = picked.map((position) => pool[position]);
       renderRandomRows(selectedRowIndexes);
-      renderCurrentTable();
+      renderPage();
+    }
+
+    function makeRecipeItem(recipe) {
+      const li = document.createElement("li");
+      li.className = "recipe-line";
+
+      const text = document.createElement("span");
+      text.className = "recipe-text";
+      text.innerHTML = `${escapeHtml(recipe.title)} <sup>${recipe.number}</sup>`;
+      li.appendChild(text);
+
+      const link = document.createElement("a");
+      link.className = "recipe-link";
+      link.href = recipe.href;
+      link.target = "_blank";
+      link.rel = "noopener noreferrer";
+      link.setAttribute("aria-label", `Rezept öffnen: ${recipe.title}`);
+      link.setAttribute("title", `Rezept öffnen: ${recipe.title}`);
+      link.innerHTML = '<i data-lucide="link-2" aria-hidden="true"></i><span class="sr-only">Link öffnen</span>';
+      li.appendChild(link);
+
+      return li;
+    }
+
+    function escapeHtml(value) {
+      return String(value)
+        .replaceAll("&", "&amp;")
+        .replaceAll("<", "&lt;")
+        .replaceAll(">", "&gt;")
+        .replaceAll('"', "&quot;")
+        .replaceAll("'", "&#39;");
+    }
+
+    function renderList(listEl, items) {
+      listEl.innerHTML = "";
+      items.forEach((item) => {
+        listEl.appendChild(makeRecipeItem(item));
+      });
+    }
+
+    function renderPage() {
+      const visibleSet = isFiltered ? new Set(selectedRowIndexes) : null;
+      const visibleRecipes = recipes.filter((recipe, index) => !visibleSet || visibleSet.has(index));
+
+      const sides = visibleRecipes.filter((recipe) => recipe.number >= 1 && recipe.number <= 6);
+      const cold = visibleRecipes.filter((recipe) => recipe.number >= 7 && recipe.number <= 15);
+      const warm = visibleRecipes.filter((recipe) => recipe.number >= 16 && recipe.number <= 28);
+
+      sidesSection.classList.toggle("hidden", isFiltered && sides.length === 0);
+      coldSection.classList.toggle("hidden", isFiltered && cold.length === 0);
+      warmSection.classList.toggle("hidden", isFiltered && warm.length === 0);
+
+      renderList(sidesList, sides);
+      renderList(coldList, cold);
+      renderList(warmList, warm);
+
+      statusEl.textContent = isFiltered
+        ? `Gefiltert: ${visibleRecipes.length} von ${recipes.length} Zeilen.`
+        : `Geladen: ${recipes.length} Zeilen.`;
+
+      if (window.lucide && typeof window.lucide.createIcons === "function") {
+        window.lucide.createIcons();
+      }
     }
 
     async function init() {
@@ -430,29 +575,36 @@
         }
 
         const markdown = await response.text();
-        const { headers, rows } = parseMarkdownTable(markdown);
+        const { rows } = parseMarkdownTable(markdown);
 
-        allHeaders = headers;
-        allRows = rows;
+        recipes = rows.map((row, index) => {
+          const link = extractCellLink(row[1] || "");
+          return {
+            number: index + 1,
+            title: row[0] || `Rezept ${index + 1}`,
+            href: link ? link.href : "#"
+          };
+        });
+
         refreshSelection();
       } catch (error) {
         statusEl.textContent = "Fehler beim Laden.";
-        errorEl.hidden = false;
+        errorEl.classList.remove("hidden");
         errorEl.textContent = `${error.message}\n\nLege eine Markdown-Datei unter ${DEFAULT_SOURCE} ab oder übergib eine URL mit ?source=https://...`;
       }
     }
 
     filterToggle.addEventListener("change", () => {
-      if (allRows.length === 0) {
+      if (recipes.length === 0) {
         return;
       }
 
       isFiltered = filterToggle.checked;
-      renderCurrentTable();
+      renderPage();
     });
 
     cardToggle.addEventListener("change", () => {
-      if (allRows.length === 0) {
+      if (recipes.length === 0) {
         return;
       }
 
