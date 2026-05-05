@@ -664,6 +664,8 @@
     const EXCLUDED_STORAGE_KEY = "recipe-cart-excluded-v1";
     const REWE_SEARCH_BASE_URL = "https://www.rewe.de/shop/productList?search=";
     const REWE_PROXY_BASE_URL = "https://r.jina.ai/http://www.rewe.de/shop/productList?search=";
+    const REWE_BASKET_URL = "https://www.rewe.de/shop/checkout/basket";
+    const REWE_BASKET_PROXY_URL = "https://r.jina.ai/http://www.rewe.de/shop/checkout/basket";
     let allHeaders = [];
     let allRows = [];
     let recipeRows = [];
@@ -1269,42 +1271,39 @@
       return "";
     }
 
-    function buildReweSearchTerms(item) {
+    function buildReweBasketTerms(item) {
       const term = item.name.trim();
       const terms = [term];
-      if (!/^ja!/i.test(term)) {
+      if (/^ja!/i.test(term)) {
+        terms.push(term.replace(/^ja!\s*/i, "").trim());
+      } else {
         terms.push(`JA! ${term}`);
       }
-      return terms;
+      return terms.filter(Boolean);
     }
 
     async function checkReweAvailability(item) {
-      const terms = buildReweSearchTerms(item);
-      for (const term of terms) {
-        const cacheBust = `&_=${Date.now()}-${Math.random().toString(36).slice(2)}`;
-        const urls = [
-          `${REWE_SEARCH_BASE_URL}${encodeURIComponent(term)}${cacheBust}`,
-          `${REWE_PROXY_BASE_URL}${encodeURIComponent(term)}${cacheBust}`
-        ];
+      const terms = buildReweBasketTerms(item);
+      const cacheBust = `?_=${Date.now()}-${Math.random().toString(36).slice(2)}`;
+      const urls = [
+        `${REWE_BASKET_URL}${cacheBust}`,
+        `${REWE_BASKET_PROXY_URL}${cacheBust}`
+      ];
 
-        for (const url of urls) {
-          try {
-            const response = await fetch(url, { cache: "no-store" });
-            if (!response.ok) {
-              continue;
-            }
-
-            const text = await response.text();
-            if (/keine/i.test(text)) {
-              continue;
-            }
-
-            if (/Deine Suche nach/i.test(text) || !/keine Treffer/i.test(text)) {
-              return true;
-            }
-          } catch (error) {
-            // Try the next URL/term.
+      for (const url of urls) {
+        try {
+          const response = await fetch(url, { cache: "no-store" });
+          if (!response.ok) {
+            continue;
           }
+
+          const text = await response.text();
+          const haystack = text.toLowerCase();
+          if (terms.some((term) => haystack.includes(term.toLowerCase()))) {
+            return true;
+          }
+        } catch (error) {
+          // Try the next URL.
         }
       }
 
@@ -1393,8 +1392,8 @@
                     data-global-key="${item.globalKey}"
                     data-item-name="${item.name}"
                     data-available="unknown"
-                    aria-label="Bei REWE suchen: ${item.label}"
-                    title="Bei REWE suchen"
+                    aria-label="Im REWE-Warenkorb prüfen: ${item.label}"
+                    title="Im REWE-Warenkorb prüfen"
                   >${createIconMarkup("truck")}</button>
                 </span>
               </li>
@@ -1435,8 +1434,8 @@
                     data-instance-key="${item.instanceKey}"
                     data-item-name="${item.name}"
                     data-available="unknown"
-                    aria-label="Bei REWE suchen: ${item.label}"
-                    title="Bei REWE suchen"
+                    aria-label="Im REWE-Warenkorb prüfen: ${item.label}"
+                    title="Im REWE-Warenkorb prüfen"
                   >${createIconMarkup("truck")}</button>
                   <button
                     type="button"
@@ -1656,14 +1655,7 @@
       }
 
       if (action === "rewe") {
-        const globalKey = button.dataset.globalKey;
-        if (!globalKey) {
-          return;
-        }
-
-        const itemName = button.dataset.itemName || button.getAttribute("aria-label")?.replace(/^Bei REWE suchen:\s*/i, "") || "";
-        openReweSearchForItem(itemName);
-        setIngredientPurchasedFromKey(globalKey, !isPurchased(globalKey));
+        renderSummary();
         return;
       }
 
