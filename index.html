@@ -573,7 +573,15 @@
   <main>
     <h1>KARTE DES HAUSES</h1>
     <div class="top-actions">
-      <a class="icon-button" href="https://www.rewe.de/service/abholservice/" aria-label="REWE Abholservice öffnen" title="REWE Abholservice öffnen">
+      <button id="selectionCartButton" class="icon-button" type="button" aria-label="Auswahl in den Warenkorb legen" title="Auswahl in den Warenkorb legen">
+        <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+          <path d="M5 19h14"></path>
+          <path d="M8 16l8-8 2 2-8 8H8v-2z"></path>
+          <path d="M14.5 6.5l2 2"></path>
+          <path d="M11 11l2 2"></path>
+        </svg>
+      </button>
+      <a class="icon-button" href="https://account.rewe.de/realms/sso/protocol/openid-connect/auth?response_type=code&client_id=ecom&scope=openid%20profile&state=6pX-affIVEX-YblZbZXGS1k16wcIwiqp0Q24jo8llV0%3D&redirect_uri=https://www.rewe.de/login/oauth2/code/sso&nonce=5a0WIhTJB9LhN0L8jHdRabYR_By2KLcZrACfKT7ENow&code_challenge=SznV9eLZlrdAvYyxbZnDQVewk7q0lBBnoLiV6Yq-w3I&code_challenge_method=S256" aria-label="REWE Login öffnen" title="REWE Login öffnen">
         <i data-lucide="arrow-up-right" aria-hidden="true"></i>
       </a>
       <button id="summaryButton" class="icon-button" type="button" aria-label="Warenkorb öffnen" aria-expanded="false" title="Warenkorb öffnen">
@@ -646,6 +654,7 @@
     const errorEl = document.getElementById("error");
     const tableHead = document.getElementById("tableHead");
     const tableBody = document.getElementById("tableBody");
+    const selectionCartButton = document.getElementById("selectionCartButton");
     const summaryButton = document.getElementById("summaryButton");
     const summaryCount = document.getElementById("summaryCount");
     const summaryPanel = document.getElementById("summaryPanel");
@@ -1032,6 +1041,15 @@
 
     function toggleCart(rowIndex) {
       setCartState(rowIndex, !isInCart(rowIndex));
+    }
+
+    function addSelectionToCart() {
+      selectedRowIndexes.forEach((rowIndex) => {
+        setCartState(rowIndex, true);
+      });
+      saveCartState();
+      renderCurrentTable();
+      renderSummary();
     }
 
     function setIngredientPurchasedFromKey(key, active) {
@@ -1450,12 +1468,15 @@
       tableHead.innerHTML = "";
       tableBody.innerHTML = "";
 
+      const visibleHeaders = headers.filter((header) => header !== "Zutaten für 1 Portion");
+      const ingredientColumnIndex = headers.indexOf("Zutaten für 1 Portion");
+
       const headerRow = document.createElement("tr");
       const indexTh = document.createElement("th");
       indexTh.textContent = "#";
       headerRow.appendChild(indexTh);
 
-      headers.forEach((header) => {
+      visibleHeaders.forEach((header) => {
         const th = document.createElement("th");
         th.textContent = header;
         headerRow.appendChild(th);
@@ -1470,6 +1491,10 @@
         tr.appendChild(indexTd);
 
         row.forEach((cell, cellIndex) => {
+          if (cellIndex === ingredientColumnIndex) {
+            return;
+          }
+
           const td = document.createElement("td");
           const link = extractCellLink(cell);
           if (cellIndex === 1 && link) {
@@ -1483,7 +1508,7 @@
             a.className = "recipe-text-link";
             a.setAttribute("aria-label", `Rezept öffnen: ${row[0]}`);
             a.setAttribute("title", `Rezept öffnen: ${row[0]}`);
-            a.innerHTML = '<i data-lucide="link-2" aria-hidden="true"></i><span>Zum Rezept</span>';
+            a.innerHTML = '<i data-lucide="link-2" aria-hidden="true"></i>';
 
             const cartButton = document.createElement("button");
             cartButton.type = "button";
@@ -1661,6 +1686,15 @@
 
     summaryButton.addEventListener("click", () => {
       setSummaryVisibility(!isSummaryOpen);
+    });
+
+    selectionCartButton.addEventListener("click", () => {
+      if (selectedRowIndexes.length === 0) {
+        return;
+      }
+
+      addSelectionToCart();
+      setSummaryVisibility(true);
     });
 
     summaryCloseButton.addEventListener("click", () => {
