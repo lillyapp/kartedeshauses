@@ -414,26 +414,6 @@
       flex: 1;
     }
 
-    .rewe-badge {
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      width: 18px;
-      height: 18px;
-      flex: none;
-      color: var(--success);
-    }
-
-    .rewe-badge svg {
-      width: 18px;
-      height: 18px;
-      stroke-width: 2.2;
-      fill: none;
-      stroke: currentColor;
-      stroke-linecap: round;
-      stroke-linejoin: round;
-    }
-
     .ingredient-actions {
       display: inline-flex;
       align-items: center;
@@ -462,6 +442,10 @@
 
     .ingredient-action[data-active="true"] {
       color: var(--success);
+    }
+
+    .ingredient-action[data-available="false"] {
+      color: var(--muted);
     }
 
     .ingredient-action svg {
@@ -1187,6 +1171,16 @@
         `;
       }
 
+      if (name === "question-circle") {
+        return `
+          <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+            <circle cx="12" cy="12" r="9"></circle>
+            <path d="M9.5 9.3a3 3 0 1 1 4.9 2.3c-.9.7-1.9 1.2-1.9 2.4"></path>
+            <path d="M12 17h.01"></path>
+          </svg>
+        `;
+      }
+
       if (name === "trash-2") {
         return `
           <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
@@ -1246,38 +1240,22 @@
       return false;
     }
 
-    function renderReweBadge(span, available) {
-      if (!span) {
-        return;
-      }
-
-      span.hidden = !available;
-      if (!available) {
-        return;
-      }
-
-      span.innerHTML = `
-        <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
-          <circle cx="12" cy="12" r="9"></circle>
-          <path d="M8.5 12.3 10.8 14.6 15.8 9.4"></path>
-        </svg>
-      `;
-    }
-
-    async function refreshReweBadges(card, items, token) {
-      const badges = Array.from(card.querySelectorAll(".rewe-badge"));
+    async function refreshReweButtons(card, items, token) {
+      const buttons = Array.from(card.querySelectorAll('.ingredient-action[data-action="rewe"]'));
       await Promise.all(items.map(async (item, index) => {
-        const badge = badges[index];
-        if (!badge) {
+        const button = buttons[index];
+        if (!button) {
           return;
         }
 
         const available = await checkReweAvailability(item);
-        if (token !== summaryRenderToken || !badge.isConnected) {
+        if (token !== summaryRenderToken || !button.isConnected) {
           return;
         }
 
-        renderReweBadge(badge, available);
+        button.dataset.active = available ? "true" : "false";
+        button.dataset.available = available ? "true" : "false";
+        button.innerHTML = createIconMarkup(available ? "truck" : "question-circle");
       }));
     }
 
@@ -1336,13 +1314,13 @@
                   title="${item.label}"
                 >${item.label}</button>
                 <span class="ingredient-actions">
-                  <span class="rewe-badge" hidden aria-label="Bei REWE gefunden" title="Bei REWE gefunden"></span>
                   <button
                     type="button"
                     class="ingredient-action"
                     data-action="rewe"
                     data-global-key="${item.globalKey}"
                     data-item-name="${item.name}"
+                    data-available="unknown"
                     aria-label="Bei REWE suchen: ${item.label}"
                     title="Bei REWE suchen"
                   >${createIconMarkup("truck")}</button>
@@ -1353,7 +1331,7 @@
         `;
         summaryContent.innerHTML = "";
         summaryContent.appendChild(section);
-        refreshReweBadges(section, merged, renderToken);
+        refreshReweButtons(section, merged, renderToken);
         return;
       }
 
@@ -1377,7 +1355,6 @@
                   title="${item.label}"
                 >${item.label}</button>
                 <span class="ingredient-actions">
-                  <span class="rewe-badge" hidden aria-label="Bei REWE gefunden" title="Bei REWE gefunden"></span>
                   <button
                     type="button"
                     class="ingredient-action"
@@ -1385,6 +1362,7 @@
                     data-global-key="${item.globalKey}"
                     data-instance-key="${item.instanceKey}"
                     data-item-name="${item.name}"
+                    data-available="unknown"
                     aria-label="Bei REWE suchen: ${item.label}"
                     title="Bei REWE suchen"
                   >${createIconMarkup("truck")}</button>
@@ -1403,7 +1381,7 @@
           </ul>
         `;
         summaryContent.appendChild(section);
-        refreshReweBadges(section, items, renderToken);
+        refreshReweButtons(section, items, renderToken);
       });
     }
 
