@@ -677,7 +677,6 @@
     let portionScale = loadPortionScale();
     let hideSpices = loadHideSpices();
     let summaryRenderToken = 0;
-    const reweAvailabilityCache = new Map();
     let purchasedState = loadBooleanMap(PURCHASED_STORAGE_KEY);
     let excludedState = loadBooleanMap(EXCLUDED_STORAGE_KEY);
 
@@ -1280,16 +1279,12 @@
     }
 
     async function checkReweAvailability(item) {
-      const cacheKey = item.key;
-      if (reweAvailabilityCache.has(cacheKey)) {
-        return reweAvailabilityCache.get(cacheKey);
-      }
-
       const terms = buildReweSearchTerms(item);
       for (const term of terms) {
+        const cacheBust = `&_=${Date.now()}-${Math.random().toString(36).slice(2)}`;
         const urls = [
-          `${REWE_SEARCH_BASE_URL}${encodeURIComponent(term)}`,
-          `${REWE_PROXY_BASE_URL}${encodeURIComponent(term)}`
+          `${REWE_SEARCH_BASE_URL}${encodeURIComponent(term)}${cacheBust}`,
+          `${REWE_PROXY_BASE_URL}${encodeURIComponent(term)}${cacheBust}`
         ];
 
         for (const url of urls) {
@@ -1300,8 +1295,11 @@
             }
 
             const text = await response.text();
+            if (/keine/i.test(text)) {
+              continue;
+            }
+
             if (/Deine Suche nach/i.test(text) || !/keine Treffer/i.test(text)) {
-              reweAvailabilityCache.set(cacheKey, true);
               return true;
             }
           } catch (error) {
@@ -1310,7 +1308,6 @@
         }
       }
 
-      reweAvailabilityCache.set(cacheKey, false);
       return false;
     }
 
