@@ -671,7 +671,6 @@
     const EXCLUDED_STORAGE_KEY = "recipe-cart-excluded-v1";
     const REWE_SEARCH_BASE_URL = "https://www.rewe.de/shop/productList?search=";
     const REWE_PROXY_BASE_URL = "https://r.jina.ai/http://www.rewe.de/shop/productList?search=";
-    const REWE_BASKET_URL = "https://www.rewe.de/shop/checkout/basket";
     const REWE_BASKET_PROXY_URL = "https://r.jina.ai/http://www.rewe.de/shop/checkout/basket";
     let allHeaders = [];
     let allRows = [];
@@ -688,6 +687,11 @@
     let summaryRenderToken = 0;
     let purchasedState = loadBooleanMap(PURCHASED_STORAGE_KEY);
     let excludedState = loadBooleanMap(EXCLUDED_STORAGE_KEY);
+    let reweBasketSnapshot = {
+      text: "",
+      fetchedAt: 0,
+      promise: null
+    };
 
     function splitMarkdownRow(line) {
       return line
@@ -1289,43 +1293,63 @@
       return terms.filter(Boolean);
     }
 
-    async function checkReweAvailability(item) {
-      const terms = buildReweBasketTerms(item);
-      const cacheBust = `?_=${Date.now()}-${Math.random().toString(36).slice(2)}`;
-      const urls = [
-        `${REWE_BASKET_URL}${cacheBust}`,
-        `${REWE_BASKET_PROXY_URL}${cacheBust}`
-      ];
+    async function loadReweBasketSnapshot(force = false) {
+      const now = Date.now();
+      if (!force && reweBasketSnapshot.text && (now - reweBasketSnapshot.fetchedAt) < 5000) {
+        return reweBasketSnapshot.text;
+      }
 
-      for (const url of urls) {
+      if (reweBasketSnapshot.promise) {
+        return reweBasketSnapshot.promise;
+      }
+
+      reweBasketSnapshot.promise = (async () => {
+        const cacheBust = `?_=${now}-${Math.random().toString(36).slice(2)}`;
+        const url = `${REWE_BASKET_PROXY_URL}${cacheBust}`;
+
         try {
           const response = await fetch(url, { cache: "no-store" });
           if (!response.ok) {
-            continue;
+            reweBasketSnapshot.text = "";
+            reweBasketSnapshot.fetchedAt = now;
+            return "";
           }
 
           const text = await response.text();
-          const haystack = text.toLowerCase();
-          if (terms.some((term) => haystack.includes(term.toLowerCase()))) {
-            return true;
-          }
+          reweBasketSnapshot.text = text;
+          reweBasketSnapshot.fetchedAt = now;
+          return text;
         } catch (error) {
-          // Try the next URL.
+          reweBasketSnapshot.text = "";
+          reweBasketSnapshot.fetchedAt = now;
+          return "";
+        } finally {
+          reweBasketSnapshot.promise = null;
         }
+      })();
+
+      return reweBasketSnapshot.promise;
+    }
+
+    function isItemInBasket(item, basketText) {
+      const haystack = (basketText || "").toLowerCase();
+      if (!haystack) {
+        return false;
       }
 
-      return false;
+      return buildReweBasketTerms(item).some((term) => haystack.includes(term.toLowerCase()));
     }
 
     async function refreshReweButtons(card, items, token) {
       const buttons = Array.from(card.querySelectorAll('.ingredient-action[data-action="rewe"]'));
+      const basketText = await loadReweBasketSnapshot();
       await Promise.all(items.map(async (item, index) => {
         const button = buttons[index];
         if (!button) {
           return;
         }
 
-        const available = await checkReweAvailability(item);
+        const available = isItemInBasket(item, basketText);
         if (token !== summaryRenderToken || !button.isConnected) {
           return;
         }
