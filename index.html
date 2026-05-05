@@ -240,17 +240,11 @@
     }
 
     .summary-panel {
-      position: fixed;
-      top: 18px;
-      right: 18px;
-      z-index: 30;
-      width: min(460px, calc(100vw - 36px));
-      max-height: calc(100vh - 36px);
-      overflow: auto;
+      width: 100%;
       border: 1px solid var(--line);
       background: var(--panel-bg);
-      box-shadow: 0 18px 50px rgba(0, 0, 0, 0.12);
       padding: 16px;
+      margin: 0 0 18px;
     }
 
     .summary-panel[hidden] {
@@ -435,7 +429,7 @@
   <main>
     <h1>KARTE DES HAUSES</h1>
     <div class="top-actions">
-      <button id="summaryButton" class="icon-button" type="button" aria-label="Rezeptübersicht öffnen" title="Rezeptübersicht öffnen">
+      <button id="summaryButton" class="icon-button" type="button" aria-label="Rezeptübersicht öffnen" aria-expanded="false" title="Rezeptübersicht öffnen">
         <i data-lucide="receipt-text" aria-hidden="true"></i>
         <span id="summaryCount" class="icon-badge" hidden>0</span>
       </button>
@@ -454,6 +448,25 @@
         Warme / kalte Speisen
       </label>
     </div>
+    <section id="summaryPanel" class="summary-panel" hidden aria-label="Rezeptübersicht">
+      <div class="summary-header">
+        <div>
+          <h2 class="summary-title">Rezept-Übersicht</h2>
+          <p id="summaryMeta" class="summary-subtitle"></p>
+        </div>
+        <button id="summaryCloseButton" class="icon-button" type="button" aria-label="Übersicht schließen" title="Übersicht schließen">
+          <i data-lucide="x" aria-hidden="true"></i>
+        </button>
+      </div>
+      <div class="summary-tools">
+        <label class="summary-toggle">
+          <input id="combineToggle" type="checkbox">
+          Alles zusammenfassen
+        </label>
+        <button id="clearCartButton" type="button">Alle entfernen</button>
+      </div>
+      <div id="summaryContent" class="summary-list"></div>
+    </section>
     <div id="status" class="status"></div>
     <div id="error" class="error" hidden></div>
     <div class="table-wrap">
@@ -463,26 +476,6 @@
       </table>
     </div>
   </main>
-
-  <aside id="summaryPanel" class="summary-panel" hidden aria-label="Rezeptübersicht">
-    <div class="summary-header">
-      <div>
-        <h2 class="summary-title">Rezept-Übersicht</h2>
-        <p id="summaryMeta" class="summary-subtitle"></p>
-      </div>
-      <button id="summaryCloseButton" class="icon-button" type="button" aria-label="Übersicht schließen" title="Übersicht schließen">
-        <i data-lucide="x" aria-hidden="true"></i>
-      </button>
-    </div>
-    <div class="summary-tools">
-      <label class="summary-toggle">
-        <input id="combineToggle" type="checkbox">
-        Alles zusammenfassen
-      </label>
-      <button id="clearCartButton" type="button">Alle entfernen</button>
-    </div>
-    <div id="summaryContent" class="summary-list"></div>
-  </aside>
 
   <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
 
@@ -576,6 +569,149 @@
       }
 
       return null;
+    }
+
+    const INGREDIENT_ALIASES = new Map([
+      ["eier", "ei"],
+      ["ei", "ei"],
+      ["eigelbe", "eigelb"],
+      ["eigelb", "eigelb"],
+      ["zehen knoblauch", "knoblauch"],
+      ["zehe knoblauch", "knoblauch"],
+      ["knoblauchzehe", "knoblauch"],
+      ["knoblauchzehen", "knoblauch"],
+      ["walnüsse", "walnuss"],
+      ["walnusskerne", "walnuss"],
+      ["mandeln", "mandel"],
+      ["mandel", "mandel"],
+      ["bananen", "banane"],
+      ["banane", "banane"],
+      ["blaubeeren", "blaubeere"],
+      ["blaubeere", "blaubeere"],
+      ["chia-samen", "chiasamen"],
+      ["chiasamen", "chiasamen"],
+      ["kirschtomaten", "kirschtomate"],
+      ["kirschtomate", "kirschtomate"],
+      ["cocktailtomaten", "kirschtomate"],
+      ["cocktailtomate", "kirschtomate"],
+      ["tomaten", "tomate"],
+      ["tomate", "tomate"],
+      ["zuckerschoten", "zuckerschote"],
+      ["zuckerschote", "zuckerschote"],
+      ["limetten", "limette"],
+      ["limette", "limette"],
+      ["zitronen", "zitrone"],
+      ["zitrone", "zitrone"],
+      ["karotten", "karotte"],
+      ["karotte", "karotte"],
+      ["süßkartoffeln", "süßkartoffel"],
+      ["süßkartoffel", "süßkartoffel"],
+      ["hähnchenbrustfilets", "hähnchenbrustfilet"],
+      ["hähnchenbrustfilet", "hähnchenbrustfilet"],
+      ["hähnchenbrust", "hähnchenbrustfilet"],
+      ["romana salatherzen", "romana salatherz"],
+      ["romana salatherz", "romana salatherz"],
+      ["parmesankäse", "parmesan"],
+      ["parmesan", "parmesan"],
+      ["parmesan (gerieben)", "parmesan"],
+      ["pecorinokäse", "pecorino"],
+      ["pecorino", "pecorino"],
+      ["fetakäse", "feta"],
+      ["feta", "feta"],
+      ["mozzarellakäse", "mozzarella"],
+      ["mozzarella", "mozzarella"],
+      ["cheddarkäse", "cheddar"],
+      ["cheddar", "cheddar"],
+      ["pitabrote", "pitabrot"],
+      ["pitabrot", "pitabrot"],
+      ["sardellenfilets", "sardellenfilet"],
+      ["sardellenfilet", "sardellenfilet"],
+      ["schlagsahne", "sahne"],
+      ["sahne", "sahne"],
+      ["haselnüsse", "haselnuss"],
+      ["haselnuss", "haselnuss"],
+      ["pinienkerne", "pinienkern"],
+      ["pinienkern", "pinienkern"],
+      ["butter (zum einfetten)", "butter"],
+      ["ungesalzene butter", "butter"],
+      ["butter", "butter"],
+      ["rote zwiebel", "rote zwiebel"],
+      ["zwiebel (rot)", "rote zwiebel"],
+      ["rote paprika", "rote paprika"],
+      ["paprika (rot)", "rote paprika"],
+      ["gelbe paprika", "gelbe paprika"],
+      ["paprika (gelb)", "gelbe paprika"],
+      ["zwiebeln", "zwiebel"],
+      ["zwiebel", "zwiebel"],
+      ["spinat (gefroren)", "spinat"],
+      ["brötchen (vom vortag)", "brötchen"],
+      ["olivenöl (zum bestreuen)", "olivenöl"],
+      ["limette (abrieb und saft)", "limette"],
+      ["stangen", "stange"],
+      ["stange", "stange"],
+      ["blätter", "blatt"],
+      ["blatt", "blatt"],
+      ["zweige", "zweig"],
+      ["zweig", "zweig"],
+      ["scheiben", "scheibe"],
+      ["scheibe", "scheibe"]
+    ]);
+
+    function normalizeIngredientName(name) {
+      const cleaned = name
+        .replace(/\s*\(.*?\)\s*/g, " ")
+        .replace(/\b(zum servieren|zum garnieren|zum bestäuben|zum anbraten|optional)\b/gi, " ")
+        .replace(/\s+/g, " ")
+        .trim()
+        .toLowerCase();
+
+      if (/\brote?\s+zwiebel\b|\bzwiebel\s+rot\b/.test(cleaned)) {
+        return "rote zwiebel";
+      }
+      if (/\brote?\s+paprika\b|\bpaprika\s+rot\b|\bgegrillte paprika\b/.test(cleaned)) {
+        return "rote paprika";
+      }
+      if (/\bgelbe?\s+paprika\b|\bpaprika\s+gelb\b/.test(cleaned)) {
+        return "gelbe paprika";
+      }
+      if (/\bbutter\b/.test(cleaned)) {
+        return "butter";
+      }
+      if (/\bspinat\s+gefroren\b/.test(cleaned)) {
+        return "spinat";
+      }
+      if (/\bbrötchen\s+vom vortag\b/.test(cleaned)) {
+        return "brötchen";
+      }
+      if (/\blimette\s+abrieb und saft\b/.test(cleaned)) {
+        return "limette";
+      }
+      if (/\bcocktailtomate\b|\bkirschtomate\b/.test(cleaned)) {
+        return "kirschtomate";
+      }
+      if (/\bhähnchenbrust\b/.test(cleaned)) {
+        return "hähnchenbrustfilet";
+      }
+
+      if (INGREDIENT_ALIASES.has(cleaned)) {
+        return INGREDIENT_ALIASES.get(cleaned);
+      }
+
+      return cleaned
+        .replace(/^zehen\s+knoblauch$/, "knoblauch")
+        .replace(/^zehe\s+knoblauch$/, "knoblauch")
+        .replace(/\s+käse$/, "")
+        .replace(/\s+filets$/, "")
+        .replace(/\s+kerne$/, "")
+        .replace(/\s+eier$/, "")
+        .replace(/\s+limetten$/, "")
+        .replace(/\s+zitronen$/, "")
+        .replace(/\s+tomaten$/, "")
+        .replace(/\s+beeren$/, "")
+        .replace(/\s+brote$/, "")
+        .replace(/\s+scheiben$/, " scheibe")
+        .replace(/\s+zweige$/, " zweig")
+        .replace(/\s+stangen$/, " stange");
     }
 
     function getStoredCart() {
@@ -696,11 +832,7 @@
         name = rest;
       }
 
-      const normalizedName = name
-        .replace(/\s*\(.*?\)\s*/g, " ")
-        .replace(/\s+/g, " ")
-        .trim()
-        .toLowerCase();
+      const normalizedName = normalizeIngredientName(name);
 
       return {
         quantity,
@@ -767,6 +899,7 @@
       isSummaryOpen = visible;
       summaryPanel.hidden = !visible;
       summaryButton.dataset.active = visible ? "true" : "false";
+      summaryButton.setAttribute("aria-expanded", visible ? "true" : "false");
       if (visible) {
         renderSummary();
       }
