@@ -969,8 +969,15 @@
       return String(rounded).replace(/\.0+$/, "").replace(/(\.\d*[1-9])0+$/, "$1");
     }
 
+    function shouldRoundQuantity(unit) {
+      return ["g", "kg", "Stück"].includes(unit);
+    }
+
     function formatIngredientLabel(item, scale = 1) {
-      const quantity = item.quantity === null ? "" : `${formatAmount(item.quantity * scale)} `;
+      const amount = item.quantity === null ? null : item.quantity * scale;
+      const quantity = amount === null
+        ? ""
+        : `${shouldRoundQuantity(item.unit) ? String(Math.round(amount)) : formatAmount(amount)} `;
       const unit = item.unit ? `${item.unit} ` : "";
       return `${quantity}${unit}${item.name}`.trim();
     }
