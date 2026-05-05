@@ -1689,18 +1689,11 @@
           });
         }
 
-        // Add extra kcal if active for this slot
+        // Add extra kcal if active for this slot (×2 for Frühstück + Abendessen)
         const extra = slotExtraKcal[slot] || { active: false, kcal: 400 };
-        const extraKcal = extra.active ? (Number(extra.kcal) || 0) : 0;
+        const extraKcal = extra.active ? (Number(extra.kcal) || 0) * 2 : 0;
         const totalKcal = kcalSum + extraKcal;
         const kcalLabel = (hasKcal || extra.active) ? `${totalKcal} kcal` : "";
-
-        // Wheat SVG icon
-        const wheatSvg = `<svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
-          <path d="M12 22V12"></path>
-          <path d="M12 12C12 12 7 9 7 5c0-2 2-3 5-3s5 1 5 3c0 4-5 7-5 7z"></path>
-          <path d="M12 12c0 0-5 3-5 7h10c0-4-5-7-5-7z"></path>
-        </svg>`;
 
         return `
           <section class="week-plan-column" data-slot="${slot}">
@@ -1721,9 +1714,9 @@
                 class="week-plan-wheat-btn"
                 data-slot="${slot}"
                 data-active="${extra.active ? "true" : "false"}"
-                title="Frühstück &amp; Abendessen einrechnen"
+                title="Frühstück &amp; Abendessen einrechnen (je 1×)"
                 aria-label="Frühstück &amp; Abendessen einrechnen"
-              >${wheatSvg}</button>
+              ><i data-lucide="wheat" aria-hidden="true"></i></button>
               <span class="week-plan-extras-label">Fr. &amp; Ab.</span>
               <input
                 type="number"
@@ -1732,7 +1725,7 @@
                 value="${extra.kcal || 400}"
                 min="0"
                 step="10"
-                title="Kcal für Frühstück &amp; Abendessen"
+                title="Kcal pro Mahlzeit (wird ×2 gerechnet)"
                 aria-label="Kcal für Frühstück &amp; Abendessen"
               >
               <span style="font-size:11px;color:var(--muted)">kcal</span>
