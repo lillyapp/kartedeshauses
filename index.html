@@ -168,6 +168,96 @@
       color: var(--fg);
     }
 
+    .week-plan-title-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin: 0 0 10px;
+      gap: 6px;
+    }
+
+    .week-plan-title-row .week-plan-title {
+      margin: 0;
+    }
+
+    .week-plan-kcal-badge {
+      font-size: 11px;
+      font-weight: 700;
+      color: var(--muted);
+      white-space: nowrap;
+      letter-spacing: 0.02em;
+    }
+
+    .week-plan-extras {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      margin: 8px 0 0;
+      padding-top: 8px;
+      border-top: 1px dashed rgba(0,0,0,0.15);
+    }
+
+    .week-plan-extras-label {
+      font-size: 11px;
+      color: var(--muted);
+      flex: 1;
+      min-width: 0;
+    }
+
+    .week-plan-wheat-btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 26px;
+      height: 26px;
+      border: 0;
+      border-radius: 999px;
+      background: transparent;
+      color: var(--muted);
+      padding: 0;
+      cursor: pointer;
+      box-shadow: none;
+      flex: none;
+    }
+
+    .week-plan-wheat-btn:hover,
+    .week-plan-wheat-btn:focus-visible {
+      background: rgba(0,0,0,0.07);
+      color: var(--fg);
+    }
+
+    .week-plan-wheat-btn[data-active="true"] {
+      background: #fff8e7;
+      color: #b8860b;
+    }
+
+    .week-plan-wheat-btn svg {
+      width: 15px;
+      height: 15px;
+      stroke-width: 1.8;
+      fill: none;
+      stroke: currentColor;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+    }
+
+    .week-plan-extra-input {
+      width: 52px;
+      padding: 3px 5px;
+      border: 1px solid rgba(0,0,0,0.18);
+      border-radius: 5px;
+      font: inherit;
+      font-size: 11px;
+      text-align: center;
+      background: #fff;
+      color: var(--fg);
+    }
+
+    .week-plan-extra-input:focus {
+      outline: 2px solid var(--fg);
+      outline-offset: 1px;
+    }
+
     .week-plan-items {
       display: grid;
       gap: 7px;
@@ -1054,6 +1144,7 @@
     const SPICE_FILTER_STORAGE_KEY = "recipe-cart-spice-filter-v1";
     const PURCHASED_STORAGE_KEY = "recipe-cart-purchased-v1";
     const EXCLUDED_STORAGE_KEY = "recipe-cart-excluded-v1";
+    const EXTRA_KCAL_STORAGE_KEY = "recipe-week-extra-kcal-v1";
     const REWE_SEARCH_BASE_URL = "https://www.rewe.de/shop/productList?search=";
     const REWE_PROXY_BASE_URL = "https://r.jina.ai/http://www.rewe.de/shop/productList?search=";
     const REWE_BASKET_PROXY_URL = "https://r.jina.ai/http://www.rewe.de/shop/checkout/basket";
@@ -1074,6 +1165,10 @@
     let summaryRenderToken = 0;
     let purchasedState = loadBooleanMap(PURCHASED_STORAGE_KEY);
     let excludedState = loadBooleanMap(EXCLUDED_STORAGE_KEY);
+
+    // Extra kcal per slot (for generic Frühstück/Abendessen)
+    // slotExtraKcal[slot] = { active: bool, kcal: number }
+    let slotExtraKcal = loadSlotExtraKcal();
     let reweBasketSnapshot = {
       text: "",
       fetchedAt: 0,
@@ -1364,6 +1459,20 @@
       localStorage.setItem(storageKey, JSON.stringify(value));
     }
 
+    function loadSlotExtraKcal() {
+      try {
+        const raw = localStorage.getItem(EXTRA_KCAL_STORAGE_KEY);
+        const parsed = raw ? JSON.parse(raw) : {};
+        return parsed && typeof parsed === "object" ? parsed : {};
+      } catch (error) {
+        return {};
+      }
+    }
+
+    function saveSlotExtraKcal() {
+      localStorage.setItem(EXTRA_KCAL_STORAGE_KEY, JSON.stringify(slotExtraKcal));
+    }
+
     function isPurchased(key) {
       return Boolean(purchasedState[key]);
     }
@@ -1560,21 +1669,77 @@
 
       syncWeekPlanState(entries);
       const titles = ["TAG 1 · 2", "TAG 3 · 4", "TAG 5 · 6", "TAG 7 · 8", "TAG 9 · 10"];
+      const kcalIndex = allHeaders.indexOf("kcal pro Portion");
       weekPlan.hidden = false;
-      weekPlanGrid.innerHTML = titles.map((title, slot) => `
-        <section class="week-plan-column" data-slot="${slot}">
-          <h2 class="week-plan-title">${title}</h2>
-          <div class="week-plan-items">
-            ${entries
-              .filter(({ rowIndex }) => weekPlanState[String(rowIndex)] === slot)
-              .map(({ row, rowIndex }) => `
+
+      weekPlanGrid.innerHTML = titles.map((title, slot) => {
+        const slotEntries = entries.filter(({ rowIndex }) => weekPlanState[String(rowIndex)] === slot);
+
+        // Sum kcal from recipes in this slot
+        let kcalSum = 0;
+        let hasKcal = false;
+        if (kcalIndex !== -1) {
+          slotEntries.forEach(({ row }) => {
+            const raw = (row[kcalIndex] || "").replace(/[^\d]/g, "");
+            const val = Number(raw);
+            if (val > 0) {
+              kcalSum += val;
+              hasKcal = true;
+            }
+          });
+        }
+
+        // Add extra kcal if active for this slot
+        const extra = slotExtraKcal[slot] || { active: false, kcal: 400 };
+        const extraKcal = extra.active ? (Number(extra.kcal) || 0) : 0;
+        const totalKcal = kcalSum + extraKcal;
+        const kcalLabel = (hasKcal || extra.active) ? `${totalKcal} kcal` : "";
+
+        // Wheat SVG icon
+        const wheatSvg = `<svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+          <path d="M12 22V12"></path>
+          <path d="M12 12C12 12 7 9 7 5c0-2 2-3 5-3s5 1 5 3c0 4-5 7-5 7z"></path>
+          <path d="M12 12c0 0-5 3-5 7h10c0-4-5-7-5-7z"></path>
+        </svg>`;
+
+        return `
+          <section class="week-plan-column" data-slot="${slot}">
+            <div class="week-plan-title-row">
+              <h2 class="week-plan-title">${title}</h2>
+              ${kcalLabel ? `<span class="week-plan-kcal-badge">${kcalLabel}</span>` : ""}
+            </div>
+            <div class="week-plan-items">
+              ${slotEntries.map(({ row, rowIndex }) => `
                 <button class="week-plan-item" type="button" draggable="true" data-row-index="${rowIndex}">
                   ${row[0]}
                 </button>
               `).join("")}
-          </div>
-        </section>
-      `).join("");
+            </div>
+            <div class="week-plan-extras">
+              <button
+                type="button"
+                class="week-plan-wheat-btn"
+                data-slot="${slot}"
+                data-active="${extra.active ? "true" : "false"}"
+                title="Frühstück &amp; Abendessen einrechnen"
+                aria-label="Frühstück &amp; Abendessen einrechnen"
+              >${wheatSvg}</button>
+              <span class="week-plan-extras-label">Fr. &amp; Ab.</span>
+              <input
+                type="number"
+                class="week-plan-extra-input"
+                data-slot="${slot}"
+                value="${extra.kcal || 400}"
+                min="0"
+                step="10"
+                title="Kcal für Frühstück &amp; Abendessen"
+                aria-label="Kcal für Frühstück &amp; Abendessen"
+              >
+              <span style="font-size:11px;color:var(--muted)">kcal</span>
+            </div>
+          </section>
+        `;
+      }).join("");
 
       if (window.lucide && typeof window.lucide.createIcons === "function") {
         window.lucide.createIcons();
@@ -2369,6 +2534,31 @@
       toggleCart(rowIndex);
     });
 
+    // Wheat button toggle
+    weekPlan.addEventListener("click", (event) => {
+      const btn = event.target.closest(".week-plan-wheat-btn");
+      if (!btn) return;
+      const slot = Number(btn.dataset.slot);
+      if (Number.isNaN(slot)) return;
+      const existing = slotExtraKcal[slot] || { active: false, kcal: 400 };
+      slotExtraKcal[slot] = { ...existing, active: !existing.active };
+      saveSlotExtraKcal();
+      renderWeekPlan();
+    });
+
+    // Extra kcal input change
+    weekPlan.addEventListener("change", (event) => {
+      const input = event.target.closest(".week-plan-extra-input");
+      if (!input) return;
+      const slot = Number(input.dataset.slot);
+      if (Number.isNaN(slot)) return;
+      const val = Math.max(0, Number(input.value) || 0);
+      const existing = slotExtraKcal[slot] || { active: false, kcal: 400 };
+      slotExtraKcal[slot] = { ...existing, kcal: val };
+      saveSlotExtraKcal();
+      renderWeekPlan();
+    });
+
     weekPlan.addEventListener("dragstart", (event) => {
       const item = event.target.closest(".week-plan-item");
       if (!item) {
@@ -2542,6 +2732,7 @@
       weekPlanState = {};
       purchasedState = {};
       excludedState = {};
+      slotExtraKcal = {};
       activeBasketText = "";
       isBasketLoading = false;
       reweBasketSnapshot.text = "";
@@ -2551,6 +2742,7 @@
       saveWeekPlanState();
       saveBooleanMap(PURCHASED_STORAGE_KEY, purchasedState);
       saveBooleanMap(EXCLUDED_STORAGE_KEY, excludedState);
+      saveSlotExtraKcal();
       renderCurrentTable();
       renderWeekPlan();
       renderSummary();
