@@ -377,6 +377,14 @@
       padding-bottom: 6px;
     }
 
+    .summary-ingredients li[data-purchased="true"],
+    .summary-ingredients li[data-excluded="true"],
+    .summary-aggregate li[data-purchased="true"] {
+      color: var(--muted);
+      text-decoration: line-through;
+      text-decoration-thickness: 1px;
+    }
+
     .summary-ingredients-item {
       min-width: 0;
       flex: 1;
@@ -424,6 +432,64 @@
       stroke: currentColor;
       stroke-linecap: round;
       stroke-linejoin: round;
+    }
+
+    .ingredient-actions {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      flex: none;
+    }
+
+    .ingredient-action {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 24px;
+      height: 24px;
+      padding: 0;
+      border: 0;
+      background: transparent;
+      color: var(--fg);
+      border-radius: 999px;
+      box-shadow: none;
+    }
+
+    .ingredient-action:hover,
+    .ingredient-action:focus-visible {
+      background: rgba(0, 0, 0, 0.06);
+    }
+
+    .ingredient-action[data-active="true"] {
+      color: var(--success);
+    }
+
+    .ingredient-action svg {
+      width: 16px;
+      height: 16px;
+      stroke-width: 2;
+      fill: none;
+      stroke: currentColor;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+    }
+
+    .ingredient-main {
+      flex: 1;
+      min-width: 0;
+      padding: 0;
+      border: 0;
+      background: transparent;
+      color: inherit;
+      text-align: left;
+      font: inherit;
+      line-height: inherit;
+    }
+
+    .ingredient-main:hover,
+    .ingredient-main:focus-visible {
+      text-decoration: underline;
+      text-underline-offset: 2px;
     }
 
     .summary-empty {
@@ -600,6 +666,8 @@
     const clearCartButton = document.getElementById("clearCartButton");
 
     const PORTION_SCALE_STORAGE_KEY = "recipe-cart-portion-scale-v1";
+    const PURCHASED_STORAGE_KEY = "recipe-cart-purchased-v1";
+    const EXCLUDED_STORAGE_KEY = "recipe-cart-excluded-v1";
     const REWE_SEARCH_BASE_URL = "https://www.rewe.de/suche/uebersicht?searchTerm=";
     const REWE_PROXY_BASE_URL = "https://r.jina.ai/http://www.rewe.de/suche/uebersicht?searchTerm=";
     let allHeaders = [];
@@ -615,6 +683,8 @@
     let portionScale = loadPortionScale();
     let summaryRenderToken = 0;
     const reweAvailabilityCache = new Map();
+    let purchasedState = loadBooleanMap(PURCHASED_STORAGE_KEY);
+    let excludedState = loadBooleanMap(EXCLUDED_STORAGE_KEY);
 
     function splitMarkdownRow(line) {
       return line
@@ -850,6 +920,58 @@
       localStorage.setItem(PORTION_SCALE_STORAGE_KEY, String(portionScale));
     }
 
+    function loadBooleanMap(storageKey) {
+      try {
+        const raw = localStorage.getItem(storageKey);
+        if (!raw) {
+          return {};
+        }
+
+        const parsed = JSON.parse(raw);
+        return parsed && typeof parsed === "object" ? parsed : {};
+      } catch (error) {
+        return {};
+      }
+    }
+
+    function saveBooleanMap(storageKey, value) {
+      localStorage.setItem(storageKey, JSON.stringify(value));
+    }
+
+    function isPurchased(key) {
+      return Boolean(purchasedState[key]);
+    }
+
+    function setPurchased(key, active) {
+      if (active) {
+        purchasedState[key] = true;
+      } else {
+        delete purchasedState[key];
+      }
+      saveBooleanMap(PURCHASED_STORAGE_KEY, purchasedState);
+    }
+
+    function togglePurchased(key) {
+      setPurchased(key, !isPurchased(key));
+    }
+
+    function isExcluded(key) {
+      return Boolean(excludedState[key]);
+    }
+
+    function setExcluded(key, active) {
+      if (active) {
+        excludedState[key] = true;
+      } else {
+        delete excludedState[key];
+      }
+      saveBooleanMap(EXCLUDED_STORAGE_KEY, excludedState);
+    }
+
+    function toggleExcluded(key) {
+      setExcluded(key, !isExcluded(key));
+    }
+
     function getRecipeKey(rowIndex) {
       return String(rowIndex);
     }
@@ -872,6 +994,24 @@
 
     function toggleCart(rowIndex) {
       setCartState(rowIndex, !isInCart(rowIndex));
+    }
+
+    function setIngredientPurchasedFromKey(key, active) {
+      setPurchased(key, active);
+      if (isSummaryOpen) {
+        renderSummary();
+      }
+    }
+
+    function setIngredientExcludedFromKey(key, active) {
+      setExcluded(key, active);
+      if (isSummaryOpen) {
+        renderSummary();
+      }
+    }
+
+    function openReweSearchForItem(itemName) {
+      window.open(`${REWE_SEARCH_BASE_URL}${encodeURIComponent(itemName)}`, "_blank", "noopener,noreferrer");
     }
 
     function parseFractionToken(token) {
@@ -982,16 +1122,20 @@
       return `${quantity}${unit}${item.name}`.trim();
     }
 
-    function getIngredientsForRow(row, scale = 1) {
+    function getIngredientsForRow(row, rowIndex, scale = 1) {
       const ingredientCell = row[2] || "";
       return ingredientCell
         .split(/<br\s*\/?>/i)
         .map((part) => part.trim())
         .filter(Boolean)
-        .map((line) => {
+        .map((line, ingredientIndex) => {
           const parsed = parseIngredientLine(line);
           return {
             ...parsed,
+            rowIndex,
+            ingredientIndex,
+            instanceKey: `${rowIndex}|${ingredientIndex}|${parsed.key}`,
+            globalKey: parsed.key,
             label: formatIngredientLabel(parsed, scale)
           };
         });
@@ -1000,8 +1144,12 @@
     function mergeIngredientDetails(rows, scale = 1) {
       const grouped = new Map();
 
-      rows.forEach(({ row }) => {
-        getIngredientsForRow(row).forEach((parsed) => {
+      rows.forEach(({ row, rowIndex }) => {
+        getIngredientsForRow(row, rowIndex).forEach((parsed) => {
+          if (isExcluded(parsed.instanceKey)) {
+            return;
+          }
+
           const existing = grouped.get(parsed.key);
           if (!existing) {
             grouped.set(parsed.key, { ...parsed, quantity: parsed.quantity || null, recipes: new Set() });
@@ -1025,6 +1173,33 @@
 
     function mergeIngredients(rows, scale = 1) {
       return mergeIngredientDetails(rows, scale).map((item) => item.label);
+    }
+
+    function createIconMarkup(name) {
+      if (name === "truck") {
+        return `
+          <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+            <path d="M3 7h11v10H3z"></path>
+            <path d="M14 10h3l3 3v4h-6z"></path>
+            <circle cx="7" cy="18" r="1.5"></circle>
+            <circle cx="18" cy="18" r="1.5"></circle>
+          </svg>
+        `;
+      }
+
+      if (name === "trash-2") {
+        return `
+          <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+            <path d="M3 6h18"></path>
+            <path d="M8 6V4h8v2"></path>
+            <path d="M6 6l1 14h10l1-14"></path>
+            <path d="M10 11v5"></path>
+            <path d="M14 11v5"></path>
+          </svg>
+        `;
+      }
+
+      return "";
     }
 
     function buildReweSearchTerms(item) {
@@ -1151,9 +1326,27 @@
         section.innerHTML = `
           <ul class="summary-aggregate">
             ${merged.map((item) => `
-              <li>
-                <span class="summary-aggregate-item">${item.label}</span>
-                <span class="rewe-badge" hidden aria-label="Bei REWE gefunden" title="Bei REWE gefunden"></span>
+              <li data-purchased="${isPurchased(item.globalKey) ? "true" : "false"}">
+                <button
+                  type="button"
+                  class="ingredient-main"
+                  data-action="toggle-purchased"
+                  data-global-key="${item.globalKey}"
+                  aria-label="${item.label}"
+                  title="${item.label}"
+                >${item.label}</button>
+                <span class="ingredient-actions">
+                  <span class="rewe-badge" hidden aria-label="Bei REWE gefunden" title="Bei REWE gefunden"></span>
+                  <button
+                    type="button"
+                    class="ingredient-action"
+                    data-action="rewe"
+                    data-global-key="${item.globalKey}"
+                    data-item-name="${item.name}"
+                    aria-label="Bei REWE suchen: ${item.label}"
+                    title="Bei REWE suchen"
+                  >${createIconMarkup("truck")}</button>
+                </span>
               </li>
             `).join("")}
           </ul>
@@ -1165,17 +1358,46 @@
       }
 
       summaryContent.innerHTML = "";
-      selected.forEach(({ row }) => {
-        const items = getIngredientsForRow(row, 1);
+      selected.forEach(({ row, rowIndex }) => {
+        const items = getIngredientsForRow(row, rowIndex, 1);
         const section = document.createElement("section");
         section.className = "summary-card";
         section.innerHTML = `
           <h3>${row[0]}</h3>
           <ul class="summary-ingredients">
             ${items.map((item) => `
-              <li>
-                <span class="summary-ingredients-item">${item.label}</span>
-                <span class="rewe-badge" hidden aria-label="Bei REWE gefunden" title="Bei REWE gefunden"></span>
+              <li data-purchased="${isPurchased(item.globalKey) ? "true" : "false"}" data-excluded="${isExcluded(item.instanceKey) ? "true" : "false"}">
+                <button
+                  type="button"
+                  class="ingredient-main"
+                  data-action="toggle-purchased"
+                  data-global-key="${item.globalKey}"
+                  data-instance-key="${item.instanceKey}"
+                  aria-label="${item.label}"
+                  title="${item.label}"
+                >${item.label}</button>
+                <span class="ingredient-actions">
+                  <span class="rewe-badge" hidden aria-label="Bei REWE gefunden" title="Bei REWE gefunden"></span>
+                  <button
+                    type="button"
+                    class="ingredient-action"
+                    data-action="rewe"
+                    data-global-key="${item.globalKey}"
+                    data-instance-key="${item.instanceKey}"
+                    data-item-name="${item.name}"
+                    aria-label="Bei REWE suchen: ${item.label}"
+                    title="Bei REWE suchen"
+                  >${createIconMarkup("truck")}</button>
+                  <button
+                    type="button"
+                    class="ingredient-action"
+                    data-action="delete"
+                    data-instance-key="${item.instanceKey}"
+                    aria-label="${isExcluded(item.instanceKey) ? "Wieder einblenden" : "Ausblenden"}: ${item.label}"
+                    title="${isExcluded(item.instanceKey) ? "Wieder einblenden" : "Ausblenden"}"
+                    data-active="${isExcluded(item.instanceKey) ? "true" : "false"}"
+                  >${createIconMarkup("trash-2")}</button>
+                </span>
               </li>
             `).join("")}
           </ul>
@@ -1356,6 +1578,48 @@
       toggleCart(rowIndex);
     });
 
+    summaryContent.addEventListener("click", (event) => {
+      const actionButton = event.target.closest("[data-action]");
+      const mainButton = event.target.closest(".ingredient-main");
+      if (!actionButton && !mainButton) {
+        return;
+      }
+
+      const button = actionButton || mainButton;
+      const action = button.dataset.action || "toggle-purchased";
+
+      if (action === "toggle-purchased") {
+        const globalKey = button.dataset.globalKey;
+        if (!globalKey) {
+          return;
+        }
+
+        setIngredientPurchasedFromKey(globalKey, !isPurchased(globalKey));
+        return;
+      }
+
+      if (action === "rewe") {
+        const globalKey = button.dataset.globalKey;
+        if (!globalKey) {
+          return;
+        }
+
+        const itemName = button.dataset.itemName || button.getAttribute("aria-label")?.replace(/^Bei REWE suchen:\s*/i, "") || "";
+        openReweSearchForItem(itemName);
+        setIngredientPurchasedFromKey(globalKey, !isPurchased(globalKey));
+        return;
+      }
+
+      if (action === "delete") {
+        const instanceKey = button.dataset.instanceKey;
+        if (!instanceKey) {
+          return;
+        }
+
+        setIngredientExcludedFromKey(instanceKey, !isExcluded(instanceKey));
+      }
+    });
+
     summaryButton.addEventListener("click", () => {
       setSummaryVisibility(!isSummaryOpen);
     });
@@ -1381,7 +1645,11 @@
 
     clearCartButton.addEventListener("click", () => {
       cartState = {};
+      purchasedState = {};
+      excludedState = {};
       saveCartState();
+      saveBooleanMap(PURCHASED_STORAGE_KEY, purchasedState);
+      saveBooleanMap(EXCLUDED_STORAGE_KEY, excludedState);
       renderCurrentTable();
       renderSummary();
     });
