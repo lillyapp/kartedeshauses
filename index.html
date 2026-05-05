@@ -187,6 +187,30 @@
       white-space: nowrap;
     }
 
+    .recipe-text-link {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      min-height: 28px;
+      padding: 0 8px;
+      border: 1px solid transparent;
+      text-decoration: none;
+      line-height: 1.2;
+    }
+
+    .recipe-text-link:hover,
+    .recipe-text-link:focus-visible {
+      border-color: var(--line);
+      background: #f5f5f5;
+    }
+
+    .recipe-text-link svg {
+      width: 15px;
+      height: 15px;
+      stroke-width: 1.9;
+      flex: none;
+    }
+
     .cart-toggle {
       display: inline-flex;
       align-items: center;
@@ -778,16 +802,7 @@
       selected.forEach(({ row }) => {
         const section = document.createElement("section");
         section.className = "summary-card";
-        const ingredients = (row[2] || "")
-          .split(/<br\s*\/?>/i)
-          .map((part) => part.trim())
-          .filter(Boolean);
-        section.innerHTML = `
-          <h3>${row[0]}</h3>
-          <ul>
-            ${ingredients.map((ingredient) => `<li>${ingredient}</li>`).join("")}
-          </ul>
-        `;
+        section.innerHTML = `<h3>${row[0]}</h3>`;
         summaryContent.appendChild(section);
       });
     }
@@ -826,10 +841,10 @@
             a.href = link.href;
             a.target = "_blank";
             a.rel = "noopener noreferrer";
-            a.className = "recipe-link";
+            a.className = "recipe-text-link";
             a.setAttribute("aria-label", `Rezept öffnen: ${row[0]}`);
             a.setAttribute("title", `Rezept öffnen: ${row[0]}`);
-            a.innerHTML = '<i data-lucide="link-2" aria-hidden="true"></i><span class="sr-only">Link öffnen</span>';
+            a.innerHTML = '<i data-lucide="link-2" aria-hidden="true"></i><span>Zum Rezept</span>';
 
             const cartButton = document.createElement("button");
             cartButton.type = "button";
