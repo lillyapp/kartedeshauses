@@ -31,9 +31,14 @@ Hinweis: Einige ursprüngliche Slugs waren nicht mehr erreichbar und wurden auf 
 | Spinat-Ricotta-Ravioli | [https://www.kitchenstories.com/de/rezepte/spinat-ricotta-ravioli](https://www.kitchenstories.com/de/rezepte/spinat-ricotta-ravioli) | 75 g Nudelteig<br>50 g Spinat<br>62 1/2 g Ricotta<br>25 g Pecorino<br>12 1/2 g Pinienkern<br>1/2 Eigelb<br>Salz<br>Pfeffer | 732 kcal |
 | Pitabrote mit gebratenem Gemüse und Salsa-Dip | [https://www.kitchenstories.com/de/rezepte/pitabrote-mit-gebratenem-gemuse-und-salsa-dip](https://www.kitchenstories.com/de/rezepte/pitabrote-mit-gebratenem-gemuse-und-salsa-dip) | 1 Pitabrot<br>1/4 Zucchini<br>1/2 Tomate<br>2 1/2 g Minze<br>57 1/2 ml THOMY Salsa mit Tomate & Paprika<br>25 g Schmand<br>100 g Kichererbsen aus der Dose<br>1/4 Zitrone<br>7 1/2 ml Olivenöl<br>Salz<br>Pfeffer<br>Olivenöl<br>Minze | 415 kcal |
 
+
 ## Produktlinks
 ```json
 {
-  "agavendicksaft|el": "https://www.rewe.de/shop/p/rewe-bio-agavendicksaft-250ml/940075"
+  "agavendicksaft|el": "https://www.rewe.de/shop/p/rewe-bio-agavendicksaft-250ml/940075",
+  "ahornsirup|el": "https://www.rewe.de/shop/p/rewe-bio-ahornsirup-250ml/360671",
+  "apfelessig|ml": "https://www.rewe.de/shop/p/rewe-bio-apfelessig-naturtrueb-0-75l/9897035",
+  "apfelmus": "https://www.rewe.de/shop/p/ja-apfelmus-710g/3026485",
+  "avocado|stück": "https://www.rewe.de/shop/p/avocado-2-stueck-in-schale/417804"
 }
 ```
