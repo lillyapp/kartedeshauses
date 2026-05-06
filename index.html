@@ -1331,6 +1331,7 @@
     let isFilterPopoverOpen = false;
     let productLinks = loadProductLinks();
     let productLinkStatus = {};
+    let reweSearchStatus = {};
     let isProductHelperOpen = false;
     let currentProductHelperIndex = 0;
     let productCheckToken = 0;
@@ -2176,7 +2177,8 @@
       return getAllProductLinkItems().filter((item) => {
         const url = productLinks[item.key];
         const status = productLinkStatus[item.key];
-        return !url || status === "bad";
+        const searchStatus = reweSearchStatus[item.key];
+        return (url && status === "bad") || (!url && searchStatus === "bad");
       });
     }
 
@@ -2184,10 +2186,25 @@
       return `https://r.jina.ai/http://${url.replace(/^https?:\/\//i, "")}`;
     }
 
+    function getReweSearchProxyUrl(itemName) {
+      const normalized = itemName.trim();
+      const term = /^ja!/i.test(normalized) ? normalized : `JA! ${normalized}`;
+      return `${REWE_PROXY_BASE_URL}${encodeURIComponent(term)}`;
+    }
+
+    function isReweSearchUnavailable(text) {
+      const haystack = (text || "").toLowerCase();
+      return haystack.includes("keine treffer")
+        || haystack.includes("nichts gefunden")
+        || haystack.includes("das haben wir nicht gefunden")
+        || haystack.includes("keine produkte")
+        || haystack.includes("keine ergebnisse");
+    }
+
     async function checkProductLink(item, token) {
       const url = productLinks[item.key];
       if (!url) {
-        productLinkStatus[item.key] = "missing";
+        productLinkStatus[item.key] = "not-needed";
         return;
       }
 
@@ -2216,18 +2233,48 @@
       }
     }
 
+    async function checkReweSearchReachability(item, token) {
+      if (productLinks[item.key]) {
+        reweSearchStatus[item.key] = "not-needed";
+        return;
+      }
+
+      reweSearchStatus[item.key] = "checking";
+      renderProductHelperButton();
+
+      try {
+        const response = await fetch(getReweSearchProxyUrl(item.name), { cache: "no-store" });
+        const text = response.ok ? await response.text() : "";
+        if (token !== productCheckToken) {
+          return;
+        }
+
+        reweSearchStatus[item.key] = response.ok && !isReweSearchUnavailable(text) ? "ok" : "bad";
+      } catch (error) {
+        if (token === productCheckToken) {
+          reweSearchStatus[item.key] = "bad";
+        }
+      }
+    }
+
     async function validateProductLinks() {
       const token = ++productCheckToken;
-      const items = getAllProductLinkItems().filter((item) => productLinks[item.key]);
+      const items = getAllProductLinkItems();
       getAllProductLinkItems().forEach((item) => {
         if (!productLinks[item.key]) {
-          productLinkStatus[item.key] = "missing";
+          productLinkStatus[item.key] = "not-needed";
+          reweSearchStatus[item.key] = "pending";
         }
       });
       renderProductHelperButton();
 
       for (const item of items) {
-        await checkProductLink(item, token);
+        if (productLinks[item.key]) {
+          await checkProductLink(item, token);
+        } else {
+          await checkReweSearchReachability(item, token);
+        }
+
         if (token !== productCheckToken) {
           return;
         }
@@ -2252,7 +2299,7 @@
       productLinkHelperButton.dataset.invalid = invalid.length > 0 ? "true" : "false";
       productLinkHelperButton.setAttribute(
         "title",
-        invalid.length > 0 ? `${invalid.length} Produktlinks fehlen oder sind nicht erreichbar` : "Produktlink-Helper"
+        invalid.length > 0 ? `${invalid.length} Produkte brauchen einen Direktlink` : "Produktlink-Helper"
       );
     }
 
@@ -2271,11 +2318,11 @@
       const done = Math.max(0, allItems.length - invalid.length);
       const current = invalid[currentProductHelperIndex] || invalid[0] || null;
 
-      productHelperMeta.textContent = `${done} von ${allItems.length} Artikeln verbunden`;
+      productHelperMeta.textContent = `${done} von ${allItems.length} Artikeln erledigt`;
       productHelperExport.value = buildProductLinksMarkdownBlock();
 
       if (!current) {
-        productHelperCurrent.innerHTML = "<strong>Alle Produktlinks sind hinterlegt und aktuell erreichbar.</strong>";
+        productHelperCurrent.innerHTML = "<strong>Alle Artikel sind per REWE-Fetch erreichbar oder haben einen gültigen Direktlink.</strong>";
         productHelperSave.disabled = true;
         productHelperOpenSearch.disabled = true;
         productHelperSkip.disabled = true;
@@ -2287,11 +2334,12 @@
       }
 
       const status = productLinkStatus[current.key] || "missing";
+      const searchStatus = reweSearchStatus[current.key] || "bad";
       const statusLabel = status === "bad"
-        ? "Link nicht erreichbar"
-        : status === "checking"
-          ? "Prüfung läuft"
-          : "Link fehlt";
+        ? "Direktlink nicht erreichbar"
+        : searchStatus === "checking"
+          ? "REWE-Prüfung läuft"
+          : "per REWE-Fetch nicht erreichbar";
 
       productHelperCurrent.innerHTML = `
         <div><strong>${escapeHtml(current.name)}</strong></div>
@@ -3026,6 +3074,7 @@
       saveProductLinks();
       productHelperStatus.textContent = "Link wird geprüft...";
       await checkProductLink(item, productCheckToken);
+      reweSearchStatus[item.key] = "not-needed";
       renderProductHelperButton();
       renderProductHelper();
     });
