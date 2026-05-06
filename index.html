@@ -2201,6 +2201,28 @@
         || haystack.includes("keine ergebnisse");
     }
 
+    async function pingUrl(url, timeoutMs = 2500) {
+      async function attempt(method) {
+        const controller = new AbortController();
+        const timeout = window.setTimeout(() => controller.abort(), timeoutMs);
+        try {
+          await fetch(url, {
+            method,
+            mode: "no-cors",
+            cache: "no-store",
+            signal: controller.signal
+          });
+          return true;
+        } catch (error) {
+          return false;
+        } finally {
+          window.clearTimeout(timeout);
+        }
+      }
+
+      return await attempt("HEAD") || await attempt("GET");
+    }
+
     async function checkProductLink(item, token) {
       const url = productLinks[item.key];
       if (!url) {
@@ -2212,20 +2234,13 @@
       renderProductHelperButton();
 
       try {
-        const response = await fetch(getProductProxyUrl(url), { cache: "no-store" });
-        const text = response.ok ? await response.text() : "";
-        const haystack = text.toLowerCase();
-        const looksUnavailable = !response.ok
-          || haystack.includes("404")
-          || haystack.includes("seite nicht gefunden")
-          || haystack.includes("nicht gefunden")
-          || haystack.includes("keine treffer");
+        const isReachable = await pingUrl(url);
 
         if (token !== productCheckToken) {
           return;
         }
 
-        productLinkStatus[item.key] = looksUnavailable ? "bad" : "ok";
+        productLinkStatus[item.key] = isReachable ? "ok" : "bad";
       } catch (error) {
         if (token === productCheckToken) {
           productLinkStatus[item.key] = "bad";
