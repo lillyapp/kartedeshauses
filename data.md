@@ -33,6 +33,7 @@ Hinweis: Einige ursprüngliche Slugs waren nicht mehr erreichbar und wurden auf 
 
 
 
+
 ## Produktlinks
 ```json
 {
@@ -50,6 +51,28 @@ Hinweis: Einige ursprüngliche Slugs waren nicht mehr erreichbar und wurden auf 
   "basilikum|g": "https://www.rewe.de/shop/p/ja-basilikum-gerebelt-15g/8727809",
   "basmatireis|g": "https://www.rewe.de/shop/p/ja-basmati-reis-1kg/7087342",
   "birne|stück": "https://www.rewe.de/shop/p/birne-gruen-ca-240g/194565",
-  "blatt reispapier|stück": "https://www.rewe.de/shop/p/rewe-beste-wahl-reispapier-22cm-100g/7529560"
+  "blatt reispapier|stück": "https://www.rewe.de/shop/p/rewe-beste-wahl-reispapier-22cm-100g/7529560",
+  "blaubeere|g": "https://www.rewe.de/shop/p/kulturheidelbeeren-125g/1045731",
+  "brötchen|stück": "https://www.rewe.de/shop/p/ja-sonntags-broetchen-8-stueck/8741482",
+  "butter": "https://www.rewe.de/shop/p/ja-markenbutter-mild-gesaeuert-250g/5883121",
+  "buttermilch|ml": "https://www.rewe.de/shop/p/ja-reine-buttermilch-500g/5724546",
+  "butter|g": "https://www.rewe.de/shop/p/ja-markenbutter-mild-gesaeuert-250g/5883121",
+  "cheddar|g": "https://www.rewe.de/shop/p/ja-cheddar-in-scheiben-175g/8926272",
+  "chiasamen": "https://www.rewe.de/shop/p/ver-val-bio-chia-samen-200g/3021438",
+  "chiasamen|el": "https://www.rewe.de/shop/p/ver-val-bio-chia-samen-200g/3021438",
+  "chiliflocken|tl": "https://www.rewe.de/shop/p/ja-chiliflocken-35g/7895170",
+  "cremige erdnussbutter|el": "https://www.rewe.de/shop/p/ja-erdnussbutter-creamy-350g/7571397",
+  "currypulver|tl": "https://www.rewe.de/shop/p/ja-curry-gemahlen-45g/2788275",
+  "dijon senf|tl": "https://www.rewe.de/shop/p/rewe-beste-wahl-dijon-senf-pikant-wuerzig-185ml/8290264",
+  "eigelb|stück": "https://www.rewe.de/shop/p/ja-frische-eier-aus-bodenhaltung-10-stueck/7937888",
+  "ei|stück": "https://www.rewe.de/shop/p/ja-frische-eier-aus-bodenhaltung-10-stueck/7937888",
+  "essiggurken|stück": "https://www.rewe.de/shop/p/ja-cornichons-mit-kraeutern-190g/8693856",
+  "essig|el": "https://www.rewe.de/shop/p/ja-wein-branntwein-essig-dunkel-1l/497359",
+  "feta|g": "https://www.rewe.de/shop/p/ja-hirtenkaese-250g/2886776",
+  "frische hefe|g": "https://www.rewe.de/shop/p/ja-trockenbackhefe-6x7g/1478286",
+  "frischkäse|g": "https://www.rewe.de/shop/p/ja-frischkaese-natur-doppelrahmstufe-300g/2421597",
+  "frühlingszwiebel": "https://www.rewe.de/shop/p/lauchzwiebeln-im-bund/482404",
+  "ganze geschälte tomate aus der dose|g": "https://www.rewe.de/shop/p/ja-tomaten-geschaelt-480g/6467555",
+  "rote paprika|g": "https://www.rewe.de/shop/p/paprika-rot-ca-250g/483559"
 }
 ```
