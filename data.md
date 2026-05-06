@@ -34,6 +34,7 @@ Hinweis: Einige ursprüngliche Slugs waren nicht mehr erreichbar und wurden auf 
 
 
 
+
 ## Produktlinks
 ```json
 {
@@ -73,6 +74,36 @@ Hinweis: Einige ursprüngliche Slugs waren nicht mehr erreichbar und wurden auf 
   "frischkäse|g": "https://www.rewe.de/shop/p/ja-frischkaese-natur-doppelrahmstufe-300g/2421597",
   "frühlingszwiebel": "https://www.rewe.de/shop/p/lauchzwiebeln-im-bund/482404",
   "ganze geschälte tomate aus der dose|g": "https://www.rewe.de/shop/p/ja-tomaten-geschaelt-480g/6467555",
+  "gelbe paprika|": "https://www.rewe.de/shop/p/paprika-gelb-ca-250g/483494",
+  "gemahlene muskatnuss": "https://www.rewe.de/shop/p/ostmann-muskatnuss-gemahlen-50g/4203488",
+  "gemahlene muskatnuss|tl": "https://www.rewe.de/shop/p/ostmann-muskatnuss-gemahlen-50g/4203488",
+  "gemahlener koriander|tl": "https://www.rewe.de/shop/p/lien-ying-asian-spirit-koriander-gemahlen-20g/7827318",
+  "gemahlener kreuzkümmel|tl": "https://www.rewe.de/shop/p/ostmann-kreuzkuemmel-gemahlen-35g/4246780",
+  "gemahlener zimt|tl": "https://www.rewe.de/shop/p/ja-zimt-gemahlen-40g/2371188",
+  "gemüsebrühe|ml": "https://www.rewe.de/shop/p/rewe-bio-gemuesebruehe-140g/8360458",
+  "geriebener mozzarella|g": "https://www.rewe.de/shop/p/ja-geriebener-mozzarella-250g/8439178",
+  "geräuchertes paprikapulver|tl": "https://www.rewe.de/shop/p/ja-paprika-edelsuess-50g/2369960",
+  "getrocknete tomate in öl|g": "https://www.rewe.de/shop/p/tomaten-getrocknet-100g/8343334",
+  "getrockneter oregano|el": "https://www.rewe.de/shop/p/ja-oregano-gerebelt-12g/7813204",
+  "gnocchi|g": "https://www.rewe.de/shop/p/ja-gnocchi-di-patate-500g/592755",
+  "griechischer joghurt|g": "https://www.rewe.de/shop/p/ja-joghurt-griechischer-art-natur-4x150g/8514626",
+  "guanciale|g": "https://www.rewe.de/shop/p/fratelli-beretta-il-guanciale-streifen-100g/9575307",
+  "gurke|stück": "https://www.rewe.de/shop/p/salatgurke-1-stueck/483303",
+  "hackfleisch|g": "https://www.rewe.de/shop/p/ja-hackfleisch-gemischt-500g/5900174",
+  "hoisin sauce|el": "https://www.rewe.de/shop/p/lien-ying-hoi-sin-sauce-fuer-wok-gerichte-200ml/8620548",
+  "honig|tl": "https://www.rewe.de/shop/p/ja-bluetenhonig-cremig-streichzart-500g/7845762",
+  "hot-dog-brötchen|stück": "https://www.rewe.de/shop/p/rewe-beste-wahl-hot-dog-rolls-brioche-6-stueck/8273841",
+  "hähnchenbrustfilet|g": "https://www.rewe.de/shop/p/ja-haehnchen-brustfilet-600g/8468236",
+  "hähnchenbrustfilet|stück": "https://www.rewe.de/shop/p/ja-haehnchen-brustfilet-600g/8468236",
+  "kakaonib": "https://www.rewe.de/shop/p/biozentrale-bio-kakaonibs-superfood-200g/8070827",
+  "karotte|stück": "https://www.rewe.de/shop/p/karotten-1kg/1045111",
+  "kartoffeln|g": "https://www.rewe.de/shop/p/kartoffeln-festkochend-ca-100g/466182",
+  "kartoffelstärke|el": "https://www.rewe.de/shop/p/ruf-bio-kartoffelmehl-500g/2453333",
+  "ketchup": "https://www.rewe.de/shop/p/ja-tomaten-ketchup-500ml/7291190",
+  "ketchup|el": "https://www.rewe.de/shop/p/ja-tomaten-ketchup-500ml/7291190",
+  "kichererbsen aus der dose|g": "https://www.rewe.de/shop/p/ja-kichererbsen-265g/7814109",
+  "kirschtomate|g": "https://www.rewe.de/shop/p/cherrytomaten-400g/3029089",
+  "kiwi|stück": "https://www.rewe.de/shop/p/kiwi-gruen-1-stueck/195634",
   "rote paprika|g": "https://www.rewe.de/shop/p/paprika-rot-ca-250g/483559"
 }
 ```
