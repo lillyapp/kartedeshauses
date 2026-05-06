@@ -1331,7 +1331,6 @@
     let isFilterPopoverOpen = false;
     let productLinks = loadProductLinks();
     let productLinkStatus = {};
-    let reweSearchStatus = {};
     let isProductHelperOpen = false;
     let currentProductHelperIndex = 0;
     let productCheckToken = 0;
@@ -2177,28 +2176,12 @@
       return getAllProductLinkItems().filter((item) => {
         const url = productLinks[item.key];
         const status = productLinkStatus[item.key];
-        const searchStatus = reweSearchStatus[item.key];
-        return (url && status === "bad") || (!url && searchStatus === "bad");
+        return !url || status === "bad";
       });
     }
 
     function getProductProxyUrl(url) {
       return `https://r.jina.ai/http://${url.replace(/^https?:\/\//i, "")}`;
-    }
-
-    function getReweSearchProxyUrl(itemName) {
-      const normalized = itemName.trim();
-      const term = /^ja!/i.test(normalized) ? normalized : `JA! ${normalized}`;
-      return `${REWE_PROXY_BASE_URL}${encodeURIComponent(term)}`;
-    }
-
-    function isReweSearchUnavailable(text) {
-      const haystack = (text || "").toLowerCase();
-      return haystack.includes("keine treffer")
-        || haystack.includes("nichts gefunden")
-        || haystack.includes("das haben wir nicht gefunden")
-        || haystack.includes("keine produkte")
-        || haystack.includes("keine ergebnisse");
     }
 
     async function pingUrl(url, timeoutMs = 2500) {
@@ -2226,7 +2209,7 @@
     async function checkProductLink(item, token) {
       const url = productLinks[item.key];
       if (!url) {
-        productLinkStatus[item.key] = "not-needed";
+        productLinkStatus[item.key] = "missing";
         return;
       }
 
@@ -2248,37 +2231,12 @@
       }
     }
 
-    async function checkReweSearchReachability(item, token) {
-      if (productLinks[item.key]) {
-        reweSearchStatus[item.key] = "not-needed";
-        return;
-      }
-
-      reweSearchStatus[item.key] = "checking";
-      renderProductHelperButton();
-
-      try {
-        const response = await fetch(getReweSearchProxyUrl(item.name), { cache: "no-store" });
-        const text = response.ok ? await response.text() : "";
-        if (token !== productCheckToken) {
-          return;
-        }
-
-        reweSearchStatus[item.key] = response.ok && !isReweSearchUnavailable(text) ? "ok" : "bad";
-      } catch (error) {
-        if (token === productCheckToken) {
-          reweSearchStatus[item.key] = "bad";
-        }
-      }
-    }
-
     async function validateProductLinks() {
       const token = ++productCheckToken;
       const items = getAllProductLinkItems();
       getAllProductLinkItems().forEach((item) => {
         if (!productLinks[item.key]) {
-          productLinkStatus[item.key] = "not-needed";
-          reweSearchStatus[item.key] = "pending";
+          productLinkStatus[item.key] = "missing";
         }
       });
       renderProductHelperButton();
@@ -2286,8 +2244,6 @@
       for (const item of items) {
         if (productLinks[item.key]) {
           await checkProductLink(item, token);
-        } else {
-          await checkReweSearchReachability(item, token);
         }
 
         if (token !== productCheckToken) {
@@ -2337,7 +2293,7 @@
       productHelperExport.value = buildProductLinksMarkdownBlock();
 
       if (!current) {
-        productHelperCurrent.innerHTML = "<strong>Alle Artikel sind per REWE-Fetch erreichbar oder haben einen gültigen Direktlink.</strong>";
+        productHelperCurrent.innerHTML = "<strong>Alle Artikel haben einen erreichbaren Produktlink.</strong>";
         productHelperSave.disabled = true;
         productHelperOpenSearch.disabled = true;
         productHelperSkip.disabled = true;
@@ -2349,12 +2305,11 @@
       }
 
       const status = productLinkStatus[current.key] || "missing";
-      const searchStatus = reweSearchStatus[current.key] || "bad";
       const statusLabel = status === "bad"
         ? "Direktlink nicht erreichbar"
-        : searchStatus === "checking"
-          ? "REWE-Prüfung läuft"
-          : "per REWE-Fetch nicht erreichbar";
+        : status === "checking"
+          ? "Direktlink wird geprüft"
+          : "Produktlink fehlt";
 
       productHelperCurrent.innerHTML = `
         <div><strong>${escapeHtml(current.name)}</strong></div>
@@ -3089,7 +3044,6 @@
       saveProductLinks();
       productHelperStatus.textContent = "Link wird geprüft...";
       await checkProductLink(item, productCheckToken);
-      reweSearchStatus[item.key] = "not-needed";
       renderProductHelperButton();
       renderProductHelper();
     });
