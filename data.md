@@ -32,13 +32,24 @@ Hinweis: Einige ursprüngliche Slugs waren nicht mehr erreichbar und wurden auf 
 | Pitabrote mit gebratenem Gemüse und Salsa-Dip | [https://www.kitchenstories.com/de/rezepte/pitabrote-mit-gebratenem-gemuse-und-salsa-dip](https://www.kitchenstories.com/de/rezepte/pitabrote-mit-gebratenem-gemuse-und-salsa-dip) | 1 Pitabrot<br>1/4 Zucchini<br>1/2 Tomate<br>2 1/2 g Minze<br>57 1/2 ml THOMY Salsa mit Tomate & Paprika<br>25 g Schmand<br>100 g Kichererbsen aus der Dose<br>1/4 Zitrone<br>7 1/2 ml Olivenöl<br>Salz<br>Pfeffer<br>Olivenöl<br>Minze | 415 kcal |
 
 
+
 ## Produktlinks
 ```json
 {
   "agavendicksaft|el": "https://www.rewe.de/shop/p/rewe-bio-agavendicksaft-250ml/940075",
   "ahornsirup|el": "https://www.rewe.de/shop/p/rewe-bio-ahornsirup-250ml/360671",
+  "ananas|g": "https://www.rewe.de/shop/p/ja-ananasstuecke-in-eigenem-saft-340g/8554014",
   "apfelessig|ml": "https://www.rewe.de/shop/p/rewe-bio-apfelessig-naturtrueb-0-75l/9897035",
   "apfelmus": "https://www.rewe.de/shop/p/ja-apfelmus-710g/3026485",
-  "avocado|stück": "https://www.rewe.de/shop/p/avocado-2-stueck-in-schale/417804"
+  "avocado|stück": "https://www.rewe.de/shop/p/avocado-2-stueck-in-schale/417804",
+  "backnatron|tl": "https://www.rewe.de/shop/p/kaiser-natron-pulver-50g/228613",
+  "backpulver|tl": "https://www.rewe.de/shop/p/ja-backpulver-10x15g/1478263",
+  "balsamicoessig|el": "https://www.rewe.de/shop/p/ja-aceto-balsamico-di-modena-500ml/397387",
+  "banane": "https://www.rewe.de/shop/p/ja-banane-ca-200g/455217",
+  "banane|stück": "https://www.rewe.de/shop/p/ja-banane-ca-200g/455217",
+  "basilikum|g": "https://www.rewe.de/shop/p/ja-basilikum-gerebelt-15g/8727809",
+  "basmatireis|g": "https://www.rewe.de/shop/p/ja-basmati-reis-1kg/7087342",
+  "birne|stück": "https://www.rewe.de/shop/p/birne-gruen-ca-240g/194565",
+  "blatt reispapier|stück": "https://www.rewe.de/shop/p/rewe-beste-wahl-reispapier-22cm-100g/7529560"
 }
 ```
