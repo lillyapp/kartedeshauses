@@ -322,11 +322,29 @@
     }
 
     #selectionCartButton,
+    #productLinkHelperButton,
     .top-actions > a.icon-button {
       border: 0;
       background: transparent;
       box-shadow: none;
       padding: 0;
+    }
+
+    #productLinkHelperButton[data-invalid="true"] {
+      color: #c62828;
+      animation: helper-alert 900ms ease-in-out infinite;
+    }
+
+    @keyframes helper-alert {
+      0%,
+      100% {
+        opacity: 1;
+        transform: scale(1);
+      }
+      50% {
+        opacity: 0.35;
+        transform: scale(1.08);
+      }
     }
 
     #summaryButton {
@@ -390,6 +408,103 @@
     .basket-prompt button[data-action="confirm"] {
       background: #eaf8ee;
       color: var(--success);
+    }
+
+    .product-helper {
+      border: 1px solid var(--line);
+      background: #fff;
+      padding: 14px;
+      margin: 0 0 18px;
+      font-size: 13px;
+      line-height: 1.45;
+    }
+
+    .product-helper[hidden] {
+      display: none;
+    }
+
+    .product-helper-header {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 12px;
+      margin: 0 0 12px;
+    }
+
+    .product-helper-title {
+      margin: 0;
+      font-size: 15px;
+      font-weight: 700;
+    }
+
+    .product-helper-meta {
+      margin: 3px 0 0;
+      color: var(--muted);
+      font-size: 12px;
+    }
+
+    .product-helper-close {
+      width: 28px;
+      height: 28px;
+      padding: 0;
+      border: 0;
+      background: transparent;
+      border-radius: 999px;
+    }
+
+    .product-helper-close:hover,
+    .product-helper-close:focus-visible {
+      background: rgba(0, 0, 0, 0.06);
+    }
+
+    .product-helper-current {
+      display: grid;
+      gap: 8px;
+      margin: 0 0 12px;
+    }
+
+    .product-helper-current strong {
+      font-weight: 700;
+    }
+
+    .product-helper-input {
+      width: 100%;
+      min-height: 38px;
+      border: 1px solid var(--line);
+      padding: 8px 10px;
+      font: inherit;
+      font-size: 13px;
+    }
+
+    .product-helper-actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin: 0 0 12px;
+    }
+
+    .product-helper-actions button[data-primary="true"] {
+      background: #eaf8ee;
+      color: var(--success);
+      border-color: var(--success);
+    }
+
+    .product-helper-export {
+      width: 100%;
+      min-height: 130px;
+      border: 1px solid rgba(0, 0, 0, 0.22);
+      background: #f7f7f3;
+      padding: 10px;
+      font: inherit;
+      font-size: 12px;
+      line-height: 1.45;
+      resize: vertical;
+    }
+
+    .product-helper-status {
+      color: var(--muted);
+      font-size: 12px;
+      min-height: 18px;
     }
 
     .icon-badge {
@@ -627,19 +742,12 @@
       stroke-linejoin: round;
     }
 
-    .summary-row {
-      margin: 0 0 18px;
-    }
-
-    .summary-row[hidden] {
-      display: none;
-    }
-
     .summary-panel {
       width: 100%;
       border: 1px solid var(--line);
       background: var(--panel-bg);
       padding: 16px;
+      margin: 0 0 18px;
     }
 
     .summary-panel[hidden] {
@@ -1041,6 +1149,9 @@
   <main>
     <h1>KARTE DES HAUSES</h1>
     <div class="top-actions">
+      <button id="productLinkHelperButton" class="icon-button" type="button" aria-label="Produktlink-Helper öffnen" title="Produktlink-Helper">
+        <i data-lucide="package-search" aria-hidden="true"></i>
+      </button>
       <button id="selectionCartButton" class="icon-button" type="button" aria-label="Auswahl in den Warenkorb legen" title="Auswahl in den Warenkorb legen">
         <i data-lucide="wand-sparkles" aria-hidden="true"></i>
       </button>
@@ -1054,6 +1165,26 @@
       <div id="randomRows" class="random-row" hidden></div>
     </div>
     <div id="basketPrompt" class="basket-prompt" hidden></div>
+    <section id="productLinkHelper" class="product-helper" hidden aria-label="Produktlink-Helper">
+      <div class="product-helper-header">
+        <div>
+          <h2 class="product-helper-title">Produktlink-Helper</h2>
+          <p id="productHelperMeta" class="product-helper-meta"></p>
+        </div>
+        <button id="productHelperClose" class="product-helper-close" type="button" aria-label="Produktlink-Helper schließen" title="Schließen">
+          <i data-lucide="x" aria-hidden="true"></i>
+        </button>
+      </div>
+      <div id="productHelperCurrent" class="product-helper-current"></div>
+      <div class="product-helper-actions">
+        <button id="productHelperSave" type="button" data-primary="true">Link speichern</button>
+        <button id="productHelperOpenSearch" type="button">REWE Suche öffnen</button>
+        <button id="productHelperSkip" type="button">Weiter</button>
+        <button id="productHelperCopy" type="button">Markdown kopieren</button>
+      </div>
+      <textarea id="productHelperExport" class="product-helper-export" readonly aria-label="Markdown-Block für data.md"></textarea>
+      <p id="productHelperStatus" class="product-helper-status"></p>
+    </section>
     <div class="controls">
       <label class="toggle">
         <input id="filterToggle" type="checkbox" checked>
@@ -1075,35 +1206,33 @@
         <div id="weekPlanGrid" class="week-plan-grid"></div>
       </div>
     </section>
-    <div id="summaryRow" class="summary-row" hidden>
-      <section id="summaryPanel" class="summary-panel" aria-label="Warenkorb">
-        <div class="summary-header">
-          <div>
-            <h2 class="summary-title">Warenkorb</h2>
-            <p id="summaryMeta" class="summary-subtitle"></p>
-          </div>
-          <button id="summaryFilterButton" class="summary-filter-button" type="button" aria-label="Warenkorb-Filter anzeigen" aria-expanded="false" title="Filter">
-            <i data-lucide="list-filter" aria-hidden="true"></i>
-          </button>
+    <section id="summaryPanel" class="summary-panel" hidden aria-label="Warenkorb">
+      <div class="summary-header">
+        <div>
+          <h2 class="summary-title">Warenkorb</h2>
+          <p id="summaryMeta" class="summary-subtitle"></p>
         </div>
-        <div id="summaryTools" class="summary-tools" hidden>
-          <label class="summary-toggle">
-            <input id="combineToggle" type="checkbox" checked>
-            Alles zusammenfassen
-          </label>
-          <label class="summary-toggle">
-            <input id="spiceToggle" type="checkbox" checked>
-            Gewürze ausblenden
-          </label>
-          <label id="portionScaleWrap" class="summary-portion" hidden>
-            Portionen
-            <input id="portionScale" type="number" min="1" step="1" value="1" inputmode="numeric">
-          </label>
-          <button id="clearCartButton" type="button">Alle entfernen</button>
-        </div>
-        <div id="summaryContent" class="summary-list"></div>
-      </section>
-    </div>
+        <button id="summaryFilterButton" class="summary-filter-button" type="button" aria-label="Warenkorb-Filter anzeigen" aria-expanded="false" title="Filter">
+          <i data-lucide="list-filter" aria-hidden="true"></i>
+        </button>
+      </div>
+      <div id="summaryTools" class="summary-tools" hidden>
+        <label class="summary-toggle">
+          <input id="combineToggle" type="checkbox">
+          Alles zusammenfassen
+        </label>
+        <label class="summary-toggle">
+          <input id="spiceToggle" type="checkbox" checked>
+          Gewürze ausblenden
+        </label>
+        <label id="portionScaleWrap" class="summary-portion" hidden>
+          Portionen
+          <input id="portionScale" type="number" min="1" step="1" value="1" inputmode="numeric">
+        </label>
+        <button id="clearCartButton" type="button">Alle entfernen</button>
+      </div>
+      <div id="summaryContent" class="summary-list"></div>
+    </section>
     <div id="status" class="status"></div>
     <div id="error" class="error" hidden></div>
     <h2 class="section-heading table-heading">REZEPTSAMMLUNG</h2>
@@ -1130,10 +1259,20 @@
     const errorEl = document.getElementById("error");
     const tableHead = document.getElementById("tableHead");
     const tableBody = document.getElementById("tableBody");
+    const productLinkHelperButton = document.getElementById("productLinkHelperButton");
+    const productLinkHelper = document.getElementById("productLinkHelper");
+    const productHelperMeta = document.getElementById("productHelperMeta");
+    const productHelperCurrent = document.getElementById("productHelperCurrent");
+    const productHelperClose = document.getElementById("productHelperClose");
+    const productHelperSave = document.getElementById("productHelperSave");
+    const productHelperOpenSearch = document.getElementById("productHelperOpenSearch");
+    const productHelperSkip = document.getElementById("productHelperSkip");
+    const productHelperCopy = document.getElementById("productHelperCopy");
+    const productHelperExport = document.getElementById("productHelperExport");
+    const productHelperStatus = document.getElementById("productHelperStatus");
     const selectionCartButton = document.getElementById("selectionCartButton");
     const summaryButton = document.getElementById("summaryButton");
     const summaryCount = document.getElementById("summaryCount");
-    const summaryRow = document.getElementById("summaryRow");
     const summaryPanel = document.getElementById("summaryPanel");
     const summaryMeta = document.getElementById("summaryMeta");
     const summaryContent = document.getElementById("summaryContent");
@@ -1155,6 +1294,7 @@
     const PURCHASED_STORAGE_KEY = "recipe-cart-purchased-v1";
     const EXCLUDED_STORAGE_KEY = "recipe-cart-excluded-v1";
     const EXTRA_KCAL_STORAGE_KEY = "recipe-week-extra-kcal-v1";
+    const PRODUCT_LINK_STORAGE_KEY = "recipe-product-links-v1";
     const REWE_SEARCH_BASE_URL = "https://www.rewe.de/shop/productList?search=";
     const REWE_PROXY_BASE_URL = "https://r.jina.ai/http://www.rewe.de/shop/productList?search=";
     const REWE_BASKET_PROXY_URL = "https://r.jina.ai/http://www.rewe.de/shop/checkout/basket";
@@ -1168,7 +1308,7 @@
     let cartState = loadCartState();
     let weekPlanState = loadWeekPlanState();
     let isSummaryOpen = false;
-    let isCombineAll = true;
+    let isCombineAll = false;
     let isSummaryFilterOpen = false;
     let portionScale = loadPortionScale();
     let hideSpices = loadHideSpices();
@@ -1189,6 +1329,11 @@
     let isBasketLoading = false;
     let basketCheckToken = 0;
     let isFilterPopoverOpen = false;
+    let productLinks = loadProductLinks();
+    let productLinkStatus = {};
+    let isProductHelperOpen = false;
+    let currentProductHelperIndex = 0;
+    let productCheckToken = 0;
 
     function splitMarkdownRow(line) {
       return line
@@ -1230,6 +1375,42 @@
       return { headers, rows };
     }
 
+    function parseProductLinksFromMarkdown(markdown) {
+      const match = markdown.match(/##\s+Produktlinks\s*```json\s*([\s\S]*?)```/i);
+      if (!match) {
+        return {};
+      }
+
+      try {
+        const parsed = JSON.parse(match[1]);
+        return parsed && typeof parsed === "object" ? parsed : {};
+      } catch (error) {
+        return {};
+      }
+    }
+
+    function loadProductLinks() {
+      try {
+        const raw = localStorage.getItem(PRODUCT_LINK_STORAGE_KEY);
+        const parsed = raw ? JSON.parse(raw) : {};
+        return parsed && typeof parsed === "object" ? parsed : {};
+      } catch (error) {
+        return {};
+      }
+    }
+
+    function saveProductLinks() {
+      localStorage.setItem(PRODUCT_LINK_STORAGE_KEY, JSON.stringify(productLinks));
+    }
+
+    function normalizeProductLinks(value) {
+      return Object.fromEntries(
+        Object.entries(value || {})
+          .map(([key, url]) => [key, String(url || "").trim()])
+          .filter(([key, url]) => key && /^https?:\/\//i.test(url))
+      );
+    }
+
     function extractCellLink(cell) {
       const markdownLink = cell.match(/\[([^\]]+)\]\(([^)]+)\)/);
       if (markdownLink) {
@@ -1248,6 +1429,14 @@
       }
 
       return null;
+    }
+
+    function escapeHtml(value) {
+      return String(value)
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;");
     }
 
     const INGREDIENT_ALIASES = new Map([
@@ -1727,6 +1916,7 @@
                 title="Frühstück &amp; Abendessen einrechnen (je 1×)"
                 aria-label="Frühstück &amp; Abendessen einrechnen"
               ><i data-lucide="wheat" aria-hidden="true"></i></button>
+              <span class="week-plan-extras-label">Fr. &amp; Ab.</span>
               <input
                 type="number"
                 class="week-plan-extra-input"
@@ -1836,11 +2026,16 @@
       }
     }
 
-    function openReweSearchForItem(itemName) {
+    function openReweSearchForItem(itemName, globalKey = "") {
+      const productUrl = globalKey ? productLinks[globalKey] : "";
+      if (productUrl) {
+        window.open(productUrl, "_blank", "noopener,noreferrer");
+        return;
+      }
+
       const normalized = itemName.trim();
       const term = /^ja!/i.test(normalized) ? normalized : `JA! ${normalized}`;
-      const url = `${REWE_SEARCH_BASE_URL}${encodeURIComponent(term)}`;
-      window.open(url, "rewe-tab");
+      window.open(`${REWE_SEARCH_BASE_URL}${encodeURIComponent(term)}`, "_blank", "noopener,noreferrer");
     }
 
     function parseFractionToken(token) {
@@ -1953,6 +2148,176 @@
 
     function shouldHideIngredient(item) {
       return isAlwaysOmittedIngredient(item) || (hideSpices && isSpiceIngredient(item));
+    }
+
+    function getAllProductLinkItems() {
+      const items = new Map();
+      allRows.forEach((row, rowIndex) => {
+        getIngredientsForRow(row, rowIndex, 1).forEach((item) => {
+          if (isAlwaysOmittedIngredient(item)) {
+            return;
+          }
+
+          if (!items.has(item.globalKey)) {
+            items.set(item.globalKey, {
+              key: item.globalKey,
+              name: item.name,
+              label: item.name,
+              url: productLinks[item.globalKey] || ""
+            });
+          }
+        });
+      });
+
+      return Array.from(items.values()).sort((a, b) => a.name.localeCompare(b.name, "de"));
+    }
+
+    function getInvalidProductLinkItems() {
+      return getAllProductLinkItems().filter((item) => {
+        const url = productLinks[item.key];
+        const status = productLinkStatus[item.key];
+        return !url || status === "bad";
+      });
+    }
+
+    function getProductProxyUrl(url) {
+      return `https://r.jina.ai/http://${url.replace(/^https?:\/\//i, "")}`;
+    }
+
+    async function checkProductLink(item, token) {
+      const url = productLinks[item.key];
+      if (!url) {
+        productLinkStatus[item.key] = "missing";
+        return;
+      }
+
+      productLinkStatus[item.key] = "checking";
+      renderProductHelperButton();
+
+      try {
+        const response = await fetch(getProductProxyUrl(url), { cache: "no-store" });
+        const text = response.ok ? await response.text() : "";
+        const haystack = text.toLowerCase();
+        const looksUnavailable = !response.ok
+          || haystack.includes("404")
+          || haystack.includes("seite nicht gefunden")
+          || haystack.includes("nicht gefunden")
+          || haystack.includes("keine treffer");
+
+        if (token !== productCheckToken) {
+          return;
+        }
+
+        productLinkStatus[item.key] = looksUnavailable ? "bad" : "ok";
+      } catch (error) {
+        if (token === productCheckToken) {
+          productLinkStatus[item.key] = "bad";
+        }
+      }
+    }
+
+    async function validateProductLinks() {
+      const token = ++productCheckToken;
+      const items = getAllProductLinkItems().filter((item) => productLinks[item.key]);
+      getAllProductLinkItems().forEach((item) => {
+        if (!productLinks[item.key]) {
+          productLinkStatus[item.key] = "missing";
+        }
+      });
+      renderProductHelperButton();
+
+      for (const item of items) {
+        await checkProductLink(item, token);
+        if (token !== productCheckToken) {
+          return;
+        }
+        renderProductHelperButton();
+        if (isProductHelperOpen) {
+          renderProductHelper();
+        }
+      }
+    }
+
+    function buildProductLinksMarkdownBlock() {
+      const sorted = Object.fromEntries(
+        Object.entries(normalizeProductLinks(productLinks))
+          .sort(([a], [b]) => a.localeCompare(b, "de"))
+      );
+
+      return `## Produktlinks\n\`\`\`json\n${JSON.stringify(sorted, null, 2)}\n\`\`\``;
+    }
+
+    function renderProductHelperButton() {
+      const invalid = getInvalidProductLinkItems();
+      productLinkHelperButton.dataset.invalid = invalid.length > 0 ? "true" : "false";
+      productLinkHelperButton.setAttribute(
+        "title",
+        invalid.length > 0 ? `${invalid.length} Produktlinks fehlen oder sind nicht erreichbar` : "Produktlink-Helper"
+      );
+    }
+
+    function setProductHelperVisibility(visible) {
+      isProductHelperOpen = visible;
+      productLinkHelper.hidden = !visible;
+      if (visible) {
+        currentProductHelperIndex = 0;
+        renderProductHelper();
+      }
+    }
+
+    function renderProductHelper() {
+      const invalid = getInvalidProductLinkItems();
+      const allItems = getAllProductLinkItems();
+      const done = Math.max(0, allItems.length - invalid.length);
+      const current = invalid[currentProductHelperIndex] || invalid[0] || null;
+
+      productHelperMeta.textContent = `${done} von ${allItems.length} Artikeln verbunden`;
+      productHelperExport.value = buildProductLinksMarkdownBlock();
+
+      if (!current) {
+        productHelperCurrent.innerHTML = "<strong>Alle Produktlinks sind hinterlegt und aktuell erreichbar.</strong>";
+        productHelperSave.disabled = true;
+        productHelperOpenSearch.disabled = true;
+        productHelperSkip.disabled = true;
+        productHelperStatus.textContent = "Den Markdown-Block unten kannst du in data.md übernehmen.";
+        if (window.lucide && typeof window.lucide.createIcons === "function") {
+          window.lucide.createIcons();
+        }
+        return;
+      }
+
+      const status = productLinkStatus[current.key] || "missing";
+      const statusLabel = status === "bad"
+        ? "Link nicht erreichbar"
+        : status === "checking"
+          ? "Prüfung läuft"
+          : "Link fehlt";
+
+      productHelperCurrent.innerHTML = `
+        <div><strong>${escapeHtml(current.name)}</strong></div>
+        <div>${currentProductHelperIndex + 1} von ${invalid.length} offenen Artikeln · ${statusLabel}</div>
+        <input
+          id="productHelperUrl"
+          class="product-helper-input"
+          type="url"
+          value="${escapeHtml(productLinks[current.key] || "")}"
+          placeholder="https://www.rewe.de/produkte/..."
+          aria-label="Produktlink für ${escapeHtml(current.name)}"
+        >
+      `;
+      productHelperSave.disabled = false;
+      productHelperOpenSearch.disabled = false;
+      productHelperSkip.disabled = invalid.length < 2;
+      productHelperStatus.textContent = "Speichern aktualisiert zunächst den Browser-Speicher. Den Block unten danach in data.md übernehmen.";
+
+      if (window.lucide && typeof window.lucide.createIcons === "function") {
+        window.lucide.createIcons();
+      }
+    }
+
+    function getCurrentProductHelperItem() {
+      const invalid = getInvalidProductLinkItems();
+      return invalid[currentProductHelperIndex] || invalid[0] || null;
     }
 
     function getIngredientsForRow(row, rowIndex, scale = 1) {
@@ -2157,7 +2522,7 @@
 
     function setSummaryVisibility(visible) {
       isSummaryOpen = visible;
-      summaryRow.hidden = !visible;
+      summaryPanel.hidden = !visible;
       summaryButton.dataset.active = visible ? "true" : "false";
       summaryButton.setAttribute("aria-expanded", visible ? "true" : "false");
       if (portionScaleInput.value !== String(portionScale)) {
@@ -2192,7 +2557,6 @@
       summaryFilterButton.dataset.active = isSummaryFilterOpen ? "true" : "false";
       summaryFilterButton.setAttribute("aria-expanded", isSummaryFilterOpen ? "true" : "false");
       portionScaleWrap.hidden = !isCombineAll;
-      combineToggle.checked = isCombineAll;
       spiceToggle.checked = hideSpices;
 
       if (selected.length === 0) {
@@ -2464,13 +2828,17 @@
 
         const markdown = await response.text();
         const { headers, rows } = parseMarkdownTable(markdown);
+        const markdownProductLinks = normalizeProductLinks(parseProductLinksFromMarkdown(markdown));
 
         allHeaders = headers;
         allRows = rows;
         recipeRows = rows;
+        productLinks = normalizeProductLinks({ ...markdownProductLinks, ...productLinks });
+        saveProductLinks();
         refreshSelection();
         renderWeekPlan();
         renderSummary();
+        validateProductLinks();
       } catch (error) {
         statusEl.textContent = "Fehler beim Laden.";
         errorEl.hidden = false;
@@ -2540,6 +2908,18 @@
 
     // Wheat button toggle
     weekPlan.addEventListener("click", (event) => {
+      const item = event.target.closest(".week-plan-item");
+      if (item) {
+        const rowIndex = Number(item.dataset.rowIndex);
+        const linkIndex = allHeaders.indexOf("Link");
+        const row = allRows[rowIndex];
+        const link = row && linkIndex !== -1 ? extractCellLink(row[linkIndex] || "") : null;
+        if (link) {
+          window.open(link.href, "_blank", "noopener,noreferrer");
+        }
+        return;
+      }
+
       const btn = event.target.closest(".week-plan-wheat-btn");
       if (!btn) return;
       const slot = Number(btn.dataset.slot);
@@ -2620,6 +3000,68 @@
       updateWeekPlanScrollButton();
     });
 
+    productLinkHelperButton.addEventListener("click", () => {
+      setProductHelperVisibility(!isProductHelperOpen);
+    });
+
+    productHelperClose.addEventListener("click", () => {
+      setProductHelperVisibility(false);
+    });
+
+    productHelperSave.addEventListener("click", async () => {
+      const item = getCurrentProductHelperItem();
+      const input = document.getElementById("productHelperUrl");
+      if (!item || !input) {
+        return;
+      }
+
+      const url = input.value.trim();
+      if (!/^https?:\/\//i.test(url)) {
+        productHelperStatus.textContent = "Bitte eine vollständige URL mit https:// eintragen.";
+        input.focus();
+        return;
+      }
+
+      productLinks[item.key] = url;
+      saveProductLinks();
+      productHelperStatus.textContent = "Link wird geprüft...";
+      await checkProductLink(item, productCheckToken);
+      renderProductHelperButton();
+      renderProductHelper();
+    });
+
+    productHelperOpenSearch.addEventListener("click", () => {
+      const item = getCurrentProductHelperItem();
+      if (!item) {
+        return;
+      }
+
+      openReweSearchForItem(item.name);
+    });
+
+    productHelperSkip.addEventListener("click", () => {
+      const invalid = getInvalidProductLinkItems();
+      if (invalid.length === 0) {
+        return;
+      }
+
+      currentProductHelperIndex = (currentProductHelperIndex + 1) % invalid.length;
+      renderProductHelper();
+    });
+
+    productHelperCopy.addEventListener("click", async () => {
+      const value = buildProductLinksMarkdownBlock();
+      productHelperExport.value = value;
+      productHelperExport.select();
+
+      try {
+        await navigator.clipboard.writeText(value);
+        productHelperStatus.textContent = "Markdown-Block kopiert. Ersetze damit den Abschnitt ## Produktlinks in data.md.";
+      } catch (error) {
+        productHelperStatus.textContent = "Kopieren nicht möglich. Der Block ist im Textfeld markiert.";
+      }
+    });
+
     summaryContent.addEventListener("click", (event) => {
       const actionButton = event.target.closest("[data-action]");
       const mainButton = event.target.closest(".ingredient-main");
@@ -2644,7 +3086,7 @@
         const itemName = button.dataset.itemName || "";
         const itemLabel = button.dataset.itemLabel || itemName;
         const globalKey = button.dataset.globalKey || "";
-        openReweSearchForItem(itemName);
+        openReweSearchForItem(itemName, globalKey);
         if (globalKey) {
           setPendingBasketItem({
             globalKey,
