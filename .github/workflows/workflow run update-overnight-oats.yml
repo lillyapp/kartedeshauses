@@ -1,0 +1,70 @@
+name: Update Overnight Oats row
+
+on:
+  workflow_dispatch:
+    inputs:
+      overnight_row:
+        description: "Complete markdown table row for Overnight Oats (must start and end with |)."
+        required: true
+        type: string
+
+permissions:
+  contents: write
+
+jobs:
+  update-data-md:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.GH_PAT || github.token }}
+
+      - name: Replace Overnight Oats row in data.md
+        env:
+          OVERNIGHT_ROW: ${{ inputs.overnight_row }}
+        run: |
+          python - <<'PY'
+          import os
+          import re
+          from pathlib import Path
+
+          data_path = Path("data.md")
+          if not data_path.exists():
+            raise SystemExit("data.md was not found in the repository root.")
+
+          new_row = os.environ["OVERNIGHT_ROW"].strip()
+          if not new_row:
+            raise SystemExit("No overnight_row value provided.")
+
+          if not (new_row.startswith("|") and new_row.endswith("|")):
+            raise SystemExit("overnight_row must be a full markdown row starting and ending with '|'.")
+
+          lines = data_path.read_text(encoding="utf-8").splitlines()
+          row_pattern = re.compile(r"^\|\s*Overnight Oats\s*\|", re.IGNORECASE)
+
+          replaced = False
+          for i, line in enumerate(lines):
+            if row_pattern.match(line):
+              lines[i] = new_row
+              replaced = True
+              break
+
+          if not replaced:
+            raise SystemExit("No table row starting with '| Overnight Oats |' found in data.md.")
+
+          data_path.write_text("\n".join(lines).rstrip() + "\n", encoding="utf-8")
+          PY
+
+      - name: Commit and push data.md
+        run: |
+          if git diff --quiet -- data.md; then
+            echo "No changes in data.md."
+            exit 0
+          fi
+
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add data.md
+          git commit -m "Update Overnight Oats row"
+          git push
