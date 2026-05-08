@@ -2099,6 +2099,7 @@
         delete cartState[key];
       }
       saveCartState();
+      syncSelectionWithCart();
       if (wasActive !== active) {
         animateCartCount(active ? "add" : "remove");
       }
@@ -2172,6 +2173,31 @@
         })
         .filter(Boolean)
         .sort((a, b) => a.rowIndex - b.rowIndex);
+    }
+
+    function getCartRowIndexesSortedForSelection() {
+      return Object.entries(cartState)
+        .filter(([, active]) => active)
+        .map(([rowIndex]) => Number(rowIndex))
+        .filter((rowIndex) => Number.isInteger(rowIndex) && rowIndex >= 0 && rowIndex < allRows.length)
+        .sort((a, b) => {
+          const slotA = Number.isInteger(weekPlanState[String(a)]) ? Number(weekPlanState[String(a)]) : 999;
+          const slotB = Number.isInteger(weekPlanState[String(b)]) ? Number(weekPlanState[String(b)]) : 999;
+          if (slotA !== slotB) {
+            return slotA - slotB;
+          }
+          return a - b;
+        });
+    }
+
+    function syncSelectionWithCart() {
+      const cartIndexes = getCartRowIndexesSortedForSelection();
+      if (cartIndexes.length === 0) {
+        return;
+      }
+
+      selectedRowIndexes = cartIndexes;
+      renderRandomRows(selectedRowIndexes);
     }
 
     function syncWeekPlanState(entries) {
@@ -2427,6 +2453,7 @@
       saveBreakfastState();
       savePortionScale();
 
+      syncSelectionWithCart();
       renderCurrentTable();
       renderWeekPlan();
       renderSummary();
@@ -3457,6 +3484,7 @@
       weekPlanState[String(replacementIndex)] = slot;
       saveCartState();
       saveWeekPlanState();
+      syncSelectionWithCart();
       renderCurrentTable();
       renderWeekPlan();
       if (isSummaryOpen) {
@@ -3653,6 +3681,8 @@
 
       weekPlanState[rowIndex] = slot;
       saveWeekPlanState();
+      syncSelectionWithCart();
+      renderCurrentTable();
       renderWeekPlan();
     });
 
