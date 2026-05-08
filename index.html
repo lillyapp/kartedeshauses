@@ -895,6 +895,47 @@
       display: none;
     }
 
+    .summary-panel-pop-in {
+      animation: summary-pop-in 220ms ease-out;
+    }
+
+    @keyframes summary-pop-in {
+      0% {
+        opacity: 0;
+        transform: translateY(8px) scale(0.985);
+      }
+      100% {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+      }
+    }
+
+    .ui-fade-out {
+      animation: ui-fade-out 180ms ease forwards;
+    }
+
+    .ui-fade-in {
+      animation: ui-fade-in 180ms ease;
+    }
+
+    @keyframes ui-fade-out {
+      0% {
+        opacity: 1;
+      }
+      100% {
+        opacity: 0;
+      }
+    }
+
+    @keyframes ui-fade-in {
+      0% {
+        opacity: 0;
+      }
+      100% {
+        opacity: 1;
+      }
+    }
+
     .summary-header {
       display: flex;
       align-items: flex-start;
@@ -2042,6 +2083,7 @@
       const titles = ["TAG 1 · 2", "TAG 3 · 4", "TAG 5 · 6", "TAG 7 · 8", "TAG 9 · 10"];
       const kcalIndex = allHeaders.indexOf("kcal pro Portion");
       const rawPortionDisplayCount = portionScale / 2;
+      const recipePortionFactor = rawPortionDisplayCount > 0 ? rawPortionDisplayCount : 1;
       const portionDisplayCount = Number.isInteger(rawPortionDisplayCount)
         ? String(rawPortionDisplayCount)
         : String(Math.round(rawPortionDisplayCount * 10) / 10).replace(/\.0$/, "");
@@ -2067,7 +2109,7 @@
         // Add extra kcal if active for this slot (×2 for Frühstück + Abendessen)
         const extra = slotExtraKcal[slot] || { active: false, kcal: 400 };
         const extraKcal = extra.active ? (Number(extra.kcal) || 0) * 2 : 0;
-        const totalKcal = kcalSum + extraKcal;
+        const totalKcal = Math.round((kcalSum * recipePortionFactor) + extraKcal);
         const hasLabel = hasKcal || extra.active;
         const planLabel = showWeekPlanPortionCount
           ? String(portionDisplayCount)
@@ -2140,6 +2182,8 @@
       const entries = getCartRecipeEntries();
       const titles = ["Tag 1 . 2", "Tag 3 . 4", "Tag 5 . 6", "Tag 7 . 8", "Tag 9 . 10"];
       const kcalIndex = allHeaders.indexOf("kcal pro Portion");
+      const rawPortionDisplayCount = portionScale / 2;
+      const recipePortionFactor = rawPortionDisplayCount > 0 ? rawPortionDisplayCount : 1;
       const lines = [`10-Tage Plan ab ${formatGermanDate()}`];
 
       titles.forEach((title, slot) => {
@@ -2159,7 +2203,7 @@
 
         const extra = slotExtraKcal[slot] || { active: false, kcal: 400 };
         const extraKcal = extra.active ? (Number(extra.kcal) || 0) * 2 : 0;
-        const totalKcal = kcalSum + extraKcal;
+        const totalKcal = Math.round((kcalSum * recipePortionFactor) + extraKcal);
         const recipeText = recipeNames.length > 0 ? recipeNames.join(", ") : "-";
         lines.push(`${title} - ${recipeText} (insg. ${totalKcal} kcal/d)`);
       });
@@ -2182,47 +2226,52 @@
 
     function buildWeekPlanCode() {
       const payload = {
-        v: 1,
-        selected: Object.entries(cartState)
+        s: Object.entries(cartState)
           .filter(([, active]) => active)
           .map(([rowIndex]) => Number(rowIndex))
           .filter((index) => Number.isInteger(index) && index >= 0),
-        slots: Object.fromEntries(
+        t: Object.fromEntries(
           Object.entries(weekPlanState)
             .filter(([rowIndex, slot]) => {
               const index = Number(rowIndex);
               return Number.isInteger(index) && index >= 0 && Number.isInteger(slot) && slot >= 0 && slot <= 4;
             })
         ),
-        portionScale: Number.isFinite(portionScale) && portionScale > 0 ? portionScale : 1,
-        extra: slotExtraKcal
+        p: Number.isFinite(portionScale) && portionScale > 0 ? portionScale : 1,
+        e: slotExtraKcal
       };
 
-      return `PLAN1-${toBase64Url(JSON.stringify(payload))}`;
+      return `P1-${toBase64Url(JSON.stringify(payload))}`;
     }
 
     function getWeekPlanCodeFromUrl() {
       const params = new URLSearchParams(window.location.search);
       const emptyKeyValue = params.get("") || "";
-      const namedKeyValue = params.get("code") || "";
+      const namedKeyValue = params.get("c") || params.get("code") || "";
       const candidate = (emptyKeyValue || namedKeyValue).trim();
-      return candidate.startsWith("PLAN1-") ? candidate : "";
+      return candidate.startsWith("P1-") || candidate.startsWith("PLAN1-") ? candidate : "";
     }
 
     function applyWeekPlanCode(code) {
       const trimmed = (code || "").trim();
-      if (!trimmed.startsWith("PLAN1-")) {
+      const isNew = trimmed.startsWith("P1-");
+      const isOld = trimmed.startsWith("PLAN1-");
+      if (!isNew && !isOld) {
         throw new Error("Ungültiges Code-Format.");
       }
 
-      const decoded = fromBase64Url(trimmed.slice(6));
+      const decoded = fromBase64Url(trimmed.slice(isNew ? 3 : 6));
       const payload = JSON.parse(decoded);
-      if (!payload || payload.v !== 1 || !Array.isArray(payload.selected) || typeof payload.slots !== "object") {
+      const selectedRaw = Array.isArray(payload?.s) ? payload.s : payload?.selected;
+      const slotsRaw = payload?.t && typeof payload.t === "object" ? payload.t : payload?.slots;
+      const portionRaw = payload?.p ?? payload?.portionScale;
+      const extraRaw = payload?.e ?? payload?.extra;
+      if (!Array.isArray(selectedRaw) || !slotsRaw || typeof slotsRaw !== "object") {
         throw new Error("Code-Inhalt ist ungültig.");
       }
 
       const nextCartState = {};
-      payload.selected.forEach((rawIndex) => {
+      selectedRaw.forEach((rawIndex) => {
         const index = Number(rawIndex);
         if (Number.isInteger(index) && index >= 0 && index < allRows.length) {
           nextCartState[String(index)] = true;
@@ -2230,7 +2279,7 @@
       });
 
       const nextWeekPlanState = {};
-      Object.entries(payload.slots || {}).forEach(([rowIndex, rawSlot]) => {
+      Object.entries(slotsRaw || {}).forEach(([rowIndex, rawSlot]) => {
         const index = Number(rowIndex);
         const slot = Number(rawSlot);
         if (nextCartState[String(index)] && Number.isInteger(slot) && slot >= 0 && slot <= 4) {
@@ -2238,13 +2287,13 @@
         }
       });
 
-      const nextPortionScale = Number(payload.portionScale);
+      const nextPortionScale = Number(portionRaw);
       const normalizedPortionScale = Number.isFinite(nextPortionScale) && nextPortionScale > 0
         ? Math.round(nextPortionScale)
         : 1;
 
       const nextExtra = {};
-      Object.entries(payload.extra || {}).forEach(([slotKey, rawConfig]) => {
+      Object.entries(extraRaw || {}).forEach(([slotKey, rawConfig]) => {
         const slot = Number(slotKey);
         const config = rawConfig && typeof rawConfig === "object" ? rawConfig : {};
         if (!Number.isInteger(slot) || slot < 0 || slot > 4) {
@@ -2883,16 +2932,40 @@
     }
 
     function setSummaryVisibility(visible) {
+      const fadeTargets = [recipeCollectionHeading, recipeTableWrap, weekPlan];
+      const clearFadeClasses = () => {
+        fadeTargets.forEach((element) => {
+          if (!element) return;
+          element.classList.remove("ui-fade-out", "ui-fade-in");
+        });
+      };
+
       isSummaryOpen = visible;
-      summaryPanel.hidden = !visible;
-      recipeCollectionHeading.hidden = visible;
-      recipeTableWrap.hidden = visible;
       summaryButton.dataset.active = visible ? "true" : "false";
       summaryButton.setAttribute("aria-expanded", visible ? "true" : "false");
       if (portionScaleInput.value !== String(portionScale)) {
         portionScaleInput.value = String(portionScale);
       }
+
       if (visible) {
+        summaryPanel.hidden = false;
+        summaryPanel.classList.remove("summary-panel-pop-in");
+        window.requestAnimationFrame(() => {
+          summaryPanel.classList.add("summary-panel-pop-in");
+        });
+
+        clearFadeClasses();
+        fadeTargets.forEach((element) => {
+          if (!element || element.hidden) return;
+          element.classList.add("ui-fade-out");
+        });
+        window.setTimeout(() => {
+          recipeCollectionHeading.hidden = true;
+          recipeTableWrap.hidden = true;
+          weekPlan.hidden = true;
+          clearFadeClasses();
+        }, 170);
+
         const token = ++basketCheckToken;
         activeBasketText = "";
         isBasketLoading = true;
@@ -2907,8 +2980,21 @@
           renderSummary();
         });
       } else {
+        summaryPanel.hidden = true;
+        summaryPanel.classList.remove("summary-panel-pop-in");
         isBasketLoading = false;
+        recipeCollectionHeading.hidden = false;
+        recipeTableWrap.hidden = false;
+        clearFadeClasses();
+        recipeCollectionHeading.classList.add("ui-fade-in");
+        recipeTableWrap.classList.add("ui-fade-in");
         renderWeekPlan();
+        if (!weekPlan.hidden) {
+          weekPlan.classList.add("ui-fade-in");
+        }
+        window.setTimeout(() => {
+          clearFadeClasses();
+        }, 190);
       }
     }
 
@@ -3386,7 +3472,7 @@
 
     weekPlanCopyButton.addEventListener("click", async () => {
       try {
-        const shareLink = `lillyapp.github.io/kartedeshauses?=${buildWeekPlanCode()}`;
+        const shareLink = `lillyapp.github.io/kartedeshauses?c=${buildWeekPlanCode()}`;
         const text = `${buildWeekPlanClipboardText()}\n\n${shareLink}`;
         await navigator.clipboard.writeText(text);
         weekPlanCopyButton.title = "Kopiert";
