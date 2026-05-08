@@ -100,6 +100,37 @@
       color: var(--fg);
     }
 
+    .week-plan-heading {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .week-plan-copy {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 24px;
+      height: 24px;
+      padding: 0;
+      border: 0;
+      background: transparent;
+      color: var(--fg);
+      border-radius: 999px;
+      box-shadow: none;
+    }
+
+    .week-plan-copy:hover,
+    .week-plan-copy:focus-visible {
+      background: rgba(0, 0, 0, 0.06);
+    }
+
+    .week-plan-copy svg {
+      width: 14px;
+      height: 14px;
+      stroke-width: 2;
+    }
+
     .week-plan-scroll {
       display: inline-flex;
       align-items: center;
@@ -188,6 +219,43 @@
       letter-spacing: 0.02em;
     }
 
+    .week-plan-kcal-wrap {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .week-plan-portion-toggle {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 22px;
+      height: 22px;
+      padding: 0;
+      border: 0;
+      border-radius: 999px;
+      background: transparent;
+      color: var(--muted);
+      box-shadow: none;
+    }
+
+    .week-plan-portion-toggle:hover,
+    .week-plan-portion-toggle:focus-visible {
+      background: rgba(0, 0, 0, 0.07);
+      color: var(--fg);
+    }
+
+    .week-plan-portion-toggle[data-active="true"] {
+      color: var(--fg);
+      background: rgba(0, 0, 0, 0.08);
+    }
+
+    .week-plan-portion-toggle svg {
+      width: 14px;
+      height: 14px;
+      stroke-width: 2;
+    }
+
     .week-plan-extras {
       display: flex;
       align-items: center;
@@ -195,13 +263,6 @@
       margin: 8px 0 0;
       padding-top: 8px;
       border-top: 1px dashed rgba(0,0,0,0.15);
-    }
-
-    .week-plan-extras-label {
-      font-size: 11px;
-      color: var(--muted);
-      flex: 1;
-      min-width: 0;
     }
 
     .week-plan-wheat-btn {
@@ -251,6 +312,7 @@
       text-align: center;
       background: #fff;
       color: var(--fg);
+      margin-left: auto;
     }
 
     .week-plan-extra-input:focus {
@@ -1197,7 +1259,12 @@
     </div>
     <section id="weekPlan" class="week-plan" hidden aria-label="Wochenplanübersicht">
       <div class="week-plan-header">
-        <h2 class="section-heading">10-TAGE PLAN</h2>
+        <div class="week-plan-heading">
+          <h2 class="section-heading">10-TAGE PLAN</h2>
+          <button id="weekPlanCopyButton" class="week-plan-copy" type="button" aria-label="10-Tage-Plan kopieren" title="10-Tage-Plan kopieren">
+            <i data-lucide="copy" aria-hidden="true"></i>
+          </button>
+        </div>
         <button id="weekPlanScrollButton" class="week-plan-scroll" type="button" aria-label="Wochenplan verschieben" title="Wochenplan verschieben">
           <i data-lucide="arrow-left-right" aria-hidden="true"></i>
         </button>
@@ -1282,6 +1349,7 @@
     const weekPlan = document.getElementById("weekPlan");
     const weekPlanViewport = document.getElementById("weekPlanViewport");
     const weekPlanGrid = document.getElementById("weekPlanGrid");
+    const weekPlanCopyButton = document.getElementById("weekPlanCopyButton");
     const weekPlanScrollButton = document.getElementById("weekPlanScrollButton");
     const combineToggle = document.getElementById("combineToggle");
     const spiceToggle = document.getElementById("spiceToggle");
@@ -1334,6 +1402,7 @@
     let isProductHelperOpen = false;
     let currentProductHelperIndex = 0;
     let productCheckToken = 0;
+    let showWeekPlanPortionCount = false;
 
     function splitMarkdownRow(line) {
       return line
@@ -1869,6 +1938,10 @@
       syncWeekPlanState(entries);
       const titles = ["TAG 1 · 2", "TAG 3 · 4", "TAG 5 · 6", "TAG 7 · 8", "TAG 9 · 10"];
       const kcalIndex = allHeaders.indexOf("kcal pro Portion");
+      const rawPortionDisplayCount = portionScale / 2;
+      const portionDisplayCount = Number.isInteger(rawPortionDisplayCount)
+        ? String(rawPortionDisplayCount)
+        : String(Math.round(rawPortionDisplayCount * 10) / 10).replace(/\.0$/, "");
       weekPlan.hidden = false;
 
       weekPlanGrid.innerHTML = titles.map((title, slot) => {
@@ -1892,13 +1965,28 @@
         const extra = slotExtraKcal[slot] || { active: false, kcal: 400 };
         const extraKcal = extra.active ? (Number(extra.kcal) || 0) * 2 : 0;
         const totalKcal = kcalSum + extraKcal;
-        const kcalLabel = (hasKcal || extra.active) ? `${totalKcal} kcal` : "";
+        const hasLabel = hasKcal || extra.active;
+        const planLabel = showWeekPlanPortionCount
+          ? String(portionDisplayCount)
+          : `${totalKcal} kcal`;
 
         return `
           <section class="week-plan-column" data-slot="${slot}">
             <div class="week-plan-title-row">
               <h2 class="week-plan-title">${title}</h2>
-              ${kcalLabel ? `<span class="week-plan-kcal-badge">${kcalLabel}</span>` : ""}
+              ${hasLabel ? `
+                <div class="week-plan-kcal-wrap">
+                  <button
+                    type="button"
+                    class="week-plan-portion-toggle"
+                    data-action="toggle-portion-display"
+                    data-active="${showWeekPlanPortionCount ? "true" : "false"}"
+                    title="${showWeekPlanPortionCount ? "kcal anzeigen" : "Portionen anzeigen"}"
+                    aria-label="${showWeekPlanPortionCount ? "kcal anzeigen" : "Portionen anzeigen"}"
+                  ><i data-lucide="user" aria-hidden="true"></i></button>
+                  <span class="week-plan-kcal-badge">${planLabel}</span>
+                </div>
+              ` : ""}
             </div>
             <div class="week-plan-items">
               ${slotEntries.map(({ row, rowIndex }) => `
@@ -1916,7 +2004,6 @@
                 title="Frühstück &amp; Abendessen einrechnen (je 1×)"
                 aria-label="Frühstück &amp; Abendessen einrechnen"
               ><i data-lucide="wheat" aria-hidden="true"></i></button>
-              <span class="week-plan-extras-label">Fr. &amp; Ab.</span>
               <input
                 type="number"
                 class="week-plan-extra-input"
@@ -1937,6 +2024,44 @@
         window.lucide.createIcons();
       }
       updateWeekPlanScrollButton();
+    }
+
+    function formatGermanDate(date = new Date()) {
+      const day = String(date.getDate()).padStart(2, "0");
+      const month = String(date.getMonth() + 1).padStart(2, "0");
+      const year = String(date.getFullYear());
+      return `${day}.${month}.${year}`;
+    }
+
+    function buildWeekPlanClipboardText() {
+      const entries = getCartRecipeEntries();
+      const titles = ["Tag 1 . 2", "Tag 3 . 4", "Tag 5 . 6", "Tag 7 . 8", "Tag 9 . 10"];
+      const kcalIndex = allHeaders.indexOf("kcal pro Portion");
+      const lines = [`10-Tage Plan ab ${formatGermanDate()}`];
+
+      titles.forEach((title, slot) => {
+        const slotEntries = entries.filter(({ rowIndex }) => weekPlanState[String(rowIndex)] === slot);
+        const recipeNames = slotEntries.map(({ row }) => row[0]).filter(Boolean);
+
+        let kcalSum = 0;
+        if (kcalIndex !== -1) {
+          slotEntries.forEach(({ row }) => {
+            const raw = (row[kcalIndex] || "").replace(/[^\d]/g, "");
+            const val = Number(raw);
+            if (val > 0) {
+              kcalSum += val;
+            }
+          });
+        }
+
+        const extra = slotExtraKcal[slot] || { active: false, kcal: 400 };
+        const extraKcal = extra.active ? (Number(extra.kcal) || 0) * 2 : 0;
+        const totalKcal = kcalSum + extraKcal;
+        const recipeText = recipeNames.length > 0 ? recipeNames.join(", ") : "-";
+        lines.push(`${title} - ${recipeText} (insg. ${totalKcal} kcal/d)`);
+      });
+
+      return lines.join("\n");
     }
 
     function updateWeekPlanScrollButton() {
@@ -2926,6 +3051,13 @@
 
     // Wheat button toggle
     weekPlan.addEventListener("click", (event) => {
+      const portionToggle = event.target.closest('[data-action="toggle-portion-display"]');
+      if (portionToggle) {
+        showWeekPlanPortionCount = !showWeekPlanPortionCount;
+        renderWeekPlan();
+        return;
+      }
+
       const item = event.target.closest(".week-plan-item");
       if (item) {
         const rowIndex = Number(item.dataset.rowIndex);
@@ -3012,6 +3144,21 @@
 
     weekPlanScrollButton.addEventListener("click", () => {
       scrollWeekPlanToOppositeSide();
+    });
+
+    weekPlanCopyButton.addEventListener("click", async () => {
+      try {
+        await navigator.clipboard.writeText(buildWeekPlanClipboardText());
+        weekPlanCopyButton.title = "Kopiert";
+        window.setTimeout(() => {
+          weekPlanCopyButton.title = "10-Tage-Plan kopieren";
+        }, 1200);
+      } catch (error) {
+        weekPlanCopyButton.title = "Kopieren fehlgeschlagen";
+        window.setTimeout(() => {
+          weekPlanCopyButton.title = "10-Tage-Plan kopieren";
+        }, 1200);
+      }
     });
 
     window.addEventListener("resize", () => {
