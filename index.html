@@ -264,75 +264,17 @@
       stroke-width: 2;
     }
 
-    .week-plan-extras {
-      display: flex;
-      align-items: center;
-      gap: 6px;
-      margin: 8px 0 0;
-      padding-top: 8px;
-      border-top: 1px dashed rgba(0,0,0,0.15);
-    }
-
-    .week-plan-wheat-btn {
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      width: 26px;
-      height: 26px;
-      border: 0;
-      border-radius: 999px;
-      background: transparent;
-      color: var(--muted);
-      padding: 0;
-      cursor: pointer;
-      box-shadow: none;
-      flex: none;
-    }
-
-    .week-plan-wheat-btn:hover,
-    .week-plan-wheat-btn:focus-visible {
-      background: rgba(0,0,0,0.07);
-      color: var(--fg);
-    }
-
-    .week-plan-wheat-btn[data-active="true"] {
-      background: #fff8e7;
-      color: #b8860b;
-    }
-
-    .week-plan-wheat-btn svg {
-      width: 15px;
-      height: 15px;
-      stroke-width: 1.8;
-      fill: none;
-      stroke: currentColor;
-      stroke-linecap: round;
-      stroke-linejoin: round;
-    }
-
-    .week-plan-extra-input {
-      width: 52px;
-      padding: 3px 5px;
-      border: 1px solid rgba(0,0,0,0.18);
-      border-radius: 5px;
-      font: inherit;
-      font-size: 11px;
-      text-align: center;
-      background: #fff;
-      color: var(--fg);
-      margin-left: auto;
-    }
-
-    .week-plan-extra-input:focus {
-      outline: 2px solid var(--fg);
-      outline-offset: 1px;
-    }
-
     .week-plan-items {
       display: grid;
       gap: 7px;
       flex: 1;
       align-content: start;
+    }
+
+    .week-plan-item-row {
+      display: flex;
+      align-items: center;
+      gap: 6px;
     }
 
     .week-plan-item {
@@ -356,6 +298,54 @@
 
     .week-plan-item:active {
       cursor: grabbing;
+    }
+
+    .week-plan-randomize {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 26px;
+      height: 26px;
+      border: 0;
+      border-radius: 999px;
+      background: transparent;
+      color: var(--muted);
+      padding: 0;
+      flex: none;
+      box-shadow: none;
+      line-height: 0;
+    }
+
+    .week-plan-randomize:hover,
+    .week-plan-randomize:focus-visible {
+      background: rgba(0, 0, 0, 0.07);
+      color: var(--fg);
+    }
+
+    .week-plan-randomize svg {
+      display: block;
+      width: 14px;
+      height: 14px;
+      stroke-width: 2;
+    }
+
+    .breakfast-table-wrap {
+      margin: 0 0 14px;
+    }
+
+    .breakfast-actions-col {
+      text-align: right;
+    }
+
+    .breakfast-filter-button[disabled] {
+      opacity: 1;
+      cursor: default;
+    }
+
+    .breakfast-add {
+      padding: 6px 10px;
+      min-height: 28px;
+      font-size: 12px;
     }
 
     .top-actions {
@@ -770,8 +760,10 @@
 
     .recipe-text-link:hover,
     .recipe-text-link:focus-visible {
-      border-color: #d7d7d3;
-      background: #f4f4f2;
+      border-color: transparent;
+      background: transparent;
+      box-shadow: none;
+      outline: none;
     }
 
     .recipe-text-link svg {
@@ -787,6 +779,20 @@
       align-items: center;
       justify-content: flex-end;
       width: 100%;
+      white-space: nowrap;
+    }
+
+    .col-index {
+      width: 44px;
+    }
+
+    .col-kcal {
+      width: 120px;
+      white-space: nowrap;
+    }
+
+    .col-actions {
+      width: 96px;
       white-space: nowrap;
     }
 
@@ -1435,6 +1441,32 @@
     </section>
     <div id="status" class="status"></div>
     <div id="error" class="error" hidden></div>
+    <h2 id="breakfastCollectionHeading" class="section-heading table-heading">BASIS</h2>
+    <div id="breakfastTableWrap" class="table-wrap breakfast-table-wrap">
+      <table aria-label="Basis Rezepte">
+        <thead>
+          <tr>
+            <th class="col-index">#</th>
+            <th>Rezept</th>
+            <th class="col-kcal">kcal pro Tag</th>
+            <th class="breakfast-actions-col col-actions">
+              <div class="recipe-header">
+                <button
+                  type="button"
+                  class="filter-button breakfast-filter-button"
+                  aria-label="Basis-Filter"
+                  title="Basis-Filter"
+                  disabled
+                >
+                  <i data-lucide="list-filter" aria-hidden="true"></i>
+                </button>
+              </div>
+            </th>
+          </tr>
+        </thead>
+        <tbody id="breakfastTableBody"></tbody>
+      </table>
+    </div>
     <h2 id="recipeCollectionHeading" class="section-heading table-heading">REZEPTSAMMLUNG</h2>
     <div id="recipeTableWrap" class="table-wrap">
       <table aria-label="Markdown Tabelle">
@@ -1459,6 +1491,9 @@
     const errorEl = document.getElementById("error");
     const tableHead = document.getElementById("tableHead");
     const tableBody = document.getElementById("tableBody");
+    const breakfastCollectionHeading = document.getElementById("breakfastCollectionHeading");
+    const breakfastTableWrap = document.getElementById("breakfastTableWrap");
+    const breakfastTableBody = document.getElementById("breakfastTableBody");
     const recipeCollectionHeading = document.getElementById("recipeCollectionHeading");
     const recipeTableWrap = document.getElementById("recipeTableWrap");
     const quickActionsToggle = document.getElementById("quickActionsToggle");
@@ -1498,7 +1533,7 @@
     const SPICE_FILTER_STORAGE_KEY = "recipe-cart-spice-filter-v1";
     const PURCHASED_STORAGE_KEY = "recipe-cart-purchased-v1";
     const EXCLUDED_STORAGE_KEY = "recipe-cart-excluded-v1";
-    const EXTRA_KCAL_STORAGE_KEY = "recipe-week-extra-kcal-v1";
+    const BREAKFAST_STORAGE_KEY = "recipe-breakfast-state-v1";
     const PRODUCT_LINK_STORAGE_KEY = "recipe-product-links-v1";
     const REWE_SEARCH_BASE_URL = "https://www.rewe.de/shop/productList?sorting=PRICE_ASC&search=";
     const REWE_PROXY_BASE_URL = "https://r.jina.ai/http://www.rewe.de/shop/productList?search=";
@@ -1521,9 +1556,7 @@
     let purchasedState = loadBooleanMap(PURCHASED_STORAGE_KEY);
     let excludedState = loadBooleanMap(EXCLUDED_STORAGE_KEY);
 
-    // Extra kcal per slot (for generic Frühstück/Abendessen)
-    // slotExtraKcal[slot] = { active: bool, kcal: number }
-    let slotExtraKcal = loadSlotExtraKcal();
+    let breakfastState = loadBreakfastState();
     let reweBasketSnapshot = {
       text: "",
       fetchedAt: 0,
@@ -1865,18 +1898,112 @@
       localStorage.setItem(storageKey, JSON.stringify(value));
     }
 
-    function loadSlotExtraKcal() {
+    function loadBreakfastState() {
       try {
-        const raw = localStorage.getItem(EXTRA_KCAL_STORAGE_KEY);
+        const raw = localStorage.getItem(BREAKFAST_STORAGE_KEY);
         const parsed = raw ? JSON.parse(raw) : {};
-        return parsed && typeof parsed === "object" ? parsed : {};
+        if (!parsed || typeof parsed !== "object") {
+          return {
+            overnightOats: { active: false, kcal: 420 },
+            brotzeit: { active: false, kcal: 360 }
+          };
+        }
+        return {
+          overnightOats: {
+            active: Boolean(parsed.overnightOats?.active),
+            kcal: Number.isFinite(Number(parsed.overnightOats?.kcal)) ? Math.max(0, Number(parsed.overnightOats.kcal)) : 420
+          },
+          brotzeit: {
+            active: Boolean(parsed.brotzeit?.active),
+            kcal: Number.isFinite(Number(parsed.brotzeit?.kcal)) ? Math.max(0, Number(parsed.brotzeit.kcal)) : 360
+          }
+        };
       } catch (error) {
-        return {};
+        return {
+          overnightOats: { active: false, kcal: 420 },
+          brotzeit: { active: false, kcal: 360 }
+        };
       }
     }
 
-    function saveSlotExtraKcal() {
-      localStorage.setItem(EXTRA_KCAL_STORAGE_KEY, JSON.stringify(slotExtraKcal));
+    function saveBreakfastState() {
+      localStorage.setItem(BREAKFAST_STORAGE_KEY, JSON.stringify(breakfastState));
+    }
+
+    function getBreakfastKcalPerDay() {
+      const overnight = breakfastState.overnightOats.active ? Number(breakfastState.overnightOats.kcal || 0) : 0;
+      const brotzeit = breakfastState.brotzeit.active ? Number(breakfastState.brotzeit.kcal || 0) : 0;
+      return overnight + brotzeit;
+    }
+
+    function findOvernightOatsRecipeLink() {
+      const match = allRows.find((row) => /overnight\s*oats/i.test(row[0] || ""));
+      if (!match) {
+        return "";
+      }
+      const link = extractCellLink(match[1] || "");
+      return link ? link.href : "";
+    }
+
+    function renderBreakfastPanel() {
+      const link = findOvernightOatsRecipeLink();
+      const title = "Overnight Oats";
+      const brotzeitTitle = "Brotzeit (2 Scheiben Brot mit Belag)";
+      const brotzeitLink = "https://www.kitchenstories.com/de/rezepte";
+
+      breakfastTableBody.innerHTML = `
+        <tr>
+          <td class="col-index">1</td>
+          <td>${title}</td>
+          <td class="col-kcal">${Math.round(Number(breakfastState.overnightOats.kcal || 0))}</td>
+          <td class="breakfast-actions-col col-actions">
+            <div class="recipe-actions">
+              ${link ? `
+                <a class="recipe-text-link" href="${link}" target="_blank" rel="noopener noreferrer" aria-label="Rezept öffnen: Overnight Oats" title="Rezept öffnen: Overnight Oats">
+                  <i data-lucide="link-2" aria-hidden="true"></i>
+                </a>
+              ` : ""}
+              <button
+                type="button"
+                class="cart-toggle breakfast-add"
+                data-action="toggle-breakfast"
+                data-breakfast-key="overnightOats"
+                data-active="${breakfastState.overnightOats.active ? "true" : "false"}"
+                aria-label="${breakfastState.overnightOats.active ? "Basis entfernen: Overnight Oats" : "Basis hinzubuchen: Overnight Oats"}"
+                title="${breakfastState.overnightOats.active ? "Basis entfernen" : "Basis hinzubuchen"}"
+              >
+                <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><circle cx="8" cy="21" r="1.5"></circle><circle cx="18" cy="21" r="1.5"></circle><path d="M2.5 3h2l2.2 12.2a2 2 0 0 0 2 1.6h8.5a2 2 0 0 0 2-1.5L21 7H6.2"></path></svg>
+              </button>
+            </div>
+          </td>
+        </tr>
+        <tr>
+          <td class="col-index">2</td>
+          <td>${brotzeitTitle}</td>
+          <td class="col-kcal">${Math.round(Number(breakfastState.brotzeit.kcal || 0))}</td>
+          <td class="breakfast-actions-col col-actions">
+            <div class="recipe-actions">
+              <a class="recipe-text-link" href="${brotzeitLink}" target="_blank" rel="noopener noreferrer" aria-label="Rezept öffnen: Brotzeit" title="Rezept öffnen: Brotzeit">
+                <i data-lucide="link-2" aria-hidden="true"></i>
+              </a>
+              <button
+                type="button"
+                class="cart-toggle breakfast-add"
+                data-action="toggle-breakfast"
+                data-breakfast-key="brotzeit"
+                data-active="${breakfastState.brotzeit.active ? "true" : "false"}"
+                aria-label="${breakfastState.brotzeit.active ? "Basis entfernen: Brotzeit" : "Basis hinzubuchen: Brotzeit"}"
+                title="${breakfastState.brotzeit.active ? "Basis entfernen" : "Basis hinzubuchen"}"
+              >
+                <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><circle cx="8" cy="21" r="1.5"></circle><circle cx="18" cy="21" r="1.5"></circle><path d="M2.5 3h2l2.2 12.2a2 2 0 0 0 2 1.6h8.5a2 2 0 0 0 2-1.5L21 7H6.2"></path></svg>
+              </button>
+            </div>
+          </td>
+        </tr>
+      `;
+      if (window.lucide && typeof window.lucide.createIcons === "function") {
+        window.lucide.createIcons();
+      }
     }
 
     function isPurchased(key) {
@@ -2106,11 +2233,9 @@
           });
         }
 
-        // Add extra kcal if active for this slot (×2 for Frühstück + Abendessen)
-        const extra = slotExtraKcal[slot] || { active: false, kcal: 400 };
-        const extraKcal = extra.active ? (Number(extra.kcal) || 0) * 2 : 0;
-        const totalKcal = Math.round((kcalSum * recipePortionFactor) + extraKcal);
-        const hasLabel = hasKcal || extra.active;
+        const breakfastKcal = getBreakfastKcalPerDay();
+        const totalKcal = Math.round((kcalSum * recipePortionFactor) + breakfastKcal);
+        const hasLabel = hasKcal || breakfastKcal > 0;
         const planLabel = showWeekPlanPortionCount
           ? String(portionDisplayCount)
           : `${totalKcal} kcal`;
@@ -2135,31 +2260,20 @@
             </div>
             <div class="week-plan-items">
               ${slotEntries.map(({ row, rowIndex }) => `
-                <button class="week-plan-item" type="button" draggable="true" data-row-index="${rowIndex}">
-                  ${row[0]}
-                </button>
+                <div class="week-plan-item-row">
+                  <button class="week-plan-item" type="button" draggable="true" data-row-index="${rowIndex}">
+                    ${row[0]}
+                  </button>
+                  <button
+                    type="button"
+                    class="week-plan-randomize"
+                    data-action="randomize-one"
+                    data-row-index="${rowIndex}"
+                    aria-label="Rezept neu randomisieren"
+                    title="Rezept neu randomisieren"
+                  ><i data-lucide="shuffle" aria-hidden="true"></i></button>
+                </div>
               `).join("")}
-            </div>
-            <div class="week-plan-extras">
-              <button
-                type="button"
-                class="week-plan-wheat-btn"
-                data-slot="${slot}"
-                data-active="${extra.active ? "true" : "false"}"
-                title="Frühstück &amp; Abendessen einrechnen (je 1×)"
-                aria-label="Frühstück &amp; Abendessen einrechnen"
-              ><i data-lucide="wheat" aria-hidden="true"></i></button>
-              <input
-                type="number"
-                class="week-plan-extra-input"
-                data-slot="${slot}"
-                value="${extra.kcal || 400}"
-                min="0"
-                step="10"
-                title="Kcal pro Mahlzeit (wird ×2 gerechnet)"
-                aria-label="Kcal für Frühstück &amp; Abendessen"
-              >
-              <span style="font-size:11px;color:var(--muted)">kcal</span>
             </div>
           </section>
         `;
@@ -2184,6 +2298,7 @@
       const kcalIndex = allHeaders.indexOf("kcal pro Portion");
       const rawPortionDisplayCount = portionScale / 2;
       const recipePortionFactor = rawPortionDisplayCount > 0 ? rawPortionDisplayCount : 1;
+      const breakfastKcalPerDay = getBreakfastKcalPerDay();
       const lines = [`10-Tage Plan ab ${formatGermanDate()}`];
 
       titles.forEach((title, slot) => {
@@ -2201,9 +2316,7 @@
           });
         }
 
-        const extra = slotExtraKcal[slot] || { active: false, kcal: 400 };
-        const extraKcal = extra.active ? (Number(extra.kcal) || 0) * 2 : 0;
-        const totalKcal = Math.round((kcalSum * recipePortionFactor) + extraKcal);
+        const totalKcal = Math.round((kcalSum * recipePortionFactor) + breakfastKcalPerDay);
         const recipeText = recipeNames.length > 0 ? recipeNames.join(", ") : "-";
         lines.push(`${title} - ${recipeText} (insg. ${totalKcal} kcal/d)`);
       });
@@ -2238,7 +2351,7 @@
             })
         ),
         p: Number.isFinite(portionScale) && portionScale > 0 ? portionScale : 1,
-        e: slotExtraKcal
+        e: breakfastState
       };
 
       return `P1-${toBase64Url(JSON.stringify(payload))}`;
@@ -2292,34 +2405,32 @@
         ? Math.round(nextPortionScale)
         : 1;
 
-      const nextExtra = {};
-      Object.entries(extraRaw || {}).forEach(([slotKey, rawConfig]) => {
-        const slot = Number(slotKey);
-        const config = rawConfig && typeof rawConfig === "object" ? rawConfig : {};
-        if (!Number.isInteger(slot) || slot < 0 || slot > 4) {
-          return;
+      const nextBreakfast = {
+        overnightOats: {
+          active: Boolean(extraRaw?.overnightOats?.active),
+          kcal: Number.isFinite(Number(extraRaw?.overnightOats?.kcal)) ? Math.max(0, Number(extraRaw.overnightOats.kcal)) : 420
+        },
+        brotzeit: {
+          active: Boolean(extraRaw?.brotzeit?.active),
+          kcal: Number.isFinite(Number(extraRaw?.brotzeit?.kcal)) ? Math.max(0, Number(extraRaw.brotzeit.kcal)) : 360
         }
-
-        nextExtra[slot] = {
-          active: Boolean(config.active),
-          kcal: Number.isFinite(Number(config.kcal)) ? Math.max(0, Number(config.kcal)) : 400
-        };
-      });
+      };
 
       cartState = nextCartState;
       weekPlanState = nextWeekPlanState;
-      slotExtraKcal = nextExtra;
+      breakfastState = nextBreakfast;
       portionScale = normalizedPortionScale;
       portionScaleInput.value = String(portionScale);
 
       saveCartState();
       saveWeekPlanState();
-      saveSlotExtraKcal();
+      saveBreakfastState();
       savePortionScale();
 
       renderCurrentTable();
       renderWeekPlan();
       renderSummary();
+      renderBreakfastPanel();
     }
 
     function updateWeekPlanScrollButton() {
@@ -2931,8 +3042,45 @@
       return getCartRecipeEntries();
     }
 
+    function getBreakfastSummaryEntries() {
+      const entries = [];
+
+      if (breakfastState.overnightOats.active) {
+        const overnightIndex = allRows.findIndex((row) => /overnight\s*oats/i.test(row[0] || ""));
+        if (overnightIndex >= 0) {
+          entries.push({ row: allRows[overnightIndex], rowIndex: overnightIndex });
+        } else {
+          entries.push({
+            row: [
+              "Overnight Oats",
+              "",
+              "50 g Haferflocken<br>150 ml Milch<br>100 g Joghurt<br>1 EL Chiasamen<br>1 Stück Banane",
+              "",
+              String(Math.round(Number(breakfastState.overnightOats.kcal || 420)))
+            ],
+            rowIndex: -1001
+          });
+        }
+      }
+
+      if (breakfastState.brotzeit.active) {
+        entries.push({
+          row: [
+            "Brotzeit",
+            "",
+            "2 Stück Scheiben Brot<br>30 g Frischkäse<br>30 g Käse<br>40 g Gurke<br>40 g Tomate",
+            "",
+            String(Math.round(Number(breakfastState.brotzeit.kcal || 360)))
+          ],
+          rowIndex: -1002
+        });
+      }
+
+      return entries;
+    }
+
     function setSummaryVisibility(visible) {
-      const fadeTargets = [recipeCollectionHeading, recipeTableWrap, weekPlan];
+      const fadeTargets = [breakfastCollectionHeading, breakfastTableWrap, recipeCollectionHeading, recipeTableWrap, weekPlan];
       const clearFadeClasses = () => {
         fadeTargets.forEach((element) => {
           if (!element) return;
@@ -2963,6 +3111,8 @@
           recipeCollectionHeading.hidden = true;
           recipeTableWrap.hidden = true;
           weekPlan.hidden = true;
+          breakfastCollectionHeading.hidden = true;
+          breakfastTableWrap.hidden = true;
           clearFadeClasses();
         }, 170);
 
@@ -2985,6 +3135,8 @@
         isBasketLoading = false;
         recipeCollectionHeading.hidden = false;
         recipeTableWrap.hidden = false;
+        breakfastCollectionHeading.hidden = false;
+        breakfastTableWrap.hidden = false;
         clearFadeClasses();
         recipeCollectionHeading.classList.add("ui-fade-in");
         recipeTableWrap.classList.add("ui-fade-in");
@@ -3000,7 +3152,10 @@
 
     function renderSummary() {
       const renderToken = ++summaryRenderToken;
-      const selected = getSelectedRecipeEntries();
+      const selected = [
+        ...getSelectedRecipeEntries(),
+        ...getBreakfastSummaryEntries()
+      ];
       summaryCount.hidden = selected.length === 0;
       summaryCount.textContent = String(selected.length);
       summaryMeta.textContent = "";
@@ -3277,6 +3432,38 @@
       renderCurrentTable();
     }
 
+    function randomizeSingleRecipe(rowIndex) {
+      const currentKey = String(rowIndex);
+      const slot = Number(weekPlanState[currentKey]);
+      if (!Number.isInteger(slot) || slot < 0 || slot > 4) {
+        return;
+      }
+
+      const selectedKeys = new Set(
+        Object.entries(cartState)
+          .filter(([, active]) => active)
+          .map(([key]) => key)
+      );
+      selectedKeys.delete(currentKey);
+      const pool = getSelectionPool().filter((index) => !selectedKeys.has(String(index)));
+      if (pool.length === 0) {
+        return;
+      }
+
+      const replacementIndex = pool[Math.floor(Math.random() * pool.length)];
+      delete cartState[currentKey];
+      cartState[String(replacementIndex)] = true;
+      delete weekPlanState[currentKey];
+      weekPlanState[String(replacementIndex)] = slot;
+      saveCartState();
+      saveWeekPlanState();
+      renderCurrentTable();
+      renderWeekPlan();
+      if (isSummaryOpen) {
+        renderSummary();
+      }
+    }
+
     async function init() {
       try {
         const response = await fetch(sourceUrl, { cache: "no-store" });
@@ -3297,6 +3484,7 @@
         renderWeekPlan();
         renderSummary();
         validateProductLinks();
+        renderBreakfastPanel();
 
         const codeFromUrl = getWeekPlanCodeFromUrl();
         if (codeFromUrl) {
@@ -3373,12 +3561,20 @@
       toggleCart(rowIndex);
     });
 
-    // Wheat button toggle
     weekPlan.addEventListener("click", (event) => {
       const portionToggle = event.target.closest('[data-action="toggle-portion-display"]');
       if (portionToggle) {
         showWeekPlanPortionCount = !showWeekPlanPortionCount;
         renderWeekPlan();
+        return;
+      }
+
+      const randomizeButton = event.target.closest('[data-action="randomize-one"]');
+      if (randomizeButton) {
+        const rowIndex = Number(randomizeButton.dataset.rowIndex);
+        if (!Number.isNaN(rowIndex)) {
+          randomizeSingleRecipe(rowIndex);
+        }
         return;
       }
 
@@ -3394,26 +3590,20 @@
         return;
       }
 
-      const btn = event.target.closest(".week-plan-wheat-btn");
-      if (!btn) return;
-      const slot = Number(btn.dataset.slot);
-      if (Number.isNaN(slot)) return;
-      const existing = slotExtraKcal[slot] || { active: false, kcal: 400 };
-      slotExtraKcal[slot] = { ...existing, active: !existing.active };
-      saveSlotExtraKcal();
-      renderWeekPlan();
     });
 
-    // Extra kcal input change
-    weekPlan.addEventListener("change", (event) => {
-      const input = event.target.closest(".week-plan-extra-input");
-      if (!input) return;
-      const slot = Number(input.dataset.slot);
-      if (Number.isNaN(slot)) return;
-      const val = Math.max(0, Number(input.value) || 0);
-      const existing = slotExtraKcal[slot] || { active: false, kcal: 400 };
-      slotExtraKcal[slot] = { ...existing, kcal: val };
-      saveSlotExtraKcal();
+    breakfastTableBody.addEventListener("click", (event) => {
+      const button = event.target.closest('[data-action="toggle-breakfast"]');
+      if (!button) {
+        return;
+      }
+      const key = button.dataset.breakfastKey;
+      if (key !== "overnightOats" && key !== "brotzeit") {
+        return;
+      }
+      breakfastState[key].active = !breakfastState[key].active;
+      saveBreakfastState();
+      renderBreakfastPanel();
       renderWeekPlan();
     });
 
@@ -3696,7 +3886,10 @@
       weekPlanState = {};
       purchasedState = {};
       excludedState = {};
-      slotExtraKcal = {};
+      breakfastState = {
+        overnightOats: { active: false, kcal: 420 },
+        brotzeit: { active: false, kcal: 360 }
+      };
       activeBasketText = "";
       isBasketLoading = false;
       reweBasketSnapshot.text = "";
@@ -3706,10 +3899,11 @@
       saveWeekPlanState();
       saveBooleanMap(PURCHASED_STORAGE_KEY, purchasedState);
       saveBooleanMap(EXCLUDED_STORAGE_KEY, excludedState);
-      saveSlotExtraKcal();
+      saveBreakfastState();
       renderCurrentTable();
       renderWeekPlan();
       renderSummary();
+      renderBreakfastPanel();
     });
 
     init();
