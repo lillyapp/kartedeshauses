@@ -7,10 +7,10 @@
   <style>
     :root {
       --bg: #ffffff;
-      --fg: #000000;
-      --muted: #6b6b6b;
-      --line: #000000;
-      --success: #138a36;
+      --fg: #1d1d1f;
+      --muted: #757575;
+      --line: #d9d9d6;
+      --success: #1f8a4d;
       --panel-bg: #ffffff;
       --page-max: 1200px;
       --page-gutter: 24px;
@@ -41,10 +41,10 @@
     }
 
     h1 {
-      font-size: 20px;
+      font-size: 22px;
       font-weight: 700;
-      margin: 0 0 18px;
-      letter-spacing: 0.02em;
+      margin: 0 0 20px;
+      letter-spacing: 0.01em;
     }
 
     .meta {
@@ -104,6 +104,12 @@
       display: inline-flex;
       align-items: center;
       gap: 6px;
+    }
+
+    .week-plan-heading-actions {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
     }
 
     .week-plan-copy {
@@ -174,16 +180,18 @@
     .week-plan-grid {
       display: grid;
       grid-template-columns: repeat(5, minmax(150px, 1fr));
-      align-items: start;
+      align-items: stretch;
       gap: 10px;
       min-width: 800px;
     }
 
     .week-plan-column {
+      display: flex;
+      flex-direction: column;
       padding: 12px;
-      border-radius: 10px;
-      background: #f1f1f1;
-      border: 1px solid #f1f1f1;
+      border-radius: 12px;
+      background: #ffffff;
+      border: 1px solid #e6e6e3;
     }
 
     .week-plan-column[data-drag-over="true"] {
@@ -323,20 +331,27 @@
     .week-plan-items {
       display: grid;
       gap: 7px;
+      flex: 1;
+      align-content: start;
     }
 
     .week-plan-item {
       width: 100%;
-      padding: 8px 9px;
+      padding: 9px 10px;
       min-height: 0;
       border: 0;
-      border-radius: 7px;
-      background: #fff;
+      border-radius: 8px;
+      background: #f3f3f1;
       text-align: left;
       font-size: 13px;
       line-height: 1.25;
       cursor: grab;
       box-shadow: none;
+    }
+
+    .week-plan-item:hover,
+    .week-plan-item:focus-visible {
+      background: #ececea;
     }
 
     .week-plan-item:active {
@@ -351,9 +366,60 @@
       display: flex;
       align-items: center;
       justify-content: flex-end;
-      flex-wrap: wrap;
       gap: 8px;
       max-width: min(360px, calc(100vw - (var(--page-gutter) * 2)));
+    }
+
+    .quick-actions-wrap {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    #quickActionsToggle {
+      border: 0;
+      background: transparent;
+      box-shadow: none;
+      padding: 0;
+      min-width: 0;
+      min-height: 0;
+      width: 28px;
+      height: 28px;
+      border-radius: 999px;
+      transition: transform 180ms ease;
+    }
+
+    #quickActionsToggle:hover,
+    #quickActionsToggle:focus-visible {
+      background: rgba(0, 0, 0, 0.06);
+    }
+
+    .top-actions[data-quick-open="true"] #quickActionsToggle {
+      transform: translateX(-4px);
+    }
+
+    .quick-actions-panel {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      max-width: 0;
+      opacity: 0;
+      overflow: hidden;
+      pointer-events: none;
+      transition: max-width 220ms ease, opacity 160ms ease;
+    }
+
+    .top-actions[data-quick-open="true"] .quick-actions-panel {
+      max-width: 180px;
+      opacity: 1;
+      pointer-events: auto;
+    }
+
+    .quick-actions-divider {
+      width: 1px;
+      height: 16px;
+      background: #d8d8d4;
+      flex: none;
     }
 
     .icon-button {
@@ -364,11 +430,12 @@
       min-width: 42px;
       min-height: 42px;
       padding: 0 12px;
-      border: 1px solid var(--line);
+      border: 1px solid #e2e2df;
       background: var(--bg);
       color: var(--fg);
       text-decoration: none;
-      box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.65) inset;
+      box-shadow: none;
+      border-radius: 10px;
     }
 
     .icon-button[data-active="true"] {
@@ -385,7 +452,7 @@
 
     #selectionCartButton,
     #productLinkHelperButton,
-    .top-actions > a.icon-button {
+    .quick-actions-panel > a.icon-button {
       border: 0;
       background: transparent;
       box-shadow: none;
@@ -433,8 +500,9 @@
       gap: 12px;
       margin: 0 0 16px;
       padding: 12px 14px;
-      border: 1px solid var(--line);
-      background: #f7f7f3;
+      border: 1px solid #e6e6e3;
+      border-radius: 12px;
+      background: #f7f7f5;
       font-size: 13px;
       line-height: 1.4;
       max-width: 100%;
@@ -473,7 +541,8 @@
     }
 
     .product-helper {
-      border: 1px solid var(--line);
+      border: 1px solid #e6e6e3;
+      border-radius: 12px;
       background: #fff;
       padding: 14px;
       margin: 0 0 18px;
@@ -532,7 +601,8 @@
     .product-helper-input {
       width: 100%;
       min-height: 38px;
-      border: 1px solid var(--line);
+      border: 1px solid #dddcd8;
+      border-radius: 8px;
       padding: 8px 10px;
       font: inherit;
       font-size: 13px;
@@ -624,8 +694,9 @@
 
     button {
       appearance: none;
-      border: 1px solid var(--line);
-      background: var(--bg);
+      border: 1px solid #ddddda;
+      border-radius: 10px;
+      background: #fff;
       color: var(--fg);
       padding: 9px 14px;
       font: inherit;
@@ -634,7 +705,7 @@
     }
 
     button:hover {
-      background: #f5f5f5;
+      background: #f4f4f2;
     }
 
     button:focus-visible {
@@ -699,8 +770,8 @@
 
     .recipe-text-link:hover,
     .recipe-text-link:focus-visible {
-      border-color: var(--line);
-      background: #f5f5f5;
+      border-color: #d7d7d3;
+      background: #f4f4f2;
     }
 
     .recipe-text-link svg {
@@ -712,10 +783,16 @@
 
     .recipe-header {
       position: relative;
-      display: inline-flex;
+      display: flex;
       align-items: center;
-      gap: 6px;
+      justify-content: flex-end;
+      width: 100%;
       white-space: nowrap;
+    }
+
+    th.recipe-actions-col,
+    td.recipe-actions-col {
+      text-align: right;
     }
 
     .filter-button {
@@ -751,9 +828,10 @@
       z-index: 15;
       min-width: 210px;
       padding: 10px;
-      border: 1px solid var(--line);
+      border: 1px solid #dededb;
+      border-radius: 10px;
       background: var(--bg);
-      box-shadow: 0 10px 28px rgba(0, 0, 0, 0.12);
+      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.08);
     }
 
     .filter-popover[hidden] {
@@ -806,7 +884,8 @@
 
     .summary-panel {
       width: 100%;
-      border: 1px solid var(--line);
+      border: 1px solid #e6e6e3;
+      border-radius: 12px;
       background: var(--panel-bg);
       padding: 16px;
       margin: 0 0 18px;
@@ -909,7 +988,7 @@
     }
 
     .summary-card {
-      border-top: 1px solid var(--line);
+      border-top: 1px solid #ecece9;
       padding-top: 12px;
     }
 
@@ -1087,10 +1166,11 @@
     .table-wrap {
       overflow-x: auto;
       max-width: 100%;
-      border-top: 1px solid var(--line);
-      border-left: 1px solid var(--line);
-      border-right: 1px solid var(--line);
+      border: 1px solid #e6e6e3;
+      border-bottom: 0;
+      border-radius: 12px 12px 0 0;
       -webkit-overflow-scrolling: touch;
+      background: #fff;
     }
 
     .table-heading {
@@ -1108,19 +1188,19 @@
       font-size: 12px;
       font-weight: 700;
       padding: 12px 10px;
-      border-bottom: 1px solid var(--line);
+      border-bottom: 1px solid #ecece9;
       white-space: nowrap;
     }
 
     tbody td {
       font-size: 13px;
       padding: 10px;
-      border-bottom: 1px solid var(--line);
+      border-bottom: 1px solid #f0f0ee;
       vertical-align: top;
     }
 
     tbody tr:hover {
-      background: #f5f5f5;
+      background: #f8f8f7;
     }
 
     a {
@@ -1137,7 +1217,9 @@
 
     .error {
       color: #000;
-      border: 1px solid var(--line);
+      border: 1px solid #e0dfdc;
+      border-radius: 10px;
+      background: #fff;
       padding: 12px;
       margin-top: 16px;
       font-size: 13px;
@@ -1211,15 +1293,23 @@
   <main>
     <h1>KARTE DES HAUSES</h1>
     <div class="top-actions">
-      <button id="productLinkHelperButton" class="icon-button" type="button" aria-label="Produktlink-Helper öffnen" title="Produktlink-Helper">
-        <i data-lucide="package-search" aria-hidden="true"></i>
-      </button>
-      <button id="selectionCartButton" class="icon-button" type="button" aria-label="Auswahl in den Warenkorb legen" title="Auswahl in den Warenkorb legen">
-        <i data-lucide="wand-sparkles" aria-hidden="true"></i>
-      </button>
-      <a class="icon-button" href="https://account.rewe.de/realms/sso/protocol/openid-connect/auth?response_type=code&client_id=ecom&scope=openid%20profile&state=6pX-affIVEX-YblZbZXGS1k16wcIwiqp0Q24jo8llV0%3D&redirect_uri=https://www.rewe.de/login/oauth2/code/sso&nonce=5a0WIhTJB9LhN0L8jHdRabYR_By2KLcZrACfKT7ENow&code_challenge=SznV9eLZlrdAvYyxbZnDQVewk7q0lBBnoLiV6Yq-w3I&code_challenge_method=S256" aria-label="REWE Login öffnen" title="REWE Login öffnen">
-        <i data-lucide="arrow-up-right" aria-hidden="true"></i>
-      </a>
+      <div class="quick-actions-wrap">
+        <button id="quickActionsToggle" class="icon-button" type="button" aria-label="Schnellaktionen anzeigen" aria-expanded="false" title="Schnellaktionen">
+          <i data-lucide="bolt" aria-hidden="true"></i>
+        </button>
+        <div id="quickActionsPanel" class="quick-actions-panel" aria-hidden="true">
+          <span class="quick-actions-divider" aria-hidden="true"></span>
+          <button id="productLinkHelperButton" class="icon-button" type="button" aria-label="Produktlink-Helper öffnen" title="Produktlink-Helper">
+            <i data-lucide="package-search" aria-hidden="true"></i>
+          </button>
+          <button id="selectionCartButton" class="icon-button" type="button" aria-label="Auswahl in den Warenkorb legen" title="Auswahl in den Warenkorb legen">
+            <i data-lucide="wand-sparkles" aria-hidden="true"></i>
+          </button>
+          <a class="icon-button" href="https://account.rewe.de/realms/sso/protocol/openid-connect/auth?response_type=code&client_id=ecom&scope=openid%20profile&state=6pX-affIVEX-YblZbZXGS1k16wcIwiqp0Q24jo8llV0%3D&redirect_uri=https://www.rewe.de/login/oauth2/code/sso&nonce=5a0WIhTJB9LhN0L8jHdRabYR_By2KLcZrACfKT7ENow&code_challenge=SznV9eLZlrdAvYyxbZnDQVewk7q0lBBnoLiV6Yq-w3I&code_challenge_method=S256" aria-label="REWE Login öffnen" title="REWE Login öffnen">
+            <i data-lucide="arrow-up-right" aria-hidden="true"></i>
+          </a>
+        </div>
+      </div>
       <button id="summaryButton" class="icon-button" type="button" aria-label="Warenkorb öffnen" aria-expanded="false" title="Warenkorb öffnen">
         <i data-lucide="receipt-text" aria-hidden="true"></i>
       </button>
@@ -1261,9 +1351,11 @@
       <div class="week-plan-header">
         <div class="week-plan-heading">
           <h2 class="section-heading">10-TAGE PLAN</h2>
-          <button id="weekPlanCopyButton" class="week-plan-copy" type="button" aria-label="10-Tage-Plan kopieren" title="10-Tage-Plan kopieren">
-            <i data-lucide="copy" aria-hidden="true"></i>
-          </button>
+          <div class="week-plan-heading-actions">
+            <button id="weekPlanCopyButton" class="week-plan-copy" type="button" aria-label="10-Tage-Plan kopieren" title="10-Tage-Plan kopieren">
+              <i data-lucide="copy" aria-hidden="true"></i>
+            </button>
+          </div>
         </div>
         <button id="weekPlanScrollButton" class="week-plan-scroll" type="button" aria-label="Wochenplan verschieben" title="Wochenplan verschieben">
           <i data-lucide="arrow-left-right" aria-hidden="true"></i>
@@ -1285,7 +1377,7 @@
       </div>
       <div id="summaryTools" class="summary-tools" hidden>
         <label class="summary-toggle">
-          <input id="combineToggle" type="checkbox">
+          <input id="combineToggle" type="checkbox" checked>
           Alles zusammenfassen
         </label>
         <label class="summary-toggle">
@@ -1302,8 +1394,8 @@
     </section>
     <div id="status" class="status"></div>
     <div id="error" class="error" hidden></div>
-    <h2 class="section-heading table-heading">REZEPTSAMMLUNG</h2>
-    <div class="table-wrap">
+    <h2 id="recipeCollectionHeading" class="section-heading table-heading">REZEPTSAMMLUNG</h2>
+    <div id="recipeTableWrap" class="table-wrap">
       <table aria-label="Markdown Tabelle">
         <thead id="tableHead"></thead>
         <tbody id="tableBody"></tbody>
@@ -1326,6 +1418,10 @@
     const errorEl = document.getElementById("error");
     const tableHead = document.getElementById("tableHead");
     const tableBody = document.getElementById("tableBody");
+    const recipeCollectionHeading = document.getElementById("recipeCollectionHeading");
+    const recipeTableWrap = document.getElementById("recipeTableWrap");
+    const quickActionsToggle = document.getElementById("quickActionsToggle");
+    const quickActionsPanel = document.getElementById("quickActionsPanel");
     const productLinkHelperButton = document.getElementById("productLinkHelperButton");
     const productLinkHelper = document.getElementById("productLinkHelper");
     const productHelperMeta = document.getElementById("productHelperMeta");
@@ -1376,7 +1472,7 @@
     let cartState = loadCartState();
     let weekPlanState = loadWeekPlanState();
     let isSummaryOpen = false;
-    let isCombineAll = false;
+    let isCombineAll = true;
     let isSummaryFilterOpen = false;
     let portionScale = loadPortionScale();
     let hideSpices = loadHideSpices();
@@ -1403,6 +1499,7 @@
     let currentProductHelperIndex = 0;
     let productCheckToken = 0;
     let showWeekPlanPortionCount = false;
+    let isQuickActionsOpen = false;
 
     function splitMarkdownRow(line) {
       return line
@@ -1928,6 +2025,12 @@
     }
 
     function renderWeekPlan() {
+      if (isSummaryOpen) {
+        weekPlan.hidden = true;
+        weekPlanGrid.innerHTML = "";
+        return;
+      }
+
       const entries = getCartRecipeEntries();
       if (entries.length < 5) {
         weekPlan.hidden = true;
@@ -2062,6 +2165,112 @@
       });
 
       return lines.join("\n");
+    }
+
+    function toBase64Url(value) {
+      const base64 = btoa(unescape(encodeURIComponent(value)));
+      return base64.replace(/\+/g, "-").replace(/\//g, "_").replace(/=+$/, "");
+    }
+
+    function fromBase64Url(value) {
+      const base64 = value
+        .replace(/-/g, "+")
+        .replace(/_/g, "/")
+        .padEnd(Math.ceil(value.length / 4) * 4, "=");
+      return decodeURIComponent(escape(atob(base64)));
+    }
+
+    function buildWeekPlanCode() {
+      const payload = {
+        v: 1,
+        selected: Object.entries(cartState)
+          .filter(([, active]) => active)
+          .map(([rowIndex]) => Number(rowIndex))
+          .filter((index) => Number.isInteger(index) && index >= 0),
+        slots: Object.fromEntries(
+          Object.entries(weekPlanState)
+            .filter(([rowIndex, slot]) => {
+              const index = Number(rowIndex);
+              return Number.isInteger(index) && index >= 0 && Number.isInteger(slot) && slot >= 0 && slot <= 4;
+            })
+        ),
+        portionScale: Number.isFinite(portionScale) && portionScale > 0 ? portionScale : 1,
+        extra: slotExtraKcal
+      };
+
+      return `PLAN1-${toBase64Url(JSON.stringify(payload))}`;
+    }
+
+    function getWeekPlanCodeFromUrl() {
+      const params = new URLSearchParams(window.location.search);
+      const emptyKeyValue = params.get("") || "";
+      const namedKeyValue = params.get("code") || "";
+      const candidate = (emptyKeyValue || namedKeyValue).trim();
+      return candidate.startsWith("PLAN1-") ? candidate : "";
+    }
+
+    function applyWeekPlanCode(code) {
+      const trimmed = (code || "").trim();
+      if (!trimmed.startsWith("PLAN1-")) {
+        throw new Error("Ungültiges Code-Format.");
+      }
+
+      const decoded = fromBase64Url(trimmed.slice(6));
+      const payload = JSON.parse(decoded);
+      if (!payload || payload.v !== 1 || !Array.isArray(payload.selected) || typeof payload.slots !== "object") {
+        throw new Error("Code-Inhalt ist ungültig.");
+      }
+
+      const nextCartState = {};
+      payload.selected.forEach((rawIndex) => {
+        const index = Number(rawIndex);
+        if (Number.isInteger(index) && index >= 0 && index < allRows.length) {
+          nextCartState[String(index)] = true;
+        }
+      });
+
+      const nextWeekPlanState = {};
+      Object.entries(payload.slots || {}).forEach(([rowIndex, rawSlot]) => {
+        const index = Number(rowIndex);
+        const slot = Number(rawSlot);
+        if (nextCartState[String(index)] && Number.isInteger(slot) && slot >= 0 && slot <= 4) {
+          nextWeekPlanState[String(index)] = slot;
+        }
+      });
+
+      const nextPortionScale = Number(payload.portionScale);
+      const normalizedPortionScale = Number.isFinite(nextPortionScale) && nextPortionScale > 0
+        ? Math.round(nextPortionScale)
+        : 1;
+
+      const nextExtra = {};
+      Object.entries(payload.extra || {}).forEach(([slotKey, rawConfig]) => {
+        const slot = Number(slotKey);
+        const config = rawConfig && typeof rawConfig === "object" ? rawConfig : {};
+        if (!Number.isInteger(slot) || slot < 0 || slot > 4) {
+          return;
+        }
+
+        nextExtra[slot] = {
+          active: Boolean(config.active),
+          kcal: Number.isFinite(Number(config.kcal)) ? Math.max(0, Number(config.kcal)) : 400
+        };
+      });
+
+      cartState = nextCartState;
+      weekPlanState = nextWeekPlanState;
+      slotExtraKcal = nextExtra;
+      portionScale = normalizedPortionScale;
+      portionScaleInput.value = String(portionScale);
+
+      saveCartState();
+      saveWeekPlanState();
+      saveSlotExtraKcal();
+      savePortionScale();
+
+      renderCurrentTable();
+      renderWeekPlan();
+      renderSummary();
     }
 
     function updateWeekPlanScrollButton() {
@@ -2399,6 +2608,16 @@
       );
     }
 
+    function setQuickActionsVisibility(visible) {
+      isQuickActionsOpen = visible;
+      const topActions = quickActionsToggle.closest(".top-actions");
+      if (topActions) {
+        topActions.dataset.quickOpen = visible ? "true" : "false";
+      }
+      quickActionsToggle.setAttribute("aria-expanded", visible ? "true" : "false");
+      quickActionsPanel.setAttribute("aria-hidden", visible ? "false" : "true");
+    }
+
     function setProductHelperVisibility(visible) {
       isProductHelperOpen = visible;
       productLinkHelper.hidden = !visible;
@@ -2666,6 +2885,8 @@
     function setSummaryVisibility(visible) {
       isSummaryOpen = visible;
       summaryPanel.hidden = !visible;
+      recipeCollectionHeading.hidden = visible;
+      recipeTableWrap.hidden = visible;
       summaryButton.dataset.active = visible ? "true" : "false";
       summaryButton.setAttribute("aria-expanded", visible ? "true" : "false");
       if (portionScaleInput.value !== String(portionScale)) {
@@ -2687,6 +2908,7 @@
         });
       } else {
         isBasketLoading = false;
+        renderWeekPlan();
       }
     }
 
@@ -2699,6 +2921,7 @@
       summaryTools.hidden = !isSummaryFilterOpen;
       summaryFilterButton.dataset.active = isSummaryFilterOpen ? "true" : "false";
       summaryFilterButton.setAttribute("aria-expanded", isSummaryFilterOpen ? "true" : "false");
+      combineToggle.checked = isCombineAll;
       portionScaleWrap.hidden = !isCombineAll;
       spiceToggle.checked = hideSpices;
 
@@ -2825,6 +3048,9 @@
         const header = headers[columnIndex];
         const th = document.createElement("th");
         if (columnIndex === linkColumnIndex) {
+          th.classList.add("recipe-actions-col");
+        }
+        if (columnIndex === linkColumnIndex) {
           th.innerHTML = `
             <div class="recipe-header">
               <button
@@ -2868,6 +3094,9 @@
         visibleColumnIndexes.forEach((cellIndex) => {
           const cell = row[cellIndex] || "";
           const td = document.createElement("td");
+          if (cellIndex === linkColumnIndex) {
+            td.classList.add("recipe-actions-col");
+          }
           td.dataset.label = cellIndex === linkColumnIndex ? "Link" : (headers[cellIndex] || "");
           const link = extractCellLink(cell);
           if (cellIndex === linkColumnIndex && link) {
@@ -2982,6 +3211,15 @@
         renderWeekPlan();
         renderSummary();
         validateProductLinks();
+
+        const codeFromUrl = getWeekPlanCodeFromUrl();
+        if (codeFromUrl) {
+          try {
+            applyWeekPlanCode(codeFromUrl);
+          } catch (error) {
+            console.warn("Plan-Code aus URL konnte nicht geladen werden:", error);
+          }
+        }
       } catch (error) {
         statusEl.textContent = "Fehler beim Laden.";
         errorEl.hidden = false;
@@ -3148,7 +3386,9 @@
 
     weekPlanCopyButton.addEventListener("click", async () => {
       try {
-        await navigator.clipboard.writeText(buildWeekPlanClipboardText());
+        const shareLink = `lillyapp.github.io/kartedeshauses?=${buildWeekPlanCode()}`;
+        const text = `${buildWeekPlanClipboardText()}\n\n${shareLink}`;
+        await navigator.clipboard.writeText(text);
         weekPlanCopyButton.title = "Kopiert";
         window.setTimeout(() => {
           weekPlanCopyButton.title = "10-Tage-Plan kopieren";
@@ -3167,6 +3407,33 @@
 
     productLinkHelperButton.addEventListener("click", () => {
       setProductHelperVisibility(!isProductHelperOpen);
+    });
+
+    quickActionsToggle.addEventListener("click", (event) => {
+      event.stopPropagation();
+      setQuickActionsVisibility(!isQuickActionsOpen);
+    });
+
+    document.addEventListener("click", (event) => {
+      if (!isQuickActionsOpen) {
+        // keep processing for week plan code popover
+      } else {
+        const target = event.target;
+        if (!(target instanceof Element) || (!target.closest("#quickActionsPanel") && !target.closest("#quickActionsToggle"))) {
+          setQuickActionsVisibility(false);
+        }
+      }
+    });
+
+    quickActionsPanel.addEventListener("click", (event) => {
+      const target = event.target;
+      if (!(target instanceof Element)) {
+        return;
+      }
+
+      if (target.closest("button") || target.closest("a")) {
+        setQuickActionsVisibility(false);
+      }
     });
 
     productHelperClose.addEventListener("click", () => {
