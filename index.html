@@ -16,6 +16,92 @@
       --page-gutter: 24px;
     }
 
+    @media (prefers-color-scheme: dark) {
+      :root {
+        --bg: #0a0a0a;
+        --fg: #f3f3f3;
+        --muted: #a8a8a8;
+        --line: #2e2e2e;
+        --panel-bg: #141414;
+        --success: #41c97f;
+      }
+
+      html,
+      body {
+        color-scheme: dark;
+      }
+
+      table,
+      .table-wrap,
+      .week-plan-column,
+      .summary-card,
+      .product-helper,
+      .basket-prompt,
+      .product-helper-export,
+      .product-helper-input {
+        background: var(--panel-bg) !important;
+        color: var(--fg) !important;
+        border-color: var(--line) !important;
+      }
+
+      th,
+      td,
+      thead th,
+      tbody td,
+      tbody tr {
+        border-color: var(--line) !important;
+      }
+
+      button,
+      .filter-button,
+      .ingredient-action,
+      .ingredient-main,
+      .cart-toggle,
+      .week-plan-copy,
+      .week-plan-scroll,
+      .week-plan-randomize,
+      #quickActionsToggle {
+        color: var(--fg) !important;
+        border-color: var(--line) !important;
+      }
+
+      button:hover,
+      .filter-button:hover,
+      .ingredient-action:hover,
+      .ingredient-main:hover,
+      .cart-toggle:hover,
+      .week-plan-copy:hover,
+      .week-plan-scroll:hover,
+      .week-plan-randomize:hover,
+      #quickActionsToggle:hover {
+        background: rgba(255, 255, 255, 0.08) !important;
+      }
+
+      .week-plan-item,
+      .filter-popover,
+      .summary-tools {
+        background: #1d1d1d !important;
+        border-color: var(--line) !important;
+      }
+
+      .week-plan-column[data-drag-over="true"] {
+        background: rgba(65, 201, 127, 0.14) !important;
+      }
+
+      .week-plan-kcal-badge,
+      .status,
+      .meta,
+      .product-helper-meta,
+      .product-helper-status {
+        color: var(--muted) !important;
+      }
+
+      a,
+      a:visited {
+        color: var(--fg) !important;
+      }
+    }
+
     *,
     *::before,
     *::after {
@@ -730,6 +816,13 @@
       line-height: 1;
     }
 
+    .recipe-link[data-enabled="false"] {
+      opacity: 0.3;
+      filter: grayscale(1);
+      pointer-events: none;
+      cursor: default;
+    }
+
     .recipe-link:hover {
       background: #f5f5f5;
     }
@@ -742,9 +835,16 @@
 
     .recipe-actions {
       display: inline-flex;
-      align-items: center;
+      flex-direction: column;
+      align-items: flex-end;
       gap: 6px;
       white-space: nowrap;
+    }
+
+    .recipe-actions-row {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
     }
 
     .recipe-text-link {
@@ -756,6 +856,13 @@
       border: 1px solid transparent;
       text-decoration: none;
       line-height: 1.2;
+    }
+
+    .recipe-text-link[data-enabled="false"] {
+      opacity: 0.32;
+      filter: grayscale(1);
+      pointer-events: none;
+      cursor: default;
     }
 
     .recipe-text-link:hover,
@@ -771,6 +878,58 @@
       height: 17px;
       stroke-width: 1.9;
       flex: none;
+    }
+
+    .recipe-day-strip {
+      display: inline-flex;
+      flex-wrap: wrap;
+      justify-content: flex-end;
+      gap: 4px;
+      max-width: 165px;
+    }
+
+    .recipe-day {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-width: 28px;
+      height: 22px;
+      padding: 0 6px;
+      border: 1px solid #dfdfdc;
+      border-radius: 999px;
+      background: #fff;
+      color: var(--muted);
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: 0.03em;
+      line-height: 1;
+      cursor: pointer;
+      box-shadow: none;
+    }
+
+    .recipe-day:hover,
+    .recipe-day:focus-visible {
+      background: #f6f6f4;
+      color: var(--fg);
+    }
+
+    .recipe-day[data-active="true"] {
+      background: #111111;
+      border-color: #111111;
+      color: #ffffff;
+    }
+
+    @media (prefers-color-scheme: dark) {
+      .recipe-day {
+        background: #181818;
+        border-color: #353535;
+      }
+
+      .recipe-day[data-active="true"] {
+        background: #ffffff;
+        border-color: #ffffff;
+        color: #111111;
+      }
     }
 
     .recipe-header {
@@ -1483,6 +1642,8 @@
     const sourceUrl = new URLSearchParams(window.location.search).get("source") || DEFAULT_SOURCE;
     const CART_STORAGE_KEY = "recipe-cart-state-v1";
     const WEEK_PLAN_STORAGE_KEY = "recipe-week-plan-v1";
+    const DAY_STATE_STORAGE_KEY = "recipe-day-state-v1";
+    const DAY_LABELS = ["Mo", "Di", "Mi", "Do", "Fr", "Sa", "So"];
 
     const randomRowsEl = document.getElementById("randomRows");
     const filterToggle = document.getElementById("filterToggle");
@@ -1547,6 +1708,7 @@
     const WARM_COLD_END_INDEX = 28;
     let cartState = loadCartState();
     let weekPlanState = loadWeekPlanState();
+    let recipeDayState = loadDayState();
     let isSummaryOpen = false;
     let isCombineAll = true;
     let isSummaryFilterOpen = false;
@@ -1649,6 +1811,61 @@
           .map(([key, url]) => [key, String(url || "").trim()])
           .filter(([key, url]) => key && /^https?:\/\//i.test(url))
       );
+    }
+
+    function normalizeDaySelection(value) {
+      const selection = Array.isArray(value) ? value : [];
+      const unique = [];
+      selection.forEach((item) => {
+        const label = String(item || "").trim();
+        if (DAY_LABELS.includes(label) && !unique.includes(label)) {
+          unique.push(label);
+        }
+      });
+      return unique.length > 0 ? unique : [...DAY_LABELS];
+    }
+
+    function loadDayState() {
+      try {
+        const raw = localStorage.getItem(DAY_STATE_STORAGE_KEY);
+        const parsed = raw ? JSON.parse(raw) : {};
+        if (!parsed || typeof parsed !== "object") {
+          return {};
+        }
+        return Object.fromEntries(
+          Object.entries(parsed)
+            .map(([key, value]) => [key, normalizeDaySelection(value)])
+            .filter(([key]) => key !== "")
+        );
+      } catch (error) {
+        return {};
+      }
+    }
+
+    function saveDayState() {
+      localStorage.setItem(DAY_STATE_STORAGE_KEY, JSON.stringify(recipeDayState));
+    }
+
+    function getActiveDaysForRow(rowIndex) {
+      const key = String(rowIndex);
+      if (!Array.isArray(recipeDayState[key])) {
+        recipeDayState[key] = [...DAY_LABELS];
+      }
+      return recipeDayState[key];
+    }
+
+    function isRecipeLinkEnabled(rowIndex) {
+      return getActiveDaysForRow(rowIndex).length > 0;
+    }
+
+    function toggleRecipeDay(rowIndex, dayLabel) {
+      const key = String(rowIndex);
+      const activeDays = normalizeDaySelection(recipeDayState[key]);
+      const nextDays = activeDays.includes(dayLabel)
+        ? activeDays.filter((label) => label !== dayLabel)
+        : [...activeDays, dayLabel];
+      recipeDayState[key] = nextDays;
+      saveDayState();
     }
 
     function extractCellLink(cell) {
@@ -3371,6 +3588,9 @@
             const wrapper = document.createElement("div");
             wrapper.className = "recipe-actions";
 
+            const rowButtons = document.createElement("div");
+            rowButtons.className = "recipe-actions-row";
+
             const a = document.createElement("a");
             a.href = link.href;
             a.target = "_blank";
@@ -3378,6 +3598,12 @@
             a.className = "recipe-text-link";
             a.setAttribute("aria-label", `Rezept öffnen: ${row[0]}`);
             a.setAttribute("title", `Rezept öffnen: ${row[0]}`);
+            a.dataset.enabled = isRecipeLinkEnabled(rowIndex) ? "true" : "false";
+            if (a.dataset.enabled === "false") {
+              a.setAttribute("aria-disabled", "true");
+              a.tabIndex = -1;
+              a.setAttribute("title", `Link deaktiviert: ${row[0]}`);
+            }
             a.innerHTML = '<i data-lucide="link-2" aria-hidden="true"></i>';
 
             const cartButton = document.createElement("button");
@@ -3391,8 +3617,28 @@
               ? '<svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><circle cx="8" cy="21" r="1.5"></circle><circle cx="18" cy="21" r="1.5"></circle><path d="M2.5 3h2l2.2 12.2a2 2 0 0 0 2 1.6h8.5a2 2 0 0 0 2-1.5L21 7H6.2"></path></svg><span class="sr-only">Im Warenkorb</span>'
               : '<svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><circle cx="8" cy="21" r="1.5"></circle><circle cx="18" cy="21" r="1.5"></circle><path d="M2.5 3h2l2.2 12.2a2 2 0 0 0 2 1.6h8.5a2 2 0 0 0 2-1.5L21 7H6.2"></path></svg><span class="sr-only">Zum Warenkorb hinzufügen</span>';
 
-            wrapper.appendChild(a);
-            wrapper.appendChild(cartButton);
+            rowButtons.appendChild(a);
+            rowButtons.appendChild(cartButton);
+            wrapper.appendChild(rowButtons);
+
+            const dayStrip = document.createElement("div");
+            dayStrip.className = "recipe-day-strip";
+            const activeDays = getActiveDaysForRow(rowIndex);
+            DAY_LABELS.forEach((dayLabel) => {
+              const dayButton = document.createElement("button");
+              dayButton.type = "button";
+              dayButton.className = "recipe-day";
+              dayButton.dataset.rowIndex = String(rowIndex);
+              dayButton.dataset.day = dayLabel;
+              dayButton.dataset.active = activeDays.includes(dayLabel) ? "true" : "false";
+              dayButton.setAttribute("aria-pressed", activeDays.includes(dayLabel) ? "true" : "false");
+              dayButton.setAttribute("aria-label", `${dayLabel} ${activeDays.includes(dayLabel) ? "deaktivieren" : "aktivieren"}`);
+              dayButton.setAttribute("title", `${dayLabel} ${activeDays.includes(dayLabel) ? "deaktivieren" : "aktivieren"}`);
+              dayButton.textContent = dayLabel;
+              dayStrip.appendChild(dayButton);
+            });
+
+            wrapper.appendChild(dayStrip);
             td.appendChild(wrapper);
           } else {
             td.innerHTML = cell;
@@ -3576,6 +3822,17 @@
     });
 
     tableBody.addEventListener("click", (event) => {
+      const dayButton = event.target.closest(".recipe-day");
+      if (dayButton) {
+        const rowIndex = Number(dayButton.dataset.rowIndex);
+        const dayLabel = dayButton.dataset.day;
+        if (!Number.isNaN(rowIndex) && DAY_LABELS.includes(dayLabel)) {
+          toggleRecipeDay(rowIndex, dayLabel);
+          renderCurrentTable();
+        }
+        return;
+      }
+
       const button = event.target.closest(".cart-toggle");
       if (!button) {
         return;
