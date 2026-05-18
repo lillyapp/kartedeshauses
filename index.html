@@ -35,6 +35,7 @@
       .table-wrap,
       .week-plan-column,
       .summary-card,
+      .summary-panel,
       .product-helper,
       .basket-prompt,
       .product-helper-export,
@@ -57,6 +58,7 @@
       .ingredient-action,
       .ingredient-main,
       .cart-toggle,
+      #summaryButton,
       .week-plan-copy,
       .week-plan-scroll,
       .week-plan-randomize,
@@ -70,6 +72,8 @@
       .ingredient-action:hover,
       .ingredient-main:hover,
       .cart-toggle:hover,
+      #summaryButton:hover,
+      #summaryButton:focus-visible,
       .week-plan-copy:hover,
       .week-plan-scroll:hover,
       .week-plan-randomize:hover,
@@ -92,8 +96,18 @@
       .status,
       .meta,
       .product-helper-meta,
-      .product-helper-status {
+      .product-helper-status,
+      .summary-subtitle {
         color: var(--muted) !important;
+      }
+
+      .summary-filter-button {
+        color: var(--fg) !important;
+      }
+
+      .summary-filter-button:hover,
+      .summary-filter-button:focus-visible {
+        background: rgba(255, 255, 255, 0.08) !important;
       }
 
       a,
@@ -569,6 +583,13 @@
       background: rgba(0, 0, 0, 0.06);
     }
 
+    @media (prefers-color-scheme: dark) {
+      #summaryButton:hover,
+      #summaryButton:focus-visible {
+        background: rgba(255, 255, 255, 0.08);
+      }
+    }
+
     .basket-prompt {
       display: flex;
       align-items: center;
@@ -880,58 +901,6 @@
       flex: none;
     }
 
-    .recipe-day-strip {
-      display: inline-flex;
-      flex-wrap: wrap;
-      justify-content: flex-end;
-      gap: 4px;
-      max-width: 165px;
-    }
-
-    .recipe-day {
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      min-width: 28px;
-      height: 22px;
-      padding: 0 6px;
-      border: 1px solid #dfdfdc;
-      border-radius: 999px;
-      background: #fff;
-      color: var(--muted);
-      font-size: 10px;
-      font-weight: 700;
-      letter-spacing: 0.03em;
-      line-height: 1;
-      cursor: pointer;
-      box-shadow: none;
-    }
-
-    .recipe-day:hover,
-    .recipe-day:focus-visible {
-      background: #f6f6f4;
-      color: var(--fg);
-    }
-
-    .recipe-day[data-active="true"] {
-      background: #111111;
-      border-color: #111111;
-      color: #ffffff;
-    }
-
-    @media (prefers-color-scheme: dark) {
-      .recipe-day {
-        background: #181818;
-        border-color: #353535;
-      }
-
-      .recipe-day[data-active="true"] {
-        background: #ffffff;
-        border-color: #ffffff;
-        color: #111111;
-      }
-    }
-
     .recipe-header {
       position: relative;
       display: flex;
@@ -939,6 +908,39 @@
       justify-content: flex-end;
       width: 100%;
       white-space: nowrap;
+    }
+
+    .week-plan-column[data-active="false"] {
+      opacity: 0.42;
+    }
+
+    .week-plan-column[data-active="false"] .week-plan-title {
+      opacity: 0.65;
+    }
+
+    .week-plan-bucket-toggle {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 26px;
+      height: 26px;
+      padding: 0;
+      border: 0;
+      background: transparent;
+      color: var(--fg);
+      border-radius: 999px;
+      box-shadow: none;
+    }
+
+    .week-plan-bucket-toggle:hover,
+    .week-plan-bucket-toggle:focus-visible {
+      background: rgba(0, 0, 0, 0.06);
+    }
+
+    .week-plan-bucket-toggle svg {
+      width: 16px;
+      height: 16px;
+      stroke-width: 2;
     }
 
     .col-index {
@@ -1642,8 +1644,8 @@
     const sourceUrl = new URLSearchParams(window.location.search).get("source") || DEFAULT_SOURCE;
     const CART_STORAGE_KEY = "recipe-cart-state-v1";
     const WEEK_PLAN_STORAGE_KEY = "recipe-week-plan-v1";
-    const DAY_STATE_STORAGE_KEY = "recipe-day-state-v1";
-    const DAY_LABELS = ["Mo", "Di", "Mi", "Do", "Fr", "Sa", "So"];
+    const WEEK_BUCKET_STATE_STORAGE_KEY = "recipe-week-bucket-state-v1";
+    const WEEK_BUCKET_TITLES = ["TAG 1 · 2", "TAG 3 · 4", "TAG 5 · 6", "TAG 7 · 8", "TAG 9 · 10"];
 
     const randomRowsEl = document.getElementById("randomRows");
     const filterToggle = document.getElementById("filterToggle");
@@ -1708,7 +1710,7 @@
     const WARM_COLD_END_INDEX = 28;
     let cartState = loadCartState();
     let weekPlanState = loadWeekPlanState();
-    let recipeDayState = loadDayState();
+    let weekBucketState = loadWeekBucketState();
     let isSummaryOpen = false;
     let isCombineAll = true;
     let isSummaryFilterOpen = false;
@@ -1813,59 +1815,56 @@
       );
     }
 
-    function normalizeDaySelection(value) {
-      const selection = Array.isArray(value) ? value : [];
-      const unique = [];
-      selection.forEach((item) => {
-        const label = String(item || "").trim();
-        if (DAY_LABELS.includes(label) && !unique.includes(label)) {
-          unique.push(label);
-        }
+    function normalizeBucketState(value) {
+      const defaults = [true, true, true, true, true];
+      if (!Array.isArray(value)) {
+        return defaults;
+      }
+
+      return defaults.map((fallback, index) => {
+        const candidate = value[index];
+        return typeof candidate === "boolean" ? candidate : fallback;
       });
-      return unique.length > 0 ? unique : [...DAY_LABELS];
     }
 
-    function loadDayState() {
+    function loadWeekBucketState() {
       try {
-        const raw = localStorage.getItem(DAY_STATE_STORAGE_KEY);
-        const parsed = raw ? JSON.parse(raw) : {};
-        if (!parsed || typeof parsed !== "object") {
-          return {};
-        }
-        return Object.fromEntries(
-          Object.entries(parsed)
-            .map(([key, value]) => [key, normalizeDaySelection(value)])
-            .filter(([key]) => key !== "")
-        );
+        const raw = localStorage.getItem(WEEK_BUCKET_STATE_STORAGE_KEY);
+        const parsed = raw ? JSON.parse(raw) : null;
+        return normalizeBucketState(parsed);
       } catch (error) {
-        return {};
+        return [true, true, true, true, true];
       }
     }
 
-    function saveDayState() {
-      localStorage.setItem(DAY_STATE_STORAGE_KEY, JSON.stringify(recipeDayState));
+    function saveWeekBucketState() {
+      localStorage.setItem(WEEK_BUCKET_STATE_STORAGE_KEY, JSON.stringify(weekBucketState));
     }
 
-    function getActiveDaysForRow(rowIndex) {
-      const key = String(rowIndex);
-      if (!Array.isArray(recipeDayState[key])) {
-        recipeDayState[key] = [...DAY_LABELS];
+    function isWeekBucketEnabled(slot) {
+      return weekBucketState[slot] !== false;
+    }
+
+    function toggleWeekBucket(slot) {
+      if (!Number.isInteger(slot) || slot < 0 || slot >= WEEK_BUCKET_TITLES.length) {
+        return;
       }
-      return recipeDayState[key];
+
+      weekBucketState[slot] = !isWeekBucketEnabled(slot);
+      saveWeekBucketState();
+    }
+
+    function getWeekPlanSlotForRow(rowIndex) {
+      const slot = Number(weekPlanState[String(rowIndex)]);
+      return Number.isInteger(slot) && slot >= 0 && slot < WEEK_BUCKET_TITLES.length ? slot : null;
     }
 
     function isRecipeLinkEnabled(rowIndex) {
-      return getActiveDaysForRow(rowIndex).length > 0;
-    }
-
-    function toggleRecipeDay(rowIndex, dayLabel) {
-      const key = String(rowIndex);
-      const activeDays = normalizeDaySelection(recipeDayState[key]);
-      const nextDays = activeDays.includes(dayLabel)
-        ? activeDays.filter((label) => label !== dayLabel)
-        : [...activeDays, dayLabel];
-      recipeDayState[key] = nextDays;
-      saveDayState();
+      const slot = getWeekPlanSlotForRow(rowIndex);
+      if (slot === null) {
+        return true;
+      }
+      return isWeekBucketEnabled(slot);
     }
 
     function extractCellLink(cell) {
@@ -2450,7 +2449,7 @@
       }
 
       syncWeekPlanState(entries);
-      const titles = ["TAG 1 · 2", "TAG 3 · 4", "TAG 5 · 6", "TAG 7 · 8", "TAG 9 · 10"];
+      const titles = WEEK_BUCKET_TITLES;
       const kcalIndex = allHeaders.indexOf("kcal pro Portion");
       const rawPortionDisplayCount = portionScale / 2;
       const recipePortionFactor = rawPortionDisplayCount > 0 ? rawPortionDisplayCount : 1;
@@ -2461,6 +2460,7 @@
 
       weekPlanGrid.innerHTML = titles.map((title, slot) => {
         const slotEntries = entries.filter(({ rowIndex }) => weekPlanState[String(rowIndex)] === slot);
+        const bucketEnabled = isWeekBucketEnabled(slot);
 
         // Sum kcal from recipes in this slot
         let kcalSum = 0;
@@ -2484,11 +2484,11 @@
           : `${totalKcal} kcal`;
 
         return `
-          <section class="week-plan-column" data-slot="${slot}">
+          <section class="week-plan-column" data-slot="${slot}" data-active="${bucketEnabled ? "true" : "false"}">
             <div class="week-plan-title-row">
               <h2 class="week-plan-title">${title}</h2>
-              ${hasLabel ? `
-                <div class="week-plan-kcal-wrap">
+              <div class="week-plan-kcal-wrap">
+                ${hasLabel ? `
                   <button
                     type="button"
                     class="week-plan-portion-toggle"
@@ -2498,8 +2498,17 @@
                     aria-label="${showWeekPlanPortionCount ? "kcal anzeigen" : "Portionen anzeigen"}"
                   ><i data-lucide="user" aria-hidden="true"></i></button>
                   <span class="week-plan-kcal-badge">${planLabel}</span>
-                </div>
-              ` : ""}
+                ` : ""}
+                <button
+                  type="button"
+                  class="week-plan-bucket-toggle"
+                  data-action="toggle-week-bucket"
+                  data-slot="${slot}"
+                  data-active="${bucketEnabled ? "true" : "false"}"
+                  aria-label="${bucketEnabled ? `${title} deaktivieren` : `${title} aktivieren`}"
+                  title="${bucketEnabled ? `${title} deaktivieren` : `${title} aktivieren`}"
+                ><i data-lucide="${bucketEnabled ? "check-square" : "square"}" aria-hidden="true"></i></button>
+              </div>
             </div>
             <div class="week-plan-items">
               ${slotEntries.map(({ row, rowIndex }) => `
@@ -2593,6 +2602,7 @@
               return Number.isInteger(index) && index >= 0 && Number.isInteger(slot) && slot >= 0 && slot <= 4;
             })
         ),
+        b: weekBucketState,
         p: Number.isFinite(portionScale) && portionScale > 0 ? portionScale : 1,
         e: breakfastState
       };
@@ -2620,6 +2630,7 @@
       const payload = JSON.parse(decoded);
       const selectedRaw = Array.isArray(payload?.s) ? payload.s : payload?.selected;
       const slotsRaw = payload?.t && typeof payload.t === "object" ? payload.t : payload?.slots;
+      const bucketRaw = Array.isArray(payload?.b) ? payload.b : payload?.buckets;
       const portionRaw = payload?.p ?? payload?.portionScale;
       const extraRaw = payload?.e ?? payload?.extra;
       if (!Array.isArray(selectedRaw) || !slotsRaw || typeof slotsRaw !== "object") {
@@ -2659,14 +2670,18 @@
         }
       };
 
+      const nextBucketState = normalizeBucketState(bucketRaw);
+
       cartState = nextCartState;
       weekPlanState = nextWeekPlanState;
+      weekBucketState = nextBucketState;
       breakfastState = nextBreakfast;
       portionScale = normalizedPortionScale;
       portionScaleInput.value = String(portionScale);
 
       saveCartState();
       saveWeekPlanState();
+      saveWeekBucketState();
       saveBreakfastState();
       savePortionScale();
 
@@ -3620,25 +3635,6 @@
             rowButtons.appendChild(a);
             rowButtons.appendChild(cartButton);
             wrapper.appendChild(rowButtons);
-
-            const dayStrip = document.createElement("div");
-            dayStrip.className = "recipe-day-strip";
-            const activeDays = getActiveDaysForRow(rowIndex);
-            DAY_LABELS.forEach((dayLabel) => {
-              const dayButton = document.createElement("button");
-              dayButton.type = "button";
-              dayButton.className = "recipe-day";
-              dayButton.dataset.rowIndex = String(rowIndex);
-              dayButton.dataset.day = dayLabel;
-              dayButton.dataset.active = activeDays.includes(dayLabel) ? "true" : "false";
-              dayButton.setAttribute("aria-pressed", activeDays.includes(dayLabel) ? "true" : "false");
-              dayButton.setAttribute("aria-label", `${dayLabel} ${activeDays.includes(dayLabel) ? "deaktivieren" : "aktivieren"}`);
-              dayButton.setAttribute("title", `${dayLabel} ${activeDays.includes(dayLabel) ? "deaktivieren" : "aktivieren"}`);
-              dayButton.textContent = dayLabel;
-              dayStrip.appendChild(dayButton);
-            });
-
-            wrapper.appendChild(dayStrip);
             td.appendChild(wrapper);
           } else {
             td.innerHTML = cell;
@@ -3822,17 +3818,6 @@
     });
 
     tableBody.addEventListener("click", (event) => {
-      const dayButton = event.target.closest(".recipe-day");
-      if (dayButton) {
-        const rowIndex = Number(dayButton.dataset.rowIndex);
-        const dayLabel = dayButton.dataset.day;
-        if (!Number.isNaN(rowIndex) && DAY_LABELS.includes(dayLabel)) {
-          toggleRecipeDay(rowIndex, dayLabel);
-          renderCurrentTable();
-        }
-        return;
-      }
-
       const button = event.target.closest(".cart-toggle");
       if (!button) {
         return;
@@ -3847,6 +3832,17 @@
     });
 
     weekPlan.addEventListener("click", (event) => {
+      const bucketToggle = event.target.closest('[data-action="toggle-week-bucket"]');
+      if (bucketToggle) {
+        const slot = Number(bucketToggle.dataset.slot);
+        if (Number.isInteger(slot)) {
+          toggleWeekBucket(slot);
+          renderWeekPlan();
+          renderCurrentTable();
+        }
+        return;
+      }
+
       const portionToggle = event.target.closest('[data-action="toggle-portion-display"]');
       if (portionToggle) {
         showWeekPlanPortionCount = !showWeekPlanPortionCount;
