@@ -312,7 +312,7 @@
       align-items: center;
       justify-content: space-between;
       margin: 0 0 10px;
-      gap: 6px;
+      gap: 8px;
     }
 
     .week-plan-title-row .week-plan-title {
@@ -331,6 +331,47 @@
       display: inline-flex;
       align-items: center;
       gap: 6px;
+    }
+
+    .week-plan-bucket-toggle {
+      margin-left: auto;
+      display: inline-flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+      min-width: 122px;
+      min-height: 34px;
+      padding: 0 12px;
+      border: 1px solid #d9d9d6;
+      border-radius: 10px;
+      background: #f3f3f1;
+      color: var(--fg);
+      box-shadow: none;
+      white-space: nowrap;
+    }
+
+    .week-plan-bucket-toggle:hover,
+    .week-plan-bucket-toggle:focus-visible {
+      background: #ececea;
+    }
+
+    .week-plan-bucket-toggle[data-active="false"] {
+      opacity: 0.45;
+    }
+
+    .week-plan-bucket-toggle svg {
+      width: 15px;
+      height: 15px;
+      stroke-width: 2;
+      flex: none;
+    }
+
+    .week-plan-bucket-toggle-label {
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+      line-height: 1;
     }
 
     .week-plan-portion-toggle {
@@ -911,36 +952,24 @@
     }
 
     .week-plan-column[data-active="false"] {
-      opacity: 0.42;
+      opacity: 0.46;
     }
 
     .week-plan-column[data-active="false"] .week-plan-title {
-      opacity: 0.65;
+      opacity: 0.72;
     }
 
-    .week-plan-bucket-toggle {
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      width: 26px;
-      height: 26px;
-      padding: 0;
-      border: 0;
-      background: transparent;
-      color: var(--fg);
-      border-radius: 999px;
-      box-shadow: none;
-    }
+    @media (prefers-color-scheme: dark) {
+      .week-plan-bucket-toggle {
+        background: #1a1a1a;
+        border-color: #353535;
+        color: var(--fg);
+      }
 
-    .week-plan-bucket-toggle:hover,
-    .week-plan-bucket-toggle:focus-visible {
-      background: rgba(0, 0, 0, 0.06);
-    }
-
-    .week-plan-bucket-toggle svg {
-      width: 16px;
-      height: 16px;
-      stroke-width: 2;
+      .week-plan-bucket-toggle:hover,
+      .week-plan-bucket-toggle:focus-visible {
+        background: #232323;
+      }
     }
 
     .col-index {
@@ -2499,16 +2528,19 @@
                   ><i data-lucide="user" aria-hidden="true"></i></button>
                   <span class="week-plan-kcal-badge">${planLabel}</span>
                 ` : ""}
-                <button
-                  type="button"
-                  class="week-plan-bucket-toggle"
-                  data-action="toggle-week-bucket"
-                  data-slot="${slot}"
-                  data-active="${bucketEnabled ? "true" : "false"}"
-                  aria-label="${bucketEnabled ? `${title} deaktivieren` : `${title} aktivieren`}"
-                  title="${bucketEnabled ? `${title} deaktivieren` : `${title} aktivieren`}"
-                ><i data-lucide="${bucketEnabled ? "check-square" : "square"}" aria-hidden="true"></i></button>
               </div>
+              <button
+                type="button"
+                class="week-plan-bucket-toggle"
+                data-action="toggle-week-bucket"
+                data-slot="${slot}"
+                data-active="${bucketEnabled ? "true" : "false"}"
+                aria-label="${bucketEnabled ? `${title} deaktivieren` : `${title} aktivieren`}"
+                title="${bucketEnabled ? `${title} deaktivieren` : `${title} aktivieren`}"
+              >
+                <span class="week-plan-bucket-toggle-label">${title}</span>
+                <i data-lucide="${bucketEnabled ? "check-square" : "square"}" aria-hidden="true"></i>
+              </button>
             </div>
             <div class="week-plan-items">
               ${slotEntries.map(({ row, rowIndex }) => `
@@ -3832,7 +3864,7 @@
     });
 
     weekPlan.addEventListener("click", (event) => {
-      const bucketToggle = event.target.closest('[data-action="toggle-week-bucket"]');
+      const bucketToggle = event.target.closest(".week-plan-bucket-toggle");
       if (bucketToggle) {
         const slot = Number(bucketToggle.dataset.slot);
         if (Number.isInteger(slot)) {
