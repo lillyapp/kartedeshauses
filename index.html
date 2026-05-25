@@ -1838,6 +1838,7 @@
 
       weekBucketState[slot] = !isWeekBucketEnabled(slot);
       saveWeekBucketState();
+      syncWeekPlanCodeToUrl();
     }
 
     function getWeekPlanSlotForRow(rowIndex) {
@@ -2594,6 +2595,16 @@
       };
 
       return `P1-${toBase64Url(JSON.stringify(payload))}`;
+    }
+
+    function syncWeekPlanCodeToUrl() {
+      if (Object.keys(cartState).length === 0) {
+        return;
+      }
+
+      const url = new URL(window.location.href);
+      url.searchParams.set("c", buildWeekPlanCode());
+      window.history.replaceState(null, "", url.toString());
     }
 
     function getWeekPlanCodeFromUrl() {
