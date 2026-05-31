@@ -2345,6 +2345,12 @@
     }
 
     function runMagicSelection({ overwrite = false } = {}) {
+      const previousSelection = new Set(
+        selectedRowIndexes
+          .filter((rowIndex) => Number.isInteger(rowIndex))
+          .map((rowIndex) => String(rowIndex))
+      );
+
       if (selectedRowIndexes.length === 0) {
         return;
       }
@@ -2358,7 +2364,7 @@
         clearPlanningData();
       }
 
-      refreshSelection();
+      refreshSelection({ excludeIndexes: previousSelection });
       addSelectionToCart();
       portionScale = 5;
       portionScaleInput.value = String(portionScale);
@@ -3690,8 +3696,16 @@
       });
     }
 
-    function refreshSelection() {
-      const pool = getSelectionPool();
+    function refreshSelection({ excludeIndexes = new Set() } = {}) {
+      const excludedKeys = new Set(
+        Array.from(excludeIndexes || [])
+          .map((value) => String(value))
+      );
+
+      const fullPool = getSelectionPool();
+      const reducedPool = fullPool.filter((index) => !excludedKeys.has(String(index)));
+      const pool = reducedPool.length >= Math.min(5, fullPool.length) ? reducedPool : fullPool;
+
       const picked = pickRandomNumbers(5, pool.length);
       selectedRowIndexes = picked.map((position) => pool[position]);
       renderRandomRows(selectedRowIndexes);
