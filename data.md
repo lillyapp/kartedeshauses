@@ -31,6 +31,7 @@ Hinweis: Einige ursprüngliche Slugs waren nicht mehr erreichbar und wurden auf 
 | Spinat-Ricotta-Ravioli | [https://www.kitchenstories.com/de/rezepte/spinat-ricotta-ravioli](https://www.kitchenstories.com/de/rezepte/spinat-ricotta-ravioli) | 75 g Nudelteig<br>50 g Spinat<br>62 1/2 g Ricotta<br>25 g Pecorino<br>12 1/2 g Pinienkern<br>1/2 Eigelb<br>Salz<br>Pfeffer | 732 kcal |
 | Pitabrote mit gebratenem Gemüse und Salsa-Dip | [https://www.kitchenstories.com/de/rezepte/pitabrote-mit-gebratenem-gemuse-und-salsa-dip](https://www.kitchenstories.com/de/rezepte/pitabrote-mit-gebratenem-gemuse-und-salsa-dip) | 1 Pitabrot<br>1/4 Zucchini<br>1/2 Tomate<br>2 1/2 g Minze<br>57 1/2 ml THOMY Salsa mit Tomate & Paprika<br>25 g Schmand<br>100 g Kichererbsen aus der Dose<br>1/4 Zitrone<br>7 1/2 ml Olivenöl<br>Salz<br>Pfeffer<br>Olivenöl<br>Minze | 415 kcal |
 | Scharfes Grilled-Cheese-Sandwich mit 5 Zutaten | [https://www.kitchenstories.com/de/rezepte/kimchi-kase-sandwich-mit-5-zutaten](https://www.kitchenstories.com/de/rezepte/kimchi-kase-sandwich-mit-5-zutaten) | 50 g Kimchi 2 Scheiben Toastbrot 62 1/2 g geriebener Mozzarella 1/2 TL Reisessig 100 g gemischter Salat Olivenöl ungesalzene Butter Salz Pfeffer | 363 kcal |
+| Club Sandwich | [https://www.kitchenstories.com/de/rezepte/club-sandwich](https://www.kitchenstories.com/de/rezepte/club-sandwich) | 4 Scheiben Bacon 3 Scheiben Toastbrot 1/2 Ochsenherztomate 1 1/2 EL Mayonnaise 1/4 Kopf Romana Salatherz 1 EL Senf 100 g hauchdünn geschnittene Truthahnbrust 1 Gewürzgurke grobes Meersalz Pfeffer Krautsalat gesalzene Chips | 725 kcal |
 
 ## Produktlinks
 ```json
@@ -43,6 +44,7 @@ Hinweis: Einige ursprüngliche Slugs waren nicht mehr erreichbar und wurden auf 
   "avocado|stück": "https://www.rewe.de/shop/p/avocado-2-stueck-in-schale/417804",
   "backnatron|tl": "https://www.rewe.de/shop/p/kaiser-natron-pulver-50g/228613",
   "backpulver|tl": "https://www.rewe.de/shop/p/ja-backpulver-10x15g/1478263",
+  "bacon|scheibe": "",
   "balsamicoessig|el": "https://www.rewe.de/shop/p/ja-aceto-balsamico-di-modena-500ml/397387",
   "banane": "https://www.rewe.de/shop/p/ja-banane-ca-200g/455217",
   "banane|stück": "https://www.rewe.de/shop/p/ja-banane-ca-200g/455217",
@@ -81,8 +83,10 @@ Hinweis: Einige ursprüngliche Slugs waren nicht mehr erreichbar und wurden auf 
   "gemüsebrühe|ml": "https://www.rewe.de/shop/p/rewe-bio-gemuesebruehe-140g/8360458",
   "geriebener mozzarella|g": "https://www.rewe.de/shop/p/ja-geriebener-mozzarella-250g/8439178",
   "geräuchertes paprikapulver|tl": "https://www.rewe.de/shop/p/ja-paprika-edelsuess-50g/2369960",
+  "gesalzene chips": "",
   "getrocknete tomate in öl|g": "https://www.rewe.de/shop/p/tomaten-getrocknet-100g/8343334",
   "getrockneter oregano|el": "https://www.rewe.de/shop/p/ja-oregano-gerebelt-12g/7813204",
+  "gewürzgurke|stück": "https://www.rewe.de/shop/p/ja-cornichons-mit-kraeutern-190g/8693856",
   "gnocchi|g": "https://www.rewe.de/shop/p/ja-gnocchi-di-patate-500g/592755",
   "griechischer joghurt|g": "https://www.rewe.de/shop/p/ja-joghurt-griechischer-art-natur-4x150g/8514626",
   "guanciale|g": "https://www.rewe.de/shop/p/fratelli-beretta-il-guanciale-streifen-100g/9575307",
@@ -103,10 +107,16 @@ Hinweis: Einige ursprüngliche Slugs waren nicht mehr erreichbar und wurden auf 
   "kimchi|g": "",
   "kirschtomate|g": "https://www.rewe.de/shop/p/cherrytomaten-400g/3029089",
   "kiwi|stück": "https://www.rewe.de/shop/p/kiwi-gruen-1-stueck/195634",
+  "krautsalat": "",
+  "mayonnaise|el": "",
+  "ochsenherztomate|stück": "",
   "olivenöl": "",
   "reisessig|tl": "",
+  "romana salatherz|kopf": "",
   "rote paprika|g": "https://www.rewe.de/shop/p/paprika-rot-ca-250g/483559",
+  "senf|el": "",
   "toastbrot|scheibe": "",
+  "truthahnbrust|g": "",
   "ungesalzene butter": "https://www.rewe.de/shop/p/ja-markenbutter-mild-gesaeuert-250g/5883121"
 }
 ```
