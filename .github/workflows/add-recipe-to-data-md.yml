@@ -1,0 +1,185 @@
+name: Add recipe to data.md
+
+on:
+  workflow_dispatch:
+    inputs:
+      recipe_name:
+        description: "Rezeptname, z. B. Overnight Oats"
+        required: true
+        type: string
+
+      recipe_link:
+        description: "Link zum Rezept"
+        required: true
+        type: string
+
+      ingredients:
+        description: "Zutaten für 1 Portion. Zeilenumbrüche erlaubt."
+        required: true
+        type: string
+
+      kcal:
+        description: "kcal pro Portion, z. B. 800 kcal"
+        required: true
+        type: string
+
+      product_links_json:
+        description: "Optional: JSON-Objekt mit neuen Produktlinks, z. B. {\"haferflocken|g\":\"https://...\"}"
+        required: false
+        type: string
+        default: ""
+
+permissions:
+  contents: write
+
+jobs:
+  add-recipe:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.GH_PAT || github.token }}
+
+      - name: Add recipe row and product links to data.md
+        env:
+          RECIPE_NAME: ${{ inputs.recipe_name }}
+          RECIPE_LINK: ${{ inputs.recipe_link }}
+          INGREDIENTS: ${{ inputs.ingredients }}
+          KCAL: ${{ inputs.kcal }}
+          PRODUCT_LINKS_JSON: ${{ inputs.product_links_json }}
+        run: |
+          python - <<'PY'
+          import os
+          import re
+          import json
+          from pathlib import Path
+
+          data_path = Path("data.md")
+
+          if not data_path.exists():
+              raise SystemExit("data.md was not found in the repository root.")
+
+          recipe_name = os.environ["RECIPE_NAME"].strip()
+          recipe_link = os.environ["RECIPE_LINK"].strip()
+          ingredients = os.environ["INGREDIENTS"].strip()
+          kcal = os.environ["KCAL"].strip()
+          product_links_raw = os.environ.get("PRODUCT_LINKS_JSON", "").strip()
+
+          if not recipe_name:
+              raise SystemExit("recipe_name is required.")
+
+          if not recipe_link:
+              raise SystemExit("recipe_link is required.")
+
+          if not ingredients:
+              raise SystemExit("ingredients is required.")
+
+          if not kcal:
+              raise SystemExit("kcal is required.")
+
+          if not kcal.lower().endswith("kcal"):
+              kcal = f"{kcal} kcal"
+
+          text = data_path.read_text(encoding="utf-8")
+
+          if "| Rezept | Link | Zutaten für 1 Portion | kcal pro Portion |" not in text:
+              raise SystemExit("Recipe table header was not found in data.md.")
+
+          if "## Produktlinks" not in text:
+              raise SystemExit("Section '## Produktlinks' was not found in data.md.")
+
+          escaped_recipe_name = re.escape(recipe_name)
+          duplicate_pattern = re.compile(
+              rf"^\|\s*{escaped_recipe_name}\s*\|",
+              re.IGNORECASE | re.MULTILINE
+          )
+
+          if duplicate_pattern.search(text):
+              raise SystemExit(f"A recipe row for '{recipe_name}' already exists in data.md.")
+
+          ingredients_md = "<br>".join(
+              line.strip()
+              for line in ingredients.splitlines()
+              if line.strip()
+          )
+
+          recipe_row = (
+              f"| {recipe_name} | "
+              f"[{recipe_link}]({recipe_link}) | "
+              f"{ingredients_md} | "
+              f"{kcal} |"
+          )
+
+          product_section_marker = "## Produktlinks"
+          before_products, after_products = text.split(product_section_marker, 1)
+
+          before_products = before_products.rstrip() + "\n"
+          before_products += recipe_row + "\n\n"
+
+          text = before_products + product_section_marker + after_products
+
+          if product_links_raw:
+              try:
+                  new_links = json.loads(product_links_raw)
+              except json.JSONDecodeError as exc:
+                  raise SystemExit(f"product_links_json is not valid JSON: {exc}")
+
+              if not isinstance(new_links, dict):
+                  raise SystemExit("product_links_json must be a JSON object.")
+
+              json_block_pattern = re.compile(
+                  r"(## Produktlinks\s*```json\s*)(\{.*?\})(\s*```)",
+                  re.DOTALL
+              )
+
+              match = json_block_pattern.search(text)
+
+              if not match:
+                  raise SystemExit("Could not find JSON block under '## Produktlinks'.")
+
+              prefix, existing_json_raw, suffix = match.groups()
+
+              try:
+                  existing_links = json.loads(existing_json_raw)
+              except json.JSONDecodeError as exc:
+                  raise SystemExit(f"Existing product links JSON is invalid: {exc}")
+
+              if not isinstance(existing_links, dict):
+                  raise SystemExit("Existing product links JSON must be an object.")
+
+              existing_links.update(new_links)
+
+              sorted_links = dict(sorted(existing_links.items(), key=lambda item: item[0].lower()))
+
+              updated_json = json.dumps(
+                  sorted_links,
+                  ensure_ascii=False,
+                  indent=2
+              )
+
+              text = (
+                  text[:match.start()]
+                  + prefix
+                  + updated_json
+                  + suffix
+                  + text[match.end():]
+              )
+
+          data_path.write_text(text.rstrip() + "\n", encoding="utf-8")
+          PY
+
+      - name: Commit and push data.md
+        run: |
+          if git diff --quiet -- data.md; then
+            echo "No changes in data.md."
+            exit 0
+          fi
+
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+
+          git add data.md
+          git commit -m "Add recipe to data.md"
+          git push
