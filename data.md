@@ -35,6 +35,7 @@ Hinweis: Einige ursprüngliche Slugs waren nicht mehr erreichbar und wurden auf 
 | Süßkartoffelpuffer mit Guacamole und pochiertem Ei | [https://www.kitchenstories.com/de/rezepte/susskartoffelpuffer-mit-guacamole-und-pochiertem-ei](https://www.kitchenstories.com/de/rezepte/susskartoffelpuffer-mit-guacamole-und-pochiertem-ei) | 150 g Süßkartoffeln 1/2 Avocado 1 3/4 Eier 1/2 Knoblauchzehe 1 1/4 EL Olivenöl 1/4 TL gemahlener Koriander 1/4 TL gemahlener Kümmel 1 1/2 EL Speisestärke 1/2 Tomate 1/4 Limette 1/4 EL Zucker 3/8 TL Chiliflocken 2 1/2 g Koriander 1/2 EL Sonnenblumenöl 1/2 TL Branntweinessig Salz Pfeffer Kitchen Stories Avocado Dreams Gewürzmischung | 794 kcal |
 | Pesto Hähnchen | [https://www.kitchenstories.com/de/rezepte/pesto-hahnchenbrust](https://www.kitchenstories.com/de/rezepte/pesto-hahnchenbrust) | 1 Hähnchenbrust ohne Haut und Knochen 1/2 Roma-Tomate 18 3/4 g Pesto 15 g geriebener Mozzarella frischer Basilikum | 290 kcal |
 | Crunchwrap mit einfacher Tomatensalsa | [https://www.kitchenstories.com/de/rezepte/crunchwrap-mit-einfacher-tomatensalsa](https://www.kitchenstories.com/de/rezepte/crunchwrap-mit-einfacher-tomatensalsa) | 16 2/3 g Doritos Nacho Cheese 1 Tomate 1/3 Frühlingszwiebel 1/6 Bündel Koriander 1/3 Limette 1/3 rote Zwiebel 2/3 Zehe Knoblauch 1/2 EL Olivenöl 1/3 EL Branntweinessig Chili 50 g Mais aus der Dose 66 2/3 g Kidneybohnen aus der Dose 1/6 Avocado 83 1/3 g Hackfleisch 1/3 EL edelsüßes Paprikapulver 1/3 TL Chilipulver 1/3 TL gemahlener Kreuzkümmel 2 Weizentortillas 33 1/3 g Schmand 50 g geriebener Mozzarellakäse Salz Pfeffer eingelegte rote Zwiebeln | 1132 kcal |
+| Zucchini-Hackfleisch-Schiffchen | [https://www.kitchenstories.com/de/rezepte/zucchini-hackfleisch-schiffchen](https://www.kitchenstories.com/de/rezepte/zucchini-hackfleisch-schiffchen) | 1 Zucchini 1/2 Zwiebel 1/2 Chili 150 g Hackfleisch 1/2 Ei 50 g Goudakäse Salz Pfeffer | 467 kcal |
 
 ## Produktlinks
 ```json
@@ -69,6 +70,7 @@ Hinweis: Einige ursprüngliche Slugs waren nicht mehr erreichbar und wurden auf 
   "chili": "",
   "chiliflocken|tl": "https://www.rewe.de/shop/p/ja-chiliflocken-35g/7895170",
   "chilipulver|tl": "",
+  "chili|stück": "",
   "cremige erdnussbutter|el": "https://www.rewe.de/shop/p/ja-erdnussbutter-creamy-350g/7571397",
   "currypulver|tl": "https://www.rewe.de/shop/p/ja-curry-gemahlen-45g/2788275",
   "dijon senf|tl": "https://www.rewe.de/shop/p/rewe-beste-wahl-dijon-senf-pikant-wuerzig-185ml/8290264",
@@ -103,6 +105,7 @@ Hinweis: Einige ursprüngliche Slugs waren nicht mehr erreichbar und wurden auf 
   "getrockneter oregano|el": "https://www.rewe.de/shop/p/ja-oregano-gerebelt-12g/7813204",
   "gewürzgurke|stück": "https://www.rewe.de/shop/p/ja-cornichons-mit-kraeutern-190g/8693856",
   "gnocchi|g": "https://www.rewe.de/shop/p/ja-gnocchi-di-patate-500g/592755",
+  "goudakäse|g": "",
   "griechischer joghurt|g": "https://www.rewe.de/shop/p/ja-joghurt-griechischer-art-natur-4x150g/8514626",
   "guanciale|g": "https://www.rewe.de/shop/p/fratelli-beretta-il-guanciale-streifen-100g/9575307",
   "gurke|stück": "https://www.rewe.de/shop/p/salatgurke-1-stueck/483303",
@@ -150,6 +153,8 @@ Hinweis: Einige ursprüngliche Slugs waren nicht mehr erreichbar und wurden auf 
   "tomate|stück": "",
   "truthahnbrust|g": "",
   "ungesalzene butter": "https://www.rewe.de/shop/p/ja-markenbutter-mild-gesaeuert-250g/5883121",
-  "weizentortillas|stück": ""
+  "weizentortillas|stück": "",
+  "zucchini|stück": "",
+  "zwiebel|stück": ""
 }
 ```
