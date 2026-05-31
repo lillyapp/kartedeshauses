@@ -33,6 +33,7 @@ Hinweis: Einige ursprüngliche Slugs waren nicht mehr erreichbar und wurden auf 
 | Scharfes Grilled-Cheese-Sandwich mit 5 Zutaten | [https://www.kitchenstories.com/de/rezepte/kimchi-kase-sandwich-mit-5-zutaten](https://www.kitchenstories.com/de/rezepte/kimchi-kase-sandwich-mit-5-zutaten) | 50 g Kimchi 2 Scheiben Toastbrot 62 1/2 g geriebener Mozzarella 1/2 TL Reisessig 100 g gemischter Salat Olivenöl ungesalzene Butter Salz Pfeffer | 363 kcal |
 | Club Sandwich | [https://www.kitchenstories.com/de/rezepte/club-sandwich](https://www.kitchenstories.com/de/rezepte/club-sandwich) | 4 Scheiben Bacon 3 Scheiben Toastbrot 1/2 Ochsenherztomate 1 1/2 EL Mayonnaise 1/4 Kopf Romana Salatherz 1 EL Senf 100 g hauchdünn geschnittene Truthahnbrust 1 Gewürzgurke grobes Meersalz Pfeffer Krautsalat gesalzene Chips | 725 kcal |
 | Süßkartoffelpuffer mit Guacamole und pochiertem Ei | [https://www.kitchenstories.com/de/rezepte/susskartoffelpuffer-mit-guacamole-und-pochiertem-ei](https://www.kitchenstories.com/de/rezepte/susskartoffelpuffer-mit-guacamole-und-pochiertem-ei) | 150 g Süßkartoffeln 1/2 Avocado 1 3/4 Eier 1/2 Knoblauchzehe 1 1/4 EL Olivenöl 1/4 TL gemahlener Koriander 1/4 TL gemahlener Kümmel 1 1/2 EL Speisestärke 1/2 Tomate 1/4 Limette 1/4 EL Zucker 3/8 TL Chiliflocken 2 1/2 g Koriander 1/2 EL Sonnenblumenöl 1/2 TL Branntweinessig Salz Pfeffer Kitchen Stories Avocado Dreams Gewürzmischung | 794 kcal |
+| Pesto Hähnchen | [https://www.kitchenstories.com/de/rezepte/pesto-hahnchenbrust](https://www.kitchenstories.com/de/rezepte/pesto-hahnchenbrust) | 1 Hähnchenbrust ohne Haut und Knochen 1/2 Roma-Tomate 18 3/4 g Pesto 15 g geriebener Mozzarella frischer Basilikum | 290 kcal |
 
 ## Produktlinks
 ```json
@@ -73,6 +74,7 @@ Hinweis: Einige ursprüngliche Slugs waren nicht mehr erreichbar und wurden auf 
   "essig|el": "https://www.rewe.de/shop/p/ja-wein-branntwein-essig-dunkel-1l/497359",
   "feta|g": "https://www.rewe.de/shop/p/ja-hirtenkaese-250g/2886776",
   "frische hefe|g": "https://www.rewe.de/shop/p/ja-trockenbackhefe-6x7g/1478286",
+  "frischer basilikum": "",
   "frischkäse|g": "https://www.rewe.de/shop/p/ja-frischkaese-natur-doppelrahmstufe-300g/2421597",
   "frühlingszwiebel": "https://www.rewe.de/shop/p/lauchzwiebeln-im-bund/482404",
   "ganze geschälte tomate aus der dose|g": "https://www.rewe.de/shop/p/ja-tomaten-geschaelt-480g/6467555",
@@ -101,6 +103,7 @@ Hinweis: Einige ursprüngliche Slugs waren nicht mehr erreichbar und wurden auf 
   "hot-dog-brötchen|stück": "https://www.rewe.de/shop/p/rewe-beste-wahl-hot-dog-rolls-brioche-6-stueck/8273841",
   "hähnchenbrustfilet|g": "https://www.rewe.de/shop/p/ja-haehnchen-brustfilet-600g/8468236",
   "hähnchenbrustfilet|stück": "https://www.rewe.de/shop/p/ja-haehnchen-brustfilet-600g/8468236",
+  "hähnchenbrust|stück": "https://www.rewe.de/shop/p/ja-haehnchen-brustfilet-600g/8468236",
   "kakaonib": "https://www.rewe.de/shop/p/biozentrale-bio-kakaonibs-superfood-200g/8070827",
   "karotte|stück": "https://www.rewe.de/shop/p/karotten-1kg/1045111",
   "kartoffeln|g": "https://www.rewe.de/shop/p/kartoffeln-festkochend-ca-100g/466182",
@@ -119,7 +122,9 @@ Hinweis: Einige ursprüngliche Slugs waren nicht mehr erreichbar und wurden auf 
   "ochsenherztomate|stück": "",
   "olivenöl": "",
   "olivenöl|el": "",
+  "pesto|g": "",
   "reisessig|tl": "",
+  "roma-tomate|stück": "",
   "romana salatherz|kopf": "",
   "rote paprika|g": "https://www.rewe.de/shop/p/paprika-rot-ca-250g/483559",
   "senf|el": "",
