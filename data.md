@@ -30,10 +30,7 @@ Hinweis: Einige ursprüngliche Slugs waren nicht mehr erreichbar und wurden auf 
 | Schwäbische Maultaschen | [https://www.kitchenstories.com/de/rezepte/schwabische-maultaschen](https://www.kitchenstories.com/de/rezepte/schwabische-maultaschen) | 62 1/2 g Mehl<br>3/4 Ei<br>1/4 EL Olivenöl<br>1/4 TL Salz<br>1/4 Zwiebel<br>3 3/4 g Petersilie<br>37 1/2 g Spinat<br>1/4 Brötchen<br>1/2 EL Milch<br>62 1/2 g Hackfleisch<br>12 1/2 g Sahne<br>Salz<br>Pfeffer<br>Muskatnuss<br>Mehl<br>Rinderbrühe | 591 kcal |
 | Spinat-Ricotta-Ravioli | [https://www.kitchenstories.com/de/rezepte/spinat-ricotta-ravioli](https://www.kitchenstories.com/de/rezepte/spinat-ricotta-ravioli) | 75 g Nudelteig<br>50 g Spinat<br>62 1/2 g Ricotta<br>25 g Pecorino<br>12 1/2 g Pinienkern<br>1/2 Eigelb<br>Salz<br>Pfeffer | 732 kcal |
 | Pitabrote mit gebratenem Gemüse und Salsa-Dip | [https://www.kitchenstories.com/de/rezepte/pitabrote-mit-gebratenem-gemuse-und-salsa-dip](https://www.kitchenstories.com/de/rezepte/pitabrote-mit-gebratenem-gemuse-und-salsa-dip) | 1 Pitabrot<br>1/4 Zucchini<br>1/2 Tomate<br>2 1/2 g Minze<br>57 1/2 ml THOMY Salsa mit Tomate & Paprika<br>25 g Schmand<br>100 g Kichererbsen aus der Dose<br>1/4 Zitrone<br>7 1/2 ml Olivenöl<br>Salz<br>Pfeffer<br>Olivenöl<br>Minze | 415 kcal |
-
-
-
-
+| Scharfes Grilled-Cheese-Sandwich mit 5 Zutaten | [https://www.kitchenstories.com/de/rezepte/kimchi-kase-sandwich-mit-5-zutaten](https://www.kitchenstories.com/de/rezepte/kimchi-kase-sandwich-mit-5-zutaten) | 50 g Kimchi 2 Scheiben Toastbrot 62 1/2 g geriebener Mozzarella 1/2 TL Reisessig 100 g gemischter Salat Olivenöl ungesalzene Butter Salz Pfeffer | 363 kcal |
 
 ## Produktlinks
 ```json
@@ -80,6 +77,7 @@ Hinweis: Einige ursprüngliche Slugs waren nicht mehr erreichbar und wurden auf 
   "gemahlener koriander|tl": "https://www.rewe.de/shop/p/lien-ying-asian-spirit-koriander-gemahlen-20g/7827318",
   "gemahlener kreuzkümmel|tl": "https://www.rewe.de/shop/p/ostmann-kreuzkuemmel-gemahlen-35g/4246780",
   "gemahlener zimt|tl": "https://www.rewe.de/shop/p/ja-zimt-gemahlen-40g/2371188",
+  "gemischter salat|g": "",
   "gemüsebrühe|ml": "https://www.rewe.de/shop/p/rewe-bio-gemuesebruehe-140g/8360458",
   "geriebener mozzarella|g": "https://www.rewe.de/shop/p/ja-geriebener-mozzarella-250g/8439178",
   "geräuchertes paprikapulver|tl": "https://www.rewe.de/shop/p/ja-paprika-edelsuess-50g/2369960",
@@ -102,8 +100,13 @@ Hinweis: Einige ursprüngliche Slugs waren nicht mehr erreichbar und wurden auf 
   "ketchup": "https://www.rewe.de/shop/p/ja-tomaten-ketchup-500ml/7291190",
   "ketchup|el": "https://www.rewe.de/shop/p/ja-tomaten-ketchup-500ml/7291190",
   "kichererbsen aus der dose|g": "https://www.rewe.de/shop/p/ja-kichererbsen-265g/7814109",
+  "kimchi|g": "",
   "kirschtomate|g": "https://www.rewe.de/shop/p/cherrytomaten-400g/3029089",
   "kiwi|stück": "https://www.rewe.de/shop/p/kiwi-gruen-1-stueck/195634",
-  "rote paprika|g": "https://www.rewe.de/shop/p/paprika-rot-ca-250g/483559"
+  "olivenöl": "",
+  "reisessig|tl": "",
+  "rote paprika|g": "https://www.rewe.de/shop/p/paprika-rot-ca-250g/483559",
+  "toastbrot|scheibe": "",
+  "ungesalzene butter": "https://www.rewe.de/shop/p/ja-markenbutter-mild-gesaeuert-250g/5883121"
 }
 ```
