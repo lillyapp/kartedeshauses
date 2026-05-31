@@ -34,6 +34,7 @@ Hinweis: Einige ursprüngliche Slugs waren nicht mehr erreichbar und wurden auf 
 | Club Sandwich | [https://www.kitchenstories.com/de/rezepte/club-sandwich](https://www.kitchenstories.com/de/rezepte/club-sandwich) | 4 Scheiben Bacon 3 Scheiben Toastbrot 1/2 Ochsenherztomate 1 1/2 EL Mayonnaise 1/4 Kopf Romana Salatherz 1 EL Senf 100 g hauchdünn geschnittene Truthahnbrust 1 Gewürzgurke grobes Meersalz Pfeffer Krautsalat gesalzene Chips | 725 kcal |
 | Süßkartoffelpuffer mit Guacamole und pochiertem Ei | [https://www.kitchenstories.com/de/rezepte/susskartoffelpuffer-mit-guacamole-und-pochiertem-ei](https://www.kitchenstories.com/de/rezepte/susskartoffelpuffer-mit-guacamole-und-pochiertem-ei) | 150 g Süßkartoffeln 1/2 Avocado 1 3/4 Eier 1/2 Knoblauchzehe 1 1/4 EL Olivenöl 1/4 TL gemahlener Koriander 1/4 TL gemahlener Kümmel 1 1/2 EL Speisestärke 1/2 Tomate 1/4 Limette 1/4 EL Zucker 3/8 TL Chiliflocken 2 1/2 g Koriander 1/2 EL Sonnenblumenöl 1/2 TL Branntweinessig Salz Pfeffer Kitchen Stories Avocado Dreams Gewürzmischung | 794 kcal |
 | Pesto Hähnchen | [https://www.kitchenstories.com/de/rezepte/pesto-hahnchenbrust](https://www.kitchenstories.com/de/rezepte/pesto-hahnchenbrust) | 1 Hähnchenbrust ohne Haut und Knochen 1/2 Roma-Tomate 18 3/4 g Pesto 15 g geriebener Mozzarella frischer Basilikum | 290 kcal |
+| Crunchwrap mit einfacher Tomatensalsa | [https://www.kitchenstories.com/de/rezepte/crunchwrap-mit-einfacher-tomatensalsa](https://www.kitchenstories.com/de/rezepte/crunchwrap-mit-einfacher-tomatensalsa) | 16 2/3 g Doritos Nacho Cheese 1 Tomate 1/3 Frühlingszwiebel 1/6 Bündel Koriander 1/3 Limette 1/3 rote Zwiebel 2/3 Zehe Knoblauch 1/2 EL Olivenöl 1/3 EL Branntweinessig Chili 50 g Mais aus der Dose 66 2/3 g Kidneybohnen aus der Dose 1/6 Avocado 83 1/3 g Hackfleisch 1/3 EL edelsüßes Paprikapulver 1/3 TL Chilipulver 1/3 TL gemahlener Kreuzkümmel 2 Weizentortillas 33 1/3 g Schmand 50 g geriebener Mozzarellakäse Salz Pfeffer eingelegte rote Zwiebeln | 1132 kcal |
 
 ## Produktlinks
 ```json
@@ -56,6 +57,7 @@ Hinweis: Einige ursprüngliche Slugs waren nicht mehr erreichbar und wurden auf 
   "birne|stück": "https://www.rewe.de/shop/p/birne-gruen-ca-240g/194565",
   "blatt reispapier|stück": "https://www.rewe.de/shop/p/rewe-beste-wahl-reispapier-22cm-100g/7529560",
   "blaubeere|g": "https://www.rewe.de/shop/p/kulturheidelbeeren-125g/1045731",
+  "branntweinessig|el": "",
   "branntweinessig|tl": "",
   "brötchen|stück": "https://www.rewe.de/shop/p/ja-sonntags-broetchen-8-stueck/8741482",
   "butter": "https://www.rewe.de/shop/p/ja-markenbutter-mild-gesaeuert-250g/5883121",
@@ -64,11 +66,16 @@ Hinweis: Einige ursprüngliche Slugs waren nicht mehr erreichbar und wurden auf 
   "cheddar|g": "https://www.rewe.de/shop/p/ja-cheddar-in-scheiben-175g/8926272",
   "chiasamen": "https://www.rewe.de/shop/p/ver-val-bio-chia-samen-200g/3021438",
   "chiasamen|el": "https://www.rewe.de/shop/p/ver-val-bio-chia-samen-200g/3021438",
+  "chili": "",
   "chiliflocken|tl": "https://www.rewe.de/shop/p/ja-chiliflocken-35g/7895170",
+  "chilipulver|tl": "",
   "cremige erdnussbutter|el": "https://www.rewe.de/shop/p/ja-erdnussbutter-creamy-350g/7571397",
   "currypulver|tl": "https://www.rewe.de/shop/p/ja-curry-gemahlen-45g/2788275",
   "dijon senf|tl": "https://www.rewe.de/shop/p/rewe-beste-wahl-dijon-senf-pikant-wuerzig-185ml/8290264",
+  "doritos nacho cheese|g": "",
+  "edelsüßes paprikapulver|el": "",
   "eigelb|stück": "https://www.rewe.de/shop/p/ja-frische-eier-aus-bodenhaltung-10-stueck/7937888",
+  "eingelegte rote zwiebeln": "",
   "ei|stück": "https://www.rewe.de/shop/p/ja-frische-eier-aus-bodenhaltung-10-stueck/7937888",
   "essiggurken|stück": "https://www.rewe.de/shop/p/ja-cornichons-mit-kraeutern-190g/8693856",
   "essig|el": "https://www.rewe.de/shop/p/ja-wein-branntwein-essig-dunkel-1l/497359",
@@ -77,6 +84,7 @@ Hinweis: Einige ursprüngliche Slugs waren nicht mehr erreichbar und wurden auf 
   "frischer basilikum": "",
   "frischkäse|g": "https://www.rewe.de/shop/p/ja-frischkaese-natur-doppelrahmstufe-300g/2421597",
   "frühlingszwiebel": "https://www.rewe.de/shop/p/lauchzwiebeln-im-bund/482404",
+  "frühlingszwiebel|stück": "https://www.rewe.de/shop/p/lauchzwiebeln-im-bund/482404",
   "ganze geschälte tomate aus der dose|g": "https://www.rewe.de/shop/p/ja-tomaten-geschaelt-480g/6467555",
   "gelbe paprika|": "https://www.rewe.de/shop/p/paprika-gelb-ca-250g/483494",
   "gemahlene muskatnuss": "https://www.rewe.de/shop/p/ostmann-muskatnuss-gemahlen-50g/4203488",
@@ -87,6 +95,7 @@ Hinweis: Einige ursprüngliche Slugs waren nicht mehr erreichbar und wurden auf 
   "gemahlener zimt|tl": "https://www.rewe.de/shop/p/ja-zimt-gemahlen-40g/2371188",
   "gemischter salat|g": "",
   "gemüsebrühe|ml": "https://www.rewe.de/shop/p/rewe-bio-gemuesebruehe-140g/8360458",
+  "geriebener mozzarellakäse|g": "https://www.rewe.de/shop/p/ja-geriebener-mozzarella-250g/8439178",
   "geriebener mozzarella|g": "https://www.rewe.de/shop/p/ja-geriebener-mozzarella-250g/8439178",
   "geräuchertes paprikapulver|tl": "https://www.rewe.de/shop/p/ja-paprika-edelsuess-50g/2369960",
   "gesalzene chips": "",
@@ -111,13 +120,17 @@ Hinweis: Einige ursprüngliche Slugs waren nicht mehr erreichbar und wurden auf 
   "ketchup": "https://www.rewe.de/shop/p/ja-tomaten-ketchup-500ml/7291190",
   "ketchup|el": "https://www.rewe.de/shop/p/ja-tomaten-ketchup-500ml/7291190",
   "kichererbsen aus der dose|g": "https://www.rewe.de/shop/p/ja-kichererbsen-265g/7814109",
+  "kidneybohnen aus der dose|g": "",
   "kimchi|g": "",
   "kirschtomate|g": "https://www.rewe.de/shop/p/cherrytomaten-400g/3029089",
   "kiwi|stück": "https://www.rewe.de/shop/p/kiwi-gruen-1-stueck/195634",
   "knoblauchzehe|stück": "",
+  "knoblauch|zehe": "",
+  "koriander|bund": "",
   "koriander|g": "",
   "krautsalat": "",
   "limette|stück": "",
+  "mais aus der dose|g": "",
   "mayonnaise|el": "",
   "ochsenherztomate|stück": "",
   "olivenöl": "",
@@ -127,6 +140,8 @@ Hinweis: Einige ursprüngliche Slugs waren nicht mehr erreichbar und wurden auf 
   "roma-tomate|stück": "",
   "romana salatherz|kopf": "",
   "rote paprika|g": "https://www.rewe.de/shop/p/paprika-rot-ca-250g/483559",
+  "rote zwiebel|stück": "",
+  "schmand|g": "",
   "senf|el": "",
   "sonnenblumenöl|el": "",
   "speisestärke|el": "",
@@ -134,6 +149,7 @@ Hinweis: Einige ursprüngliche Slugs waren nicht mehr erreichbar und wurden auf 
   "toastbrot|scheibe": "",
   "tomate|stück": "",
   "truthahnbrust|g": "",
-  "ungesalzene butter": "https://www.rewe.de/shop/p/ja-markenbutter-mild-gesaeuert-250g/5883121"
+  "ungesalzene butter": "https://www.rewe.de/shop/p/ja-markenbutter-mild-gesaeuert-250g/5883121",
+  "weizentortillas|stück": ""
 }
 ```
