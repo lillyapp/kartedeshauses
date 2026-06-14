@@ -1,843 +1,11 @@
-<html lang="de"><head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>KARTE DES HAUSES v2</title>
-  <style>
-    :root {
-      --bg: #ffffff;
-      --fg: #1d1d1f;
-      --muted: #757575;
-      --line: #d9d9d6;
-      --success: #1f8a4d;
-      --danger: #c62828;
-      --panel-bg: #ffffff;
-      --page-max: 1200px;
-      --page-gutter: 24px;
-    }
-
-    @media (prefers-color-scheme: dark) {
-      :root {
-        --bg: #0a0a0a;
-        --fg: #f3f3f3;
-        --muted: #a8a8a8;
-        --line: #2e2e2e;
-        --panel-bg: #141414;
-        --success: #41c97f;
-        --danger: #ff5a5f;
-      }
-
-      html,
-      body {
-        color-scheme: dark;
-      }
-
-      table,
-      .table-wrap,
-      .week-plan-column,
-      .summary-card,
-      .summary-panel,
-      .basket-prompt {
-        background: var(--panel-bg) !important;
-        color: var(--fg) !important;
-        border-color: var(--line) !important;
-      }
-
-      th,
-      td,
-      thead th,
-      tbody td,
-      tbody tr {
-        border-color: var(--line) !important;
-      }
-
-      button,
-      .filter-button,
-      .ingredient-action,
-      .ingredient-main,
-      .cart-toggle,
-      #summaryButton,
-      .week-plan-copy,
-      .week-plan-scroll,
-      .week-plan-randomize,
-      #quickActionsToggle {
-        color: var(--fg) !important;
-        border-color: var(--line) !important;
-      }
-
-      button:hover,
-      .filter-button:hover,
-      .ingredient-action:hover,
-      .ingredient-main:hover,
-      .cart-toggle:hover,
-      #summaryButton:hover,
-      #summaryButton:focus-visible,
-      .week-plan-copy:hover,
-      .week-plan-scroll:hover,
-      .week-plan-randomize:hover,
-      #quickActionsToggle:hover {
-        background: rgba(255, 255, 255, 0.08) !important;
-      }
-
-      .week-plan-item,
-      .filter-popover,
-      .summary-tools {
-        background: #1d1d1d !important;
-        border-color: var(--line) !important;
-      }
-
-      .week-plan-column[data-drag-over="true"] {
-        background: rgba(65, 201, 127, 0.14) !important;
-      }
-
-      .week-plan-kcal-badge,
-      .status,
-      .meta,
-      .summary-subtitle {
-        color: var(--muted) !important;
-      }
-
-      .summary-filter-button {
-        color: var(--fg) !important;
-      }
-
-      .summary-filter-button:hover,
-      .summary-filter-button:focus-visible {
-        background: rgba(255, 255, 255, 0.08) !important;
-      }
-
-      a,
-      a:visited {
-        color: var(--fg) !important;
-      }
-
-      tbody tr:hover {
-        background: rgba(255,255,255,0.04) !important;
-      }
-    }
-
-    *,
-    *::before,
-    *::after {
-      box-sizing: border-box;
-    }
-
-    html, body {
-      margin: 0;
-      padding: 0;
-      background: var(--bg);
-      color: var(--fg);
-      font-family: Helvetica, Arial, sans-serif;
-    }
-
-    body {
-      padding: 32px var(--page-gutter) 40px;
-    }
-
-    main {
-      position: relative;
-      max-width: var(--page-max);
-      margin: 0 auto;
-    }
-
-    h1 {
-      font-size: 22px;
-      font-weight: 700;
-      margin: 0 0 20px;
-      letter-spacing: 0.01em;
-    }
-
-    .top-actions {
-      position: fixed;
-      top: 18px;
-      right: max(var(--page-gutter), calc((100vw - var(--page-max)) / 2));
-      z-index: 20;
-      display: flex;
-      align-items: center;
-      justify-content: flex-end;
-      gap: 8px;
-      max-width: min(360px, calc(100vw - (var(--page-gutter) * 2)));
-    }
-
-    .icon-button {
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      gap: 8px;
-      min-width: 42px;
-      min-height: 42px;
-      padding: 0 12px;
-      border: 1px solid #e2e2df;
-      background: var(--bg);
-      color: var(--fg);
-      text-decoration: none;
-      box-shadow: none;
-      border-radius: 10px;
-      cursor: pointer;
-    }
-
-    .icon-button[data-active="true"] {
-      background: #eaf8ee;
-      border-color: var(--success);
-      color: var(--success);
-    }
-
-    .icon-button svg {
-      width: 17px;
-      height: 17px;
-      stroke-width: 1.9;
-    }
-
-    #summaryButton {
-      border: 0;
-      background: transparent;
-      box-shadow: none;
-      padding: 0;
-      min-width: 0;
-      min-height: 0;
-      width: 28px;
-      height: 28px;
-      border-radius: 999px;
-    }
-
-    .icon-badge {
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      min-width: 18px;
-      height: 18px;
-      padding: 0 5px;
-      border-radius: 999px;
-      background: var(--fg);
-      color: #fff;
-      font-size: 11px;
-      font-weight: 700;
-      line-height: 1;
-    }
-
-    .controls {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 10px;
-      margin: 12px 0 18px;
-      align-items: center;
-    }
-
-    .toggle {
-      display: inline-flex;
-      align-items: center;
-      gap: 8px;
-      font-size: 13px;
-      user-select: none;
-    }
-
-    .toggle input,
-    .toggle select {
-      accent-color: #000;
-    }
-
-    .toggle select {
-      border: 1px solid var(--line);
-      border-radius: 10px;
-      padding: 8px 10px;
-      background: var(--panel-bg);
-      color: var(--fg);
-      font: inherit;
-    }
-
-    button {
-      appearance: none;
-      border: 1px solid #ddddda;
-      border-radius: 10px;
-      background: #fff;
-      color: var(--fg);
-      padding: 9px 14px;
-      font: inherit;
-      font-size: 13px;
-      cursor: pointer;
-    }
-
-    button:hover {
-      background: #f4f4f2;
-    }
-
-    button:focus-visible,
-    a:focus-visible {
-      outline: 2px solid var(--fg);
-      outline-offset: 2px;
-    }
-
-    .section-heading {
-      margin: 0;
-      font-size: 12px;
-      font-weight: 700;
-      letter-spacing: 0.06em;
-      color: var(--fg);
-    }
-
-    .table-heading {
-      margin: 0 0 8px;
-    }
-
-    .table-wrap {
-      overflow-x: auto;
-      max-width: 100%;
-      border: 1px solid #e6e6e3;
-      border-bottom: 0;
-      border-radius: 12px 12px 0 0;
-      -webkit-overflow-scrolling: touch;
-      background: #fff;
-      margin-bottom: 18px;
-    }
-
-    table {
-      width: 100%;
-      border-collapse: collapse;
-      table-layout: auto;
-    }
-
-    thead th {
-      text-align: left;
-      font-size: 12px;
-      font-weight: 700;
-      padding: 12px 10px;
-      border-bottom: 1px solid #ecece9;
-      white-space: nowrap;
-    }
-
-    tbody td {
-      font-size: 13px;
-      padding: 10px;
-      border-bottom: 1px solid #f0f0ee;
-      vertical-align: top;
-    }
-
-    tbody tr:hover {
-      background: #f8f8f7;
-    }
-
-    .col-index {
-      width: 44px;
-    }
-
-    .col-kcal {
-      width: 120px;
-      white-space: nowrap;
-    }
-
-    .col-actions {
-      width: 96px;
-      white-space: nowrap;
-    }
-
-    th.recipe-actions-col,
-    td.recipe-actions-col {
-      text-align: right;
-    }
-
-    .recipe-title-cell {
-      display: inline-flex;
-      align-items: center;
-      flex-wrap: wrap;
-      gap: 7px;
-      min-width: 0;
-    }
-
-    .category-badge {
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      padding: 3px 7px;
-      border-radius: 999px;
-      border: 1px solid var(--line);
-      background: #f3f3f1;
-      color: var(--muted);
-      font-size: 10px;
-      font-weight: 700;
-      line-height: 1;
-      letter-spacing: 0.04em;
-      text-transform: uppercase;
-      white-space: nowrap;
-    }
-
-    .category-badge[data-category="Budget"] {
-      background: #eaf8ee;
-      color: var(--success);
-      border-color: rgba(31, 138, 77, 0.35);
-    }
-
-    .category-badge[data-category="Frühstück"] {
-      background: #fff7df;
-      color: #8a5a00;
-      border-color: rgba(138, 90, 0, 0.28);
-    }
-
-    .category-badge[data-category="Kalte Mahlzeit"] {
-      background: #e9f2ff;
-      color: #245a9c;
-      border-color: rgba(36, 90, 156, 0.28);
-    }
-
-    .category-badge[data-category="Teuer"] {
-      background: #fff0f0;
-      color: var(--danger);
-      border-color: rgba(198, 40, 40, 0.28);
-    }
-
-    .week-plan-category-badge {
-      display: block;
-      margin-top: 4px;
-      color: var(--muted);
-      font-size: 10px;
-      font-weight: 700;
-      letter-spacing: 0.04em;
-      text-transform: uppercase;
-    }
-
-    @media (prefers-color-scheme: dark) {
-      .category-badge {
-        background: #1d1d1d;
-        color: var(--muted);
-      }
-
-      .category-badge[data-category="Budget"] {
-        background: rgba(65, 201, 127, 0.14);
-        color: var(--success);
-      }
-
-      .category-badge[data-category="Frühstück"] {
-        background: rgba(255, 193, 7, 0.14);
-        color: #ffd166;
-      }
-
-      .category-badge[data-category="Kalte Mahlzeit"] {
-        background: rgba(90, 160, 255, 0.14);
-        color: #8abfff;
-      }
-
-      .category-badge[data-category="Teuer"] {
-        background: rgba(255, 90, 95, 0.14);
-        color: var(--danger);
-      }
-    }
-
-    .recipe-actions {
-      display: inline-flex;
-      flex-direction: column;
-      align-items: flex-end;
-      gap: 6px;
-      white-space: nowrap;
-    }
-
-    .recipe-actions-row {
-      display: inline-flex;
-      align-items: center;
-      gap: 6px;
-    }
-
-    .recipe-text-link {
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      min-height: 28px;
-      width: 28px;
-      border: 1px solid transparent;
-      text-decoration: none;
-      line-height: 1.2;
-      color: var(--fg);
-    }
-
-    .recipe-text-link[data-enabled="false"] {
-      opacity: 0.32;
-      filter: grayscale(1);
-      pointer-events: none;
-      cursor: default;
-    }
-
-    .recipe-text-link:hover,
-    .recipe-text-link:focus-visible {
-      border-color: transparent;
-      background: transparent;
-      box-shadow: none;
-      outline: none;
-    }
-
-    .recipe-text-link svg {
-      width: 17px;
-      height: 17px;
-      stroke-width: 1.9;
-      flex: none;
-    }
-
-    .cart-toggle {
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      width: 28px;
-      height: 28px;
-      border: 0;
-      background: transparent;
-      color: var(--fg);
-      padding: 0;
-      border-radius: 999px;
-      box-shadow: none;
-    }
-
-    .cart-toggle:hover,
-    .cart-toggle:focus-visible {
-      background: rgba(0, 0, 0, 0.06);
-    }
-
-    .cart-toggle[data-active="true"] {
-      background: #eaf8ee;
-      color: var(--success);
-    }
-
-    .cart-toggle svg {
-      width: 17px;
-      height: 17px;
-      stroke-width: 2;
-      fill: none;
-      stroke: currentColor;
-      stroke-linecap: round;
-      stroke-linejoin: round;
-    }
-
-    .week-plan {
-      margin: 0 0 18px;
-      max-width: 100%;
-      border-left: 1px solid transparent;
-      border-right: 1px solid transparent;
-    }
-
-    .week-plan[hidden] {
-      display: none;
-    }
-
-    .week-plan-header {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 12px;
-      margin: 0 0 8px;
-      padding-right: 0;
-    }
-
-    .week-plan-heading {
-      display: inline-flex;
-      align-items: center;
-      gap: 6px;
-    }
-
-    .week-plan-copy,
-    .week-plan-scroll {
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      width: 28px;
-      height: 28px;
-      padding: 0;
-      border: 0;
-      background: transparent;
-      color: var(--fg);
-      border-radius: 999px;
-      box-shadow: none;
-    }
-
-    .week-plan-copy svg,
-    .week-plan-scroll svg {
-      width: 18px;
-      height: 18px;
-      stroke-width: 2;
-    }
-
-    .week-plan-viewport {
-      max-width: 100%;
-      overflow-x: hidden;
-      scrollbar-width: none;
-      -webkit-overflow-scrolling: touch;
-    }
-
-    .week-plan-viewport::-webkit-scrollbar {
-      display: none;
-    }
-
-    .week-plan-grid {
-      display: grid;
-      grid-template-columns: repeat(5, minmax(150px, 1fr));
-      align-items: stretch;
-      gap: 10px;
-      min-width: 800px;
-    }
-
-    .week-plan-column {
-      display: flex;
-      flex-direction: column;
-      padding: 12px;
-      border-radius: 12px;
-      background: #ffffff;
-      border: 1px solid #e6e6e3;
-    }
-
-    .week-plan-title-row {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      margin: 0 0 10px;
-      gap: 8px;
-    }
-
-    .week-plan-title {
-      margin: 0;
-      font-size: 12px;
-      font-weight: 700;
-      letter-spacing: 0.06em;
-      color: var(--fg);
-    }
-
-    .week-plan-kcal-badge {
-      font-size: 11px;
-      font-weight: 700;
-      color: var(--muted);
-      white-space: nowrap;
-      letter-spacing: 0.02em;
-    }
-
-    .week-plan-items {
-      display: grid;
-      gap: 7px;
-      flex: 1;
-      align-content: start;
-    }
-
-    .week-plan-item-row {
-      display: flex;
-      align-items: center;
-      gap: 6px;
-    }
-
-    .week-plan-item {
-      width: 100%;
-      padding: 9px 10px;
-      min-height: 0;
-      border: 0;
-      border-radius: 8px;
-      background: #f3f3f1;
-      text-align: left;
-      font-size: 13px;
-      line-height: 1.25;
-      cursor: pointer;
-      box-shadow: none;
-      transition: background 140ms ease, color 140ms ease, opacity 140ms ease;
-    }
-
-    .week-plan-randomize {
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      width: 26px;
-      height: 26px;
-      border: 0;
-      border-radius: 999px;
-      background: transparent;
-      color: var(--muted);
-      padding: 0;
-      flex: none;
-      box-shadow: none;
-      line-height: 0;
-    }
-
-    .summary-panel {
-      width: 100%;
-      border: 1px solid #e6e6e3;
-      border-radius: 12px;
-      background: var(--panel-bg);
-      padding: 16px;
-      margin: 0 0 18px;
-    }
-
-    .summary-panel[hidden] {
-      display: none;
-    }
-
-    .summary-header {
-      display: flex;
-      align-items: flex-start;
-      justify-content: space-between;
-      gap: 12px;
-      margin-bottom: 14px;
-    }
-
-    .summary-title {
-      font-size: 16px;
-      font-weight: 700;
-      margin: 0;
-    }
-
-    .summary-subtitle {
-      margin: 4px 0 0;
-      color: var(--muted);
-      font-size: 12px;
-      line-height: 1.4;
-    }
-
-    .summary-tools {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 8px;
-      margin: 10px 0 14px;
-    }
-
-    .summary-list {
-      display: grid;
-      gap: 12px;
-    }
-
-    .summary-card {
-      border-top: 1px solid #ecece9;
-      padding-top: 12px;
-    }
-
-    .summary-card:first-child {
-      border-top: 0;
-      padding-top: 0;
-    }
-
-    .summary-card h3 {
-      margin: 0 0 6px;
-      font-size: 14px;
-      display: flex;
-      align-items: center;
-      gap: 7px;
-      flex-wrap: wrap;
-    }
-
-    .summary-aggregate,
-    .summary-ingredients {
-      display: grid;
-      gap: 6px;
-      margin: 0;
-      padding: 0;
-      list-style: none;
-      font-size: 13px;
-      line-height: 1.5;
-    }
-
-    .summary-aggregate li,
-    .summary-ingredients li {
-      border-bottom: 1px dotted rgba(0, 0, 0, 0.18);
-      padding-bottom: 6px;
-      display: flex;
-      align-items: flex-start;
-      justify-content: space-between;
-      gap: 12px;
-    }
-
-    .ingredient-main {
-      flex: 1;
-      min-width: 0;
-      padding: 0;
-      border: 0;
-      background: transparent;
-      color: inherit;
-      text-align: left;
-      font: inherit;
-      line-height: inherit;
-    }
-
-    .ingredient-main:hover,
-    .ingredient-main:focus-visible {
-      text-decoration: underline;
-      text-underline-offset: 2px;
-    }
-
-    .summary-empty,
-    .status {
-      color: var(--muted);
-      font-size: 13px;
-      line-height: 1.5;
-      margin: 0;
-    }
-
-    .status {
-      margin: 12px 0 0;
-    }
-
-    .error {
-      color: #000;
-      border: 1px solid #e0dfdc;
-      border-radius: 10px;
-      background: #fff;
-      padding: 12px;
-      margin-top: 16px;
-      font-size: 13px;
-      white-space: pre-wrap;
-    }
-
-    a {
-      color: var(--fg);
-      text-decoration: underline;
-      text-underline-offset: 2px;
-    }
-
-    .sr-only {
-      position: absolute;
-      width: 1px;
-      height: 1px;
-      padding: 0;
-      margin: -1px;
-      overflow: hidden;
-      clip: rect(0, 0, 0, 0);
-      white-space: nowrap;
-      border: 0;
-    }
-
-    @media (max-width: 700px) {
-      :root {
-        --page-gutter: 14px;
-      }
-
-      body {
-        padding: 20px var(--page-gutter) 28px;
-      }
-
-      h1 {
-        font-size: 18px;
-      }
-
-      .top-actions {
-        top: 14px;
-      }
-
-      .week-plan-header {
-        display: none;
-      }
-
-      .week-plan-grid {
-        grid-template-columns: 1fr;
-        min-width: 0;
-      }
-
-      .week-plan-viewport {
-        overflow-x: visible;
-      }
-
-      thead th,
-      tbody td {
-        padding-left: 8px;
-        padding-right: 8px;
-      }
-    }
-  </style>
-</head>
-<body>
-  <main>
+<main>
     <h1>KARTE DES HAUSES</h1>
 
     <div class="top-actions">
       <button id="summaryButton" class="icon-button" type="button" aria-label="Warenkorb öffnen" aria-expanded="false" title="Warenkorb öffnen">
-        <i data-lucide="receipt-text" aria-hidden="true"></i>
+        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" data-lucide="receipt-text" aria-hidden="true" class="lucide lucide-receipt-text"><path d="M13 16H8"></path><path d="M14 8H8"></path><path d="M16 12H8"></path><path d="M4 3a1 1 0 0 1 1-1 1.3 1.3 0 0 1 .7.2l.933.6a1.3 1.3 0 0 0 1.4 0l.934-.6a1.3 1.3 0 0 1 1.4 0l.933.6a1.3 1.3 0 0 0 1.4 0l.933-.6a1.3 1.3 0 0 1 1.4 0l.934.6a1.3 1.3 0 0 0 1.4 0l.933-.6A1.3 1.3 0 0 1 19 2a1 1 0 0 1 1 1v18a1 1 0 0 1-1 1 1.3 1.3 0 0 1-.7-.2l-.933-.6a1.3 1.3 0 0 0-1.4 0l-.934.6a1.3 1.3 0 0 1-1.4 0l-.933-.6a1.3 1.3 0 0 0-1.4 0l-.933.6a1.3 1.3 0 0 1-1.4 0l-.934-.6a1.3 1.3 0 0 0-1.4 0l-.933.6a1.3 1.3 0 0 1-.7.2 1 1 0 0 1-1-1z"></path></svg>
       </button>
-      <span id="summaryCount" class="icon-badge" hidden="">0</span>
+      <span id="summaryCount" class="icon-badge">5</span>
     </div>
 
     <div class="controls">
@@ -861,20 +29,120 @@
       <button id="selectionCartButton" type="button">Auswahl in Warenkorb</button>
     </div>
 
-    <section id="weekPlan" class="week-plan" hidden="" aria-label="10-Tage-Plan">
+    <section id="weekPlan" class="week-plan" aria-label="10-Tage-Plan">
       <div class="week-plan-header">
         <div class="week-plan-heading">
           <h2 class="section-heading">10-TAGE PLAN</h2>
           <button id="weekPlanCopyButton" class="week-plan-copy" type="button" aria-label="10-Tage-Plan kopieren" title="10-Tage-Plan kopieren">
-            <i data-lucide="copy" aria-hidden="true"></i>
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" data-lucide="copy" aria-hidden="true" class="lucide lucide-copy"><rect width="14" height="14" x="8" y="8" rx="2" ry="2"></rect><path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"></path></svg>
           </button>
         </div>
         <button id="weekPlanScrollButton" class="week-plan-scroll" type="button" aria-label="Wochenplan verschieben" title="Wochenplan verschieben" hidden="">
-          <i data-lucide="arrow-left-right" aria-hidden="true"></i>
+          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" data-lucide="arrow-left-right" aria-hidden="true" class="lucide lucide-arrow-left-right"><path d="M8 3 4 7l4 4"></path><path d="M4 7h16"></path><path d="m16 21 4-4-4-4"></path><path d="M20 17H4"></path></svg>
         </button>
       </div>
       <div id="weekPlanViewport" class="week-plan-viewport">
-        <div id="weekPlanGrid" class="week-plan-grid"></div>
+        <div id="weekPlanGrid" class="week-plan-grid">
+          <section class="week-plan-column" data-slot="0">
+            <div class="week-plan-title-row">
+              <h2 class="week-plan-title">TAG 1 · 2</h2>
+              <span class="week-plan-kcal-badge">400 kcal</span>
+            </div>
+            <div class="week-plan-items">
+              
+                <div class="week-plan-item-row">
+                  <button class="week-plan-item" type="button" draggable="true" data-row-index="7">
+                    Buttermilch-Pancakes
+                    <span class="week-plan-category-badge">Frühstück</span>
+                  </button>
+                  <button type="button" class="week-plan-randomize" data-action="randomize-one" data-row-index="7" aria-label="Rezept neu randomisieren" title="Rezept neu randomisieren">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" data-lucide="shuffle" aria-hidden="true" class="lucide lucide-shuffle"><path d="m18 14 4 4-4 4"></path><path d="m18 2 4 4-4 4"></path><path d="M2 18h1.973a4 4 0 0 0 3.3-1.7l5.454-8.6a4 4 0 0 1 3.3-1.7H22"></path><path d="M2 6h1.972a4 4 0 0 1 3.6 2.2"></path><path d="M22 18h-6.041a4 4 0 0 1-3.3-1.8l-.359-.45"></path></svg>
+                  </button>
+                </div>
+              
+            </div>
+          </section>
+        
+          <section class="week-plan-column" data-slot="1">
+            <div class="week-plan-title-row">
+              <h2 class="week-plan-title">TAG 3 · 4</h2>
+              <span class="week-plan-kcal-badge">859 kcal</span>
+            </div>
+            <div class="week-plan-items">
+              
+                <div class="week-plan-item-row">
+                  <button class="week-plan-item" type="button" draggable="true" data-row-index="14">
+                    Einfacher mediterraner Nudelsalat
+                    <span class="week-plan-category-badge">Kalte Mahlzeit</span>
+                  </button>
+                  <button type="button" class="week-plan-randomize" data-action="randomize-one" data-row-index="14" aria-label="Rezept neu randomisieren" title="Rezept neu randomisieren">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" data-lucide="shuffle" aria-hidden="true" class="lucide lucide-shuffle"><path d="m18 14 4 4-4 4"></path><path d="m18 2 4 4-4 4"></path><path d="M2 18h1.973a4 4 0 0 0 3.3-1.7l5.454-8.6a4 4 0 0 1 3.3-1.7H22"></path><path d="M2 6h1.972a4 4 0 0 1 3.6 2.2"></path><path d="M22 18h-6.041a4 4 0 0 1-3.3-1.8l-.359-.45"></path></svg>
+                  </button>
+                </div>
+              
+            </div>
+          </section>
+        
+          <section class="week-plan-column" data-slot="2">
+            <div class="week-plan-title-row">
+              <h2 class="week-plan-title">TAG 5 · 6</h2>
+              <span class="week-plan-kcal-badge">1075 kcal</span>
+            </div>
+            <div class="week-plan-items">
+              
+                <div class="week-plan-item-row">
+                  <button class="week-plan-item" type="button" draggable="true" data-row-index="17">
+                    Knuspriges Hähnchen-Caesar-Schnitzel
+                    <span class="week-plan-category-badge">Teuer</span>
+                  </button>
+                  <button type="button" class="week-plan-randomize" data-action="randomize-one" data-row-index="17" aria-label="Rezept neu randomisieren" title="Rezept neu randomisieren">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" data-lucide="shuffle" aria-hidden="true" class="lucide lucide-shuffle"><path d="m18 14 4 4-4 4"></path><path d="m18 2 4 4-4 4"></path><path d="M2 18h1.973a4 4 0 0 0 3.3-1.7l5.454-8.6a4 4 0 0 1 3.3-1.7H22"></path><path d="M2 6h1.972a4 4 0 0 1 3.6 2.2"></path><path d="M22 18h-6.041a4 4 0 0 1-3.3-1.8l-.359-.45"></path></svg>
+                  </button>
+                </div>
+              
+            </div>
+          </section>
+        
+          <section class="week-plan-column" data-slot="3">
+            <div class="week-plan-title-row">
+              <h2 class="week-plan-title">TAG 7 · 8</h2>
+              <span class="week-plan-kcal-badge">687 kcal</span>
+            </div>
+            <div class="week-plan-items">
+              
+                <div class="week-plan-item-row">
+                  <button class="week-plan-item" type="button" draggable="true" data-row-index="34">
+                    Klassischer Milchreis
+                    <span class="week-plan-category-badge">Budget</span>
+                  </button>
+                  <button type="button" class="week-plan-randomize" data-action="randomize-one" data-row-index="34" aria-label="Rezept neu randomisieren" title="Rezept neu randomisieren">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" data-lucide="shuffle" aria-hidden="true" class="lucide lucide-shuffle"><path d="m18 14 4 4-4 4"></path><path d="m18 2 4 4-4 4"></path><path d="M2 18h1.973a4 4 0 0 0 3.3-1.7l5.454-8.6a4 4 0 0 1 3.3-1.7H22"></path><path d="M2 6h1.972a4 4 0 0 1 3.6 2.2"></path><path d="M22 18h-6.041a4 4 0 0 1-3.3-1.8l-.359-.45"></path></svg>
+                  </button>
+                </div>
+              
+            </div>
+          </section>
+        
+          <section class="week-plan-column" data-slot="4">
+            <div class="week-plan-title-row">
+              <h2 class="week-plan-title">TAG 9 · 10</h2>
+              <span class="week-plan-kcal-badge">250 kcal</span>
+            </div>
+            <div class="week-plan-items">
+              
+                <div class="week-plan-item-row">
+                  <button class="week-plan-item" type="button" draggable="true" data-row-index="39">
+                    Hausgemachte Spätzle
+                    <span class="week-plan-category-badge">Budget</span>
+                  </button>
+                  <button type="button" class="week-plan-randomize" data-action="randomize-one" data-row-index="39" aria-label="Rezept neu randomisieren" title="Rezept neu randomisieren">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" data-lucide="shuffle" aria-hidden="true" class="lucide lucide-shuffle"><path d="m18 14 4 4-4 4"></path><path d="m18 2 4 4-4 4"></path><path d="M2 18h1.973a4 4 0 0 0 3.3-1.7l5.454-8.6a4 4 0 0 1 3.3-1.7H22"></path><path d="M2 6h1.972a4 4 0 0 1 3.6 2.2"></path><path d="M22 18h-6.041a4 4 0 0 1-3.3-1.8l-.359-.45"></path></svg>
+                  </button>
+                </div>
+              
+            </div>
+          </section>
+        </div>
       </div>
     </section>
 
@@ -882,670 +150,281 @@
       <div class="summary-header">
         <div>
           <h2 class="summary-title">Warenkorb</h2>
-          <p id="summaryMeta" class="summary-subtitle"></p>
+          <p id="summaryMeta" class="summary-subtitle">5 Rezepte ausgewählt</p>
         </div>
         <button id="clearCartButton" type="button">Alle entfernen</button>
       </div>
-      <div id="summaryContent" class="summary-list"></div>
+      <div id="summaryContent" class="summary-list">
+          <section class="summary-card">
+            <h3>Buttermilch-Pancakes <span class="category-badge" data-category="Frühstück">Frühstück</span></h3>
+            <ul class="summary-ingredients">
+              
+                <li>
+                  <button type="button" class="ingredient-main">1/2 Ei</button>
+                </li>
+              
+                <li>
+                  <button type="button" class="ingredient-main">1 EL Pflanzenöl</button>
+                </li>
+              
+                <li>
+                  <button type="button" class="ingredient-main">3/4 EL Ahornsirup</button>
+                </li>
+              
+                <li>
+                  <button type="button" class="ingredient-main">60 ml Buttermilch</button>
+                </li>
+              
+                <li>
+                  <button type="button" class="ingredient-main">50 g Mehl</button>
+                </li>
+              
+                <li>
+                  <button type="button" class="ingredient-main">1/4 TL Backpulver</button>
+                </li>
+              
+                <li>
+                  <button type="button" class="ingredient-main">Salz</button>
+                </li>
+              
+                <li>
+                  <button type="button" class="ingredient-main">Butter</button>
+                </li>
+              
+                <li>
+                  <button type="button" class="ingredient-main">Marmelade</button>
+                </li>
+              
+                <li>
+                  <button type="button" class="ingredient-main">Puderzucker</button>
+                </li>
+              
+            </ul>
+          </section>
+        
+          <section class="summary-card">
+            <h3>Einfacher mediterraner Nudelsalat <span class="category-badge" data-category="Kalte Mahlzeit">Kalte Mahlzeit</span></h3>
+            <ul class="summary-ingredients">
+              
+                <li>
+                  <button type="button" class="ingredient-main">125 g kurze Pasta</button>
+                </li>
+              
+                <li>
+                  <button type="button" class="ingredient-main">62 1/2 g Kirschtomate</button>
+                </li>
+              
+                <li>
+                  <button type="button" class="ingredient-main">50 g getrocknete Tomate in Öl</button>
+                </li>
+              
+                <li>
+                  <button type="button" class="ingredient-main">75 g gegrillte Paprika</button>
+                </li>
+              
+                <li>
+                  <button type="button" class="ingredient-main">50 g Rucola</button>
+                </li>
+              
+                <li>
+                  <button type="button" class="ingredient-main">1/2 Zwiebel</button>
+                </li>
+              
+                <li>
+                  <button type="button" class="ingredient-main">30 g Pinienkern</button>
+                </li>
+              
+                <li>
+                  <button type="button" class="ingredient-main">15 g Serrano-Schinken</button>
+                </li>
+              
+                <li>
+                  <button type="button" class="ingredient-main">10 g Parmesan</button>
+                </li>
+              
+                <li>
+                  <button type="button" class="ingredient-main">2 EL Öl der getrockneten Tomate</button>
+                </li>
+              
+                <li>
+                  <button type="button" class="ingredient-main">1 EL Balsamicoessig</button>
+                </li>
+              
+                <li>
+                  <button type="button" class="ingredient-main">Salz</button>
+                </li>
+              
+                <li>
+                  <button type="button" class="ingredient-main">Pfeffer</button>
+                </li>
+              
+            </ul>
+          </section>
+        
+          <section class="summary-card">
+            <h3>Knuspriges Hähnchen-Caesar-Schnitzel <span class="category-badge" data-category="Teuer">Teuer</span></h3>
+            <ul class="summary-ingredients">
+              
+                <li>
+                  <button type="button" class="ingredient-main">200 g Hähnchenbrustfilet</button>
+                </li>
+              
+                <li>
+                  <button type="button" class="ingredient-main">1 Ei</button>
+                </li>
+              
+                <li>
+                  <button type="button" class="ingredient-main">100 g Semmelbrösel</button>
+                </li>
+              
+                <li>
+                  <button type="button" class="ingredient-main">1 1/2 EL Mehl</button>
+                </li>
+              
+                <li>
+                  <button type="button" class="ingredient-main">150 g Romana Salatherz</button>
+                </li>
+              
+                <li>
+                  <button type="button" class="ingredient-main">2 EL Mayonnaise</button>
+                </li>
+              
+                <li>
+                  <button type="button" class="ingredient-main">1 1/2 Sardellenfilet</button>
+                </li>
+              
+                <li>
+                  <button type="button" class="ingredient-main">1/2 EL Worcestershiresoße</button>
+                </li>
+              
+                <li>
+                  <button type="button" class="ingredient-main">1 Zitrone</button>
+                </li>
+              
+                <li>
+                  <button type="button" class="ingredient-main">50 g Parmesan</button>
+                </li>
+              
+                <li>
+                  <button type="button" class="ingredient-main">1/2 TL Dijon Senf</button>
+                </li>
+              
+                <li>
+                  <button type="button" class="ingredient-main">1/2 Knoblauch</button>
+                </li>
+              
+                <li>
+                  <button type="button" class="ingredient-main">Öl</button>
+                </li>
+              
+                <li>
+                  <button type="button" class="ingredient-main">1/2 Handvoll Kräuter</button>
+                </li>
+              
+                <li>
+                  <button type="button" class="ingredient-main">Salz</button>
+                </li>
+              
+                <li>
+                  <button type="button" class="ingredient-main">Pfeffer</button>
+                </li>
+              
+            </ul>
+          </section>
+        
+          <section class="summary-card">
+            <h3>Klassischer Milchreis <span class="category-badge" data-category="Budget">Budget</span></h3>
+            <ul class="summary-ingredients">
+              
+                <li>
+                  <button type="button" class="ingredient-main">50 g Rundkornreis/Milchreis</button>
+                </li>
+              
+                <li>
+                  <button type="button" class="ingredient-main">187 1/2 ml Milch</button>
+                </li>
+              
+                <li>
+                  <button type="button" class="ingredient-main">3/4 EL Zucker</button>
+                </li>
+              
+                <li>
+                  <button type="button" class="ingredient-main">3/4 EL Butter</button>
+                </li>
+              
+                <li>
+                  <button type="button" class="ingredient-main">Salz</button>
+                </li>
+              
+                <li>
+                  <button type="button" class="ingredient-main">Zimt/Zucker optional</button>
+                </li>
+              
+            </ul>
+          </section>
+        
+          <section class="summary-card">
+            <h3>Hausgemachte Spätzle <span class="category-badge" data-category="Budget">Budget</span></h3>
+            <ul class="summary-ingredients">
+              
+                <li>
+                  <button type="button" class="ingredient-main">60 g Mehl</button>
+                </li>
+              
+                <li>
+                  <button type="button" class="ingredient-main">1/4 EL Salz</button>
+                </li>
+              
+                <li>
+                  <button type="button" class="ingredient-main">1/2 Ei</button>
+                </li>
+              
+                <li>
+                  <button type="button" class="ingredient-main">30 ml Wasser</button>
+                </li>
+              
+                <li>
+                  <button type="button" class="ingredient-main">optional Butter/Röstzwiebeln</button>
+                </li>
+              
+            </ul>
+          </section>
+        </div>
     </section>
 
-    <div id="status" class="status">Fehler beim Laden.</div>
-    <div id="error" class="error">Failed to fetch
-
-Lege eine Markdown-Datei unter ./data.md ab oder übergib eine URL mit ?source=https://...</div>
+    <div id="status" class="status">5 von 40 Rezepten angezeigt.</div>
+    <div id="error" class="error" hidden=""></div>
 
     <h2 id="recipeCollectionHeading" class="section-heading table-heading">REZEPTSAMMLUNG</h2>
     <div id="recipeTableWrap" class="table-wrap">
       <table aria-label="Markdown Tabelle">
-        <thead id="tableHead"></thead>
-        <tbody id="tableBody"></tbody>
+        <thead id="tableHead"><tr><th class="col-index">#</th><th>Rezept</th><th class="col-kcal">kcal pro Portion</th><th class="recipe-actions-col col-actions"></th></tr></thead>
+        <tbody id="tableBody"><tr><td class="col-index">8</td><td>
+        <span class="recipe-title-cell">
+          <span>Buttermilch-Pancakes</span>
+          <span class="category-badge" data-category="Frühstück">Frühstück</span>
+        </span>
+      </td><td>400 kcal</td><td class="recipe-actions-col"><div class="recipe-actions"><div class="recipe-actions-row"><a href="https://www.kitchenstories.com/de/rezepte/fluffige-buttermilch-pancakes" target="_blank" rel="noopener noreferrer" class="recipe-text-link" aria-label="Rezept öffnen: Buttermilch-Pancakes" title="Rezept öffnen: Buttermilch-Pancakes"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" data-lucide="link-2" aria-hidden="true" class="lucide lucide-link-2"><path d="M9 17H7A5 5 0 0 1 7 7h2"></path><path d="M15 7h2a5 5 0 1 1 0 10h-2"></path><line x1="8" x2="16" y1="12" y2="12"></line></svg></a><button type="button" class="cart-toggle" data-active="true" data-row-index="7" aria-label="Aus Warenkorb entfernen: Buttermilch-Pancakes" title="Aus Warenkorb entfernen: Buttermilch-Pancakes"><svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><circle cx="8" cy="21" r="1.5"></circle><circle cx="18" cy="21" r="1.5"></circle><path d="M2.5 3h2l2.2 12.2a2 2 0 0 0 2 1.6h8.5a2 2 0 0 0 2-1.5L21 7H6.2"></path></svg><span class="sr-only">Warenkorb</span></button></div></div></td></tr><tr><td class="col-index">15</td><td>
+        <span class="recipe-title-cell">
+          <span>Einfacher mediterraner Nudelsalat</span>
+          <span class="category-badge" data-category="Kalte Mahlzeit">Kalte Mahlzeit</span>
+        </span>
+      </td><td>859 kcal</td><td class="recipe-actions-col"><div class="recipe-actions"><div class="recipe-actions-row"><a href="https://www.kitchenstories.com/de/rezepte/einfacher-mediterraner-nudelsalat" target="_blank" rel="noopener noreferrer" class="recipe-text-link" aria-label="Rezept öffnen: Einfacher mediterraner Nudelsalat" title="Rezept öffnen: Einfacher mediterraner Nudelsalat"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" data-lucide="link-2" aria-hidden="true" class="lucide lucide-link-2"><path d="M9 17H7A5 5 0 0 1 7 7h2"></path><path d="M15 7h2a5 5 0 1 1 0 10h-2"></path><line x1="8" x2="16" y1="12" y2="12"></line></svg></a><button type="button" class="cart-toggle" data-active="true" data-row-index="14" aria-label="Aus Warenkorb entfernen: Einfacher mediterraner Nudelsalat" title="Aus Warenkorb entfernen: Einfacher mediterraner Nudelsalat"><svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><circle cx="8" cy="21" r="1.5"></circle><circle cx="18" cy="21" r="1.5"></circle><path d="M2.5 3h2l2.2 12.2a2 2 0 0 0 2 1.6h8.5a2 2 0 0 0 2-1.5L21 7H6.2"></path></svg><span class="sr-only">Warenkorb</span></button></div></div></td></tr><tr><td class="col-index">18</td><td>
+        <span class="recipe-title-cell">
+          <span>Knuspriges Hähnchen-Caesar-Schnitzel</span>
+          <span class="category-badge" data-category="Teuer">Teuer</span>
+        </span>
+      </td><td>1075 kcal</td><td class="recipe-actions-col"><div class="recipe-actions"><div class="recipe-actions-row"><a href="https://www.kitchenstories.com/de/rezepte/knuspriges-hahnchen-caesar-schnitzel" target="_blank" rel="noopener noreferrer" class="recipe-text-link" aria-label="Rezept öffnen: Knuspriges Hähnchen-Caesar-Schnitzel" title="Rezept öffnen: Knuspriges Hähnchen-Caesar-Schnitzel"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" data-lucide="link-2" aria-hidden="true" class="lucide lucide-link-2"><path d="M9 17H7A5 5 0 0 1 7 7h2"></path><path d="M15 7h2a5 5 0 1 1 0 10h-2"></path><line x1="8" x2="16" y1="12" y2="12"></line></svg></a><button type="button" class="cart-toggle" data-active="true" data-row-index="17" aria-label="Aus Warenkorb entfernen: Knuspriges Hähnchen-Caesar-Schnitzel" title="Aus Warenkorb entfernen: Knuspriges Hähnchen-Caesar-Schnitzel"><svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><circle cx="8" cy="21" r="1.5"></circle><circle cx="18" cy="21" r="1.5"></circle><path d="M2.5 3h2l2.2 12.2a2 2 0 0 0 2 1.6h8.5a2 2 0 0 0 2-1.5L21 7H6.2"></path></svg><span class="sr-only">Warenkorb</span></button></div></div></td></tr><tr><td class="col-index">35</td><td>
+        <span class="recipe-title-cell">
+          <span>Klassischer Milchreis</span>
+          <span class="category-badge" data-category="Budget">Budget</span>
+        </span>
+      </td><td>687 kcal</td><td class="recipe-actions-col"><div class="recipe-actions"><div class="recipe-actions-row"><a href="https://www.kitchenstories.com/de/rezepte/klassischer-milchreis" target="_blank" rel="noopener noreferrer" class="recipe-text-link" aria-label="Rezept öffnen: Klassischer Milchreis" title="Rezept öffnen: Klassischer Milchreis"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" data-lucide="link-2" aria-hidden="true" class="lucide lucide-link-2"><path d="M9 17H7A5 5 0 0 1 7 7h2"></path><path d="M15 7h2a5 5 0 1 1 0 10h-2"></path><line x1="8" x2="16" y1="12" y2="12"></line></svg></a><button type="button" class="cart-toggle" data-active="true" data-row-index="34" aria-label="Aus Warenkorb entfernen: Klassischer Milchreis" title="Aus Warenkorb entfernen: Klassischer Milchreis"><svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><circle cx="8" cy="21" r="1.5"></circle><circle cx="18" cy="21" r="1.5"></circle><path d="M2.5 3h2l2.2 12.2a2 2 0 0 0 2 1.6h8.5a2 2 0 0 0 2-1.5L21 7H6.2"></path></svg><span class="sr-only">Warenkorb</span></button></div></div></td></tr><tr><td class="col-index">40</td><td>
+        <span class="recipe-title-cell">
+          <span>Hausgemachte Spätzle</span>
+          <span class="category-badge" data-category="Budget">Budget</span>
+        </span>
+      </td><td>250 kcal</td><td class="recipe-actions-col"><div class="recipe-actions"><div class="recipe-actions-row"><a href="https://www.kitchenstories.com/de/rezepte/hausgemachte-spatzle" target="_blank" rel="noopener noreferrer" class="recipe-text-link" aria-label="Rezept öffnen: Hausgemachte Spätzle" title="Rezept öffnen: Hausgemachte Spätzle"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" data-lucide="link-2" aria-hidden="true" class="lucide lucide-link-2"><path d="M9 17H7A5 5 0 0 1 7 7h2"></path><path d="M15 7h2a5 5 0 1 1 0 10h-2"></path><line x1="8" x2="16" y1="12" y2="12"></line></svg></a><button type="button" class="cart-toggle" data-active="true" data-row-index="39" aria-label="Aus Warenkorb entfernen: Hausgemachte Spätzle" title="Aus Warenkorb entfernen: Hausgemachte Spätzle"><svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><circle cx="8" cy="21" r="1.5"></circle><circle cx="18" cy="21" r="1.5"></circle><path d="M2.5 3h2l2.2 12.2a2 2 0 0 0 2 1.6h8.5a2 2 0 0 0 2-1.5L21 7H6.2"></path></svg><span class="sr-only">Warenkorb</span></button></div></div></td></tr></tbody>
       </table>
     </div>
   </main>
-
-  <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
-
-  <script>
-    const DEFAULT_SOURCE = "https://raw.githubusercontent.com/lillyapp/kartedeshauses/main/data.md";
-    const sourceUrl = new URLSearchParams(window.location.search).get("source") || DEFAULT_SOURCE;
-
-    const CART_STORAGE_KEY = "recipe-cart-state-v2";
-    const WEEK_PLAN_STORAGE_KEY = "recipe-week-plan-v2";
-    const WEEK_BUCKET_TITLES = ["TAG 1 · 2", "TAG 3 · 4", "TAG 5 · 6", "TAG 7 · 8", "TAG 9 · 10"];
-
-    const filterToggle = document.getElementById("filterToggle");
-    const categoryFilter = document.getElementById("categoryFilter");
-    const randomizeButton = document.getElementById("randomizeButton");
-    const selectionCartButton = document.getElementById("selectionCartButton");
-    const summaryButton = document.getElementById("summaryButton");
-    const summaryCount = document.getElementById("summaryCount");
-    const summaryPanel = document.getElementById("summaryPanel");
-    const summaryMeta = document.getElementById("summaryMeta");
-    const summaryContent = document.getElementById("summaryContent");
-    const clearCartButton = document.getElementById("clearCartButton");
-    const weekPlan = document.getElementById("weekPlan");
-    const weekPlanViewport = document.getElementById("weekPlanViewport");
-    const weekPlanGrid = document.getElementById("weekPlanGrid");
-    const weekPlanCopyButton = document.getElementById("weekPlanCopyButton");
-    const weekPlanScrollButton = document.getElementById("weekPlanScrollButton");
-    const statusEl = document.getElementById("status");
-    const errorEl = document.getElementById("error");
-    const tableHead = document.getElementById("tableHead");
-    const tableBody = document.getElementById("tableBody");
-
-    let allHeaders = [];
-    let allRows = [];
-    let selectedRowIndexes = [];
-    let cartState = loadJson(CART_STORAGE_KEY, {});
-    let weekPlanState = loadJson(WEEK_PLAN_STORAGE_KEY, {});
-    let isSummaryOpen = false;
-
-    function splitMarkdownRow(line) {
-      return line
-        .trim()
-        .replace(/^\|/, "")
-        .replace(/\|$/, "")
-        .split("|")
-        .map((cell) => cell.trim());
-    }
-
-    function isSeparatorRow(line) {
-      return /^\s*\|?[:\- ]+\|[:\-\| ]+\s*$/.test(line) && line.includes("-");
-    }
-
-    function parseMarkdownTable(markdown) {
-      const lines = markdown
-        .split(/\r?\n/)
-        .map((line) => line.trimEnd())
-        .filter((line) => line.trim().length > 0);
-
-      const tableStart = lines.findIndex((line, index) => {
-        const next = lines[index + 1];
-        return line.includes("|") && next && isSeparatorRow(next);
-      });
-
-      if (tableStart === -1) {
-        throw new Error("Keine Markdown-Tabelle gefunden.");
-      }
-
-      const headers = splitMarkdownRow(lines[tableStart]);
-      const rows = [];
-
-      for (let i = tableStart + 2; i < lines.length; i += 1) {
-        const line = lines[i];
-        if (!line.includes("|")) break;
-        rows.push(splitMarkdownRow(line));
-      }
-
-      return { headers, rows };
-    }
-
-    function loadJson(key, fallback) {
-      try {
-        const raw = localStorage.getItem(key);
-        return raw ? JSON.parse(raw) : fallback;
-      } catch (error) {
-        return fallback;
-      }
-    }
-
-    function saveJson(key, value) {
-      localStorage.setItem(key, JSON.stringify(value));
-    }
-
-    function escapeHtml(value) {
-      return String(value ?? "")
-        .replace(/&/g, "&amp;")
-        .replace(/</g, "&lt;")
-        .replace(/>/g, "&gt;")
-        .replace(/"/g, "&quot;");
-    }
-
-    function getColumnIndex(label) {
-      return allHeaders.indexOf(label);
-    }
-
-    function getCell(row, label, fallbackIndex = -1) {
-      const index = getColumnIndex(label);
-      if (index !== -1) {
-        return row[index] || "";
-      }
-      return fallbackIndex >= 0 ? (row[fallbackIndex] || "") : "";
-    }
-
-    function getRecipeName(row) {
-      return getCell(row, "Rezept", 0);
-    }
-
-    function getRecipeCategory(row) {
-      return getCell(row, "Kategorie", 1);
-    }
-
-    function getRecipeLinkCell(row) {
-      return getCell(row, "Link", 2);
-    }
-
-    function getRecipeIngredientsCell(row) {
-      return getCell(row, "Zutaten für 1 Portion", 3);
-    }
-
-    function getRecipeKcalCell(row) {
-      return getCell(row, "kcal pro Portion", 4);
-    }
-
-    function createCategoryBadge(category) {
-      const value = String(category || "").trim();
-      if (!value) return "";
-      return `<span class="category-badge" data-category="${escapeHtml(value)}">${escapeHtml(value)}</span>`;
-    }
-
-    function createRecipeTitleWithBadge(row) {
-      const name = getRecipeName(row);
-      const category = getRecipeCategory(row);
-      return `
-        <span class="recipe-title-cell">
-          <span>${escapeHtml(name)}</span>
-          ${createCategoryBadge(category)}
-        </span>
-      `;
-    }
-
-    function extractCellLink(cell) {
-      const markdownLink = String(cell || "").match(/\[([^\]]+)\]\(([^)]+)\)/);
-      if (markdownLink) {
-        return { text: markdownLink[1], href: markdownLink[2] };
-      }
-
-      const plainUrl = String(cell || "").match(/https?:\/\/[^\s)]+/);
-      if (plainUrl) {
-        return { text: cell, href: plainUrl[0] };
-      }
-
-      return null;
-    }
-
-    function parseIngredientLine(line) {
-      const cleanLine = String(line || "").trim();
-      const match = cleanLine.match(/^((?:\d+\s+)?(?:\d+\/\d+|\d+(?:[.,]\d+)?)|[¼½¾⅓⅔⅛⅜⅝⅞])\s+(.+)$/);
-      if (!match) {
-        return { quantity: null, unit: "", name: cleanLine, label: cleanLine };
-      }
-
-      const quantity = match[1].replace(",", ".");
-      const rest = match[2].trim();
-      return { quantity, unit: "", name: rest, label: `${quantity} ${rest}` };
-    }
-
-    function getIngredientsForRow(row) {
-      const ingredientCell = getRecipeIngredientsCell(row);
-      return ingredientCell
-        .split(/<br\s*\/?>/i)
-        .map((part) => part.trim())
-        .filter(Boolean)
-        .map(parseIngredientLine);
-    }
-
-    function getKcalNumber(row) {
-      const raw = getRecipeKcalCell(row).replace(/[^\d]/g, "");
-      const n = Number(raw);
-      return Number.isFinite(n) ? n : 0;
-    }
-
-    function isInCart(rowIndex) {
-      return Boolean(cartState[String(rowIndex)]);
-    }
-
-    function setCartState(rowIndex, active) {
-      if (active) {
-        cartState[String(rowIndex)] = true;
-      } else {
-        delete cartState[String(rowIndex)];
-        delete weekPlanState[String(rowIndex)];
-      }
-      saveJson(CART_STORAGE_KEY, cartState);
-      saveJson(WEEK_PLAN_STORAGE_KEY, weekPlanState);
-      renderAll();
-    }
-
-    function getCartEntries() {
-      return Object.entries(cartState)
-        .filter(([, active]) => active)
-        .map(([rowIndex]) => {
-          const index = Number(rowIndex);
-          const row = allRows[index];
-          return row ? { rowIndex: index, row } : null;
-        })
-        .filter(Boolean)
-        .sort((a, b) => a.rowIndex - b.rowIndex);
-    }
-
-    function getFilteredPool() {
-      const selectedCategory = categoryFilter.value;
-      return allRows
-        .map((row, rowIndex) => ({ row, rowIndex }))
-        .filter(({ row }) => !selectedCategory || getRecipeCategory(row) === selectedCategory);
-    }
-
-    function pickRandomSelection() {
-      const pool = getFilteredPool().map((entry) => entry.rowIndex);
-      for (let i = pool.length - 1; i > 0; i -= 1) {
-        const j = Math.floor(Math.random() * (i + 1));
-        [pool[i], pool[j]] = [pool[j], pool[i]];
-      }
-      selectedRowIndexes = pool.slice(0, Math.min(5, pool.length));
-    }
-
-    function getVisibleEntries() {
-      const filteredPool = getFilteredPool();
-      if (!filterToggle.checked) {
-        return filteredPool;
-      }
-
-      const selected = new Set(selectedRowIndexes.map(String));
-      return filteredPool.filter(({ rowIndex }) => selected.has(String(rowIndex)));
-    }
-
-    function renderTable() {
-      const ingredientColumnIndex = getColumnIndex("Zutaten für 1 Portion");
-      const categoryColumnIndex = getColumnIndex("Kategorie");
-      const linkColumnIndex = getColumnIndex("Link");
-      const kcalColumnIndex = getColumnIndex("kcal pro Portion");
-
-      const visibleColumnIndexes = allHeaders
-        .map((_, index) => index)
-        .filter((index) => index !== ingredientColumnIndex && index !== categoryColumnIndex);
-
-      if (linkColumnIndex !== -1 && kcalColumnIndex !== -1) {
-        const linkPosition = visibleColumnIndexes.indexOf(linkColumnIndex);
-        const kcalPosition = visibleColumnIndexes.indexOf(kcalColumnIndex);
-        if (linkPosition !== -1 && kcalPosition !== -1) {
-          [visibleColumnIndexes[linkPosition], visibleColumnIndexes[kcalPosition]] =
-          [visibleColumnIndexes[kcalPosition], visibleColumnIndexes[linkPosition]];
-        }
-      }
-
-      tableHead.innerHTML = "";
-      tableBody.innerHTML = "";
-
-      const headerRow = document.createElement("tr");
-
-      const indexTh = document.createElement("th");
-      indexTh.className = "col-index";
-      indexTh.textContent = "#";
-      headerRow.appendChild(indexTh);
-
-      visibleColumnIndexes.forEach((columnIndex) => {
-        const th = document.createElement("th");
-        th.textContent = columnIndex === linkColumnIndex ? "" : allHeaders[columnIndex];
-        if (columnIndex === kcalColumnIndex) th.className = "col-kcal";
-        if (columnIndex === linkColumnIndex) th.className = "recipe-actions-col col-actions";
-        headerRow.appendChild(th);
-      });
-
-      tableHead.appendChild(headerRow);
-
-      getVisibleEntries().forEach(({ row, rowIndex }) => {
-        const tr = document.createElement("tr");
-
-        const indexTd = document.createElement("td");
-        indexTd.className = "col-index";
-        indexTd.textContent = String(rowIndex + 1);
-        tr.appendChild(indexTd);
-
-        visibleColumnIndexes.forEach((cellIndex) => {
-          const td = document.createElement("td");
-          if (cellIndex === linkColumnIndex) {
-            td.classList.add("recipe-actions-col");
-          }
-
-          if (cellIndex === 0) {
-            td.innerHTML = createRecipeTitleWithBadge(row);
-          } else if (cellIndex === linkColumnIndex) {
-            const link = extractCellLink(getRecipeLinkCell(row));
-            const wrapper = document.createElement("div");
-            wrapper.className = "recipe-actions";
-
-            const rowButtons = document.createElement("div");
-            rowButtons.className = "recipe-actions-row";
-
-            if (link) {
-              const a = document.createElement("a");
-              a.href = link.href;
-              a.target = "_blank";
-              a.rel = "noopener noreferrer";
-              a.className = "recipe-text-link";
-              a.setAttribute("aria-label", `Rezept öffnen: ${getRecipeName(row)}`);
-              a.setAttribute("title", `Rezept öffnen: ${getRecipeName(row)}`);
-              a.innerHTML = '<i data-lucide="link-2" aria-hidden="true"></i>';
-              rowButtons.appendChild(a);
-            }
-
-            const cartButton = document.createElement("button");
-            cartButton.type = "button";
-            cartButton.className = "cart-toggle";
-            cartButton.dataset.active = isInCart(rowIndex) ? "true" : "false";
-            cartButton.dataset.rowIndex = String(rowIndex);
-            cartButton.setAttribute("aria-label", isInCart(rowIndex) ? `Aus Warenkorb entfernen: ${getRecipeName(row)}` : `Zum Warenkorb hinzufügen: ${getRecipeName(row)}`);
-            cartButton.setAttribute("title", isInCart(rowIndex) ? `Aus Warenkorb entfernen: ${getRecipeName(row)}` : `Zum Warenkorb hinzufügen: ${getRecipeName(row)}`);
-            cartButton.innerHTML = '<svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><circle cx="8" cy="21" r="1.5"></circle><circle cx="18" cy="21" r="1.5"></circle><path d="M2.5 3h2l2.2 12.2a2 2 0 0 0 2 1.6h8.5a2 2 0 0 0 2-1.5L21 7H6.2"></path></svg><span class="sr-only">Warenkorb</span>';
-
-            rowButtons.appendChild(cartButton);
-            wrapper.appendChild(rowButtons);
-            td.appendChild(wrapper);
-          } else {
-            td.innerHTML = row[cellIndex] || "";
-          }
-
-          tr.appendChild(td);
-        });
-
-        tableBody.appendChild(tr);
-      });
-
-      renderIcons();
-    }
-
-    function syncWeekPlanState(entries) {
-      const activeKeys = new Set(entries.map(({ rowIndex }) => String(rowIndex)));
-      Object.keys(weekPlanState).forEach((key) => {
-        if (!activeKeys.has(key)) delete weekPlanState[key];
-      });
-
-      entries.forEach(({ rowIndex }, index) => {
-        const key = String(rowIndex);
-        const slot = Number(weekPlanState[key]);
-        if (!Number.isInteger(slot) || slot < 0 || slot > 4) {
-          weekPlanState[key] = index % 5;
-        }
-      });
-
-      saveJson(WEEK_PLAN_STORAGE_KEY, weekPlanState);
-    }
-
-    function renderWeekPlan() {
-      const entries = getCartEntries();
-      if (entries.length < 5 || isSummaryOpen) {
-        weekPlan.hidden = true;
-        weekPlanGrid.innerHTML = "";
-        return;
-      }
-
-      syncWeekPlanState(entries);
-      weekPlan.hidden = false;
-
-      weekPlanGrid.innerHTML = WEEK_BUCKET_TITLES.map((title, slot) => {
-        const slotEntries = entries.filter(({ rowIndex }) => weekPlanState[String(rowIndex)] === slot);
-        const kcal = slotEntries.reduce((sum, { row }) => sum + getKcalNumber(row), 0);
-
-        return `
-          <section class="week-plan-column" data-slot="${slot}">
-            <div class="week-plan-title-row">
-              <h2 class="week-plan-title">${title}</h2>
-              <span class="week-plan-kcal-badge">${kcal} kcal</span>
-            </div>
-            <div class="week-plan-items">
-              ${slotEntries.map(({ row, rowIndex }) => `
-                <div class="week-plan-item-row">
-                  <button class="week-plan-item" type="button" draggable="true" data-row-index="${rowIndex}">
-                    ${escapeHtml(getRecipeName(row))}
-                    ${getRecipeCategory(row) ? `<span class="week-plan-category-badge">${escapeHtml(getRecipeCategory(row))}</span>` : ""}
-                  </button>
-                  <button type="button" class="week-plan-randomize" data-action="randomize-one" data-row-index="${rowIndex}" aria-label="Rezept neu randomisieren" title="Rezept neu randomisieren">
-                    <i data-lucide="shuffle" aria-hidden="true"></i>
-                  </button>
-                </div>
-              `).join("")}
-            </div>
-          </section>
-        `;
-      }).join("");
-
-      renderIcons();
-      updateWeekPlanScrollButton();
-    }
-
-    function renderSummary() {
-      const entries = getCartEntries();
-      summaryCount.hidden = entries.length === 0;
-      summaryCount.textContent = String(entries.length);
-      summaryMeta.textContent = `${entries.length} Rezept${entries.length === 1 ? "" : "e"} ausgewählt`;
-
-      if (entries.length === 0) {
-        summaryContent.innerHTML = '<p class="summary-empty">Noch keine Rezepte im Warenkorb.</p>';
-        return;
-      }
-
-      summaryContent.innerHTML = entries.map(({ row }) => {
-        const ingredients = getIngredientsForRow(row);
-        return `
-          <section class="summary-card">
-            <h3>${escapeHtml(getRecipeName(row))} ${createCategoryBadge(getRecipeCategory(row))}</h3>
-            <ul class="summary-ingredients">
-              ${ingredients.map((item) => `
-                <li>
-                  <button type="button" class="ingredient-main">${escapeHtml(item.label)}</button>
-                </li>
-              `).join("")}
-            </ul>
-          </section>
-        `;
-      }).join("");
-    }
-
-    function renderAll() {
-      renderTable();
-      renderSummary();
-      renderWeekPlan();
-      statusEl.textContent = allRows.length ? `${getVisibleEntries().length} von ${allRows.length} Rezepten angezeigt.` : "";
-    }
-
-    function renderIcons() {
-      if (window.lucide && typeof window.lucide.createIcons === "function") {
-        window.lucide.createIcons();
-      }
-    }
-
-    function addSelectionToCart() {
-      selectedRowIndexes.forEach((rowIndex) => {
-        cartState[String(rowIndex)] = true;
-      });
-      saveJson(CART_STORAGE_KEY, cartState);
-      renderAll();
-    }
-
-    function randomizeSingleRecipe(rowIndex) {
-      const oldKey = String(rowIndex);
-      const slot = Number(weekPlanState[oldKey]);
-      if (!Number.isInteger(slot)) return;
-
-      const current = new Set(Object.keys(cartState));
-      current.delete(oldKey);
-
-      const pool = getFilteredPool()
-        .map(({ rowIndex }) => rowIndex)
-        .filter((index) => !current.has(String(index)));
-
-      if (pool.length === 0) return;
-
-      const replacement = pool[Math.floor(Math.random() * pool.length)];
-
-      delete cartState[oldKey];
-      delete weekPlanState[oldKey];
-      cartState[String(replacement)] = true;
-      weekPlanState[String(replacement)] = slot;
-
-      saveJson(CART_STORAGE_KEY, cartState);
-      saveJson(WEEK_PLAN_STORAGE_KEY, weekPlanState);
-      renderAll();
-    }
-
-    function updateWeekPlanScrollButton() {
-      if (weekPlan.hidden) {
-        weekPlanScrollButton.hidden = true;
-        return;
-      }
-
-      window.requestAnimationFrame(() => {
-        weekPlanScrollButton.hidden = weekPlanViewport.scrollWidth <= weekPlanViewport.clientWidth + 1;
-      });
-    }
-
-    function scrollWeekPlanToOppositeSide() {
-      const maxScroll = Math.max(0, weekPlanViewport.scrollWidth - weekPlanViewport.clientWidth);
-      const isNearEnd = weekPlanViewport.scrollLeft >= maxScroll - 8;
-      weekPlanViewport.scrollTo({
-        left: isNearEnd ? 0 : maxScroll,
-        behavior: "smooth"
-      });
-    }
-
-    function buildWeekPlanClipboardText() {
-      const entries = getCartEntries();
-      const lines = ["10-Tage Plan"];
-
-      WEEK_BUCKET_TITLES.forEach((title, slot) => {
-        const slotEntries = entries.filter(({ rowIndex }) => weekPlanState[String(rowIndex)] === slot);
-        const names = slotEntries.map(({ row }) => getRecipeName(row)).join(", ") || "-";
-        const kcal = slotEntries.reduce((sum, { row }) => sum + getKcalNumber(row), 0);
-        lines.push(`${title} - ${names} (${kcal} kcal)`);
-      });
-
-      return lines.join("\n");
-    }
-
-    async function init() {
-      try {
-        const response = await fetch(sourceUrl, { cache: "no-store" });
-        if (!response.ok) {
-          throw new Error(`Markdown konnte nicht geladen werden (${response.status}).`);
-        }
-
-        const markdown = await response.text();
-        const { headers, rows } = parseMarkdownTable(markdown);
-
-        allHeaders = headers;
-        allRows = rows;
-
-        pickRandomSelection();
-        renderAll();
-      } catch (error) {
-        statusEl.textContent = "Fehler beim Laden.";
-        errorEl.hidden = false;
-        errorEl.textContent = `${error.message}\n\nLege eine Markdown-Datei unter ${DEFAULT_SOURCE} ab oder übergib eine URL mit ?source=https://...`;
-      }
-    }
-
-    filterToggle.addEventListener("change", renderAll);
-
-    categoryFilter.addEventListener("change", () => {
-      pickRandomSelection();
-      renderAll();
-    });
-
-    randomizeButton.addEventListener("click", () => {
-      pickRandomSelection();
-      renderAll();
-    });
-
-    selectionCartButton.addEventListener("click", addSelectionToCart);
-
-    tableBody.addEventListener("click", (event) => {
-      const button = event.target.closest(".cart-toggle");
-      if (!button) return;
-
-      const rowIndex = Number(button.dataset.rowIndex);
-      if (Number.isNaN(rowIndex)) return;
-
-      setCartState(rowIndex, !isInCart(rowIndex));
-    });
-
-    summaryButton.addEventListener("click", () => {
-      isSummaryOpen = !isSummaryOpen;
-      summaryPanel.hidden = !isSummaryOpen;
-      summaryButton.dataset.active = isSummaryOpen ? "true" : "false";
-      summaryButton.setAttribute("aria-expanded", isSummaryOpen ? "true" : "false");
-      renderWeekPlan();
-    });
-
-    clearCartButton.addEventListener("click", () => {
-      cartState = {};
-      weekPlanState = {};
-      saveJson(CART_STORAGE_KEY, cartState);
-      saveJson(WEEK_PLAN_STORAGE_KEY, weekPlanState);
-      renderAll();
-    });
-
-    weekPlan.addEventListener("click", (event) => {
-      const randomizeButton = event.target.closest('[data-action="randomize-one"]');
-      if (!randomizeButton) return;
-
-      const rowIndex = Number(randomizeButton.dataset.rowIndex);
-      if (!Number.isNaN(rowIndex)) {
-        randomizeSingleRecipe(rowIndex);
-      }
-    });
-
-    weekPlan.addEventListener("dragstart", (event) => {
-      const item = event.target.closest(".week-plan-item");
-      if (!item) return;
-
-      event.dataTransfer.effectAllowed = "move";
-      event.dataTransfer.setData("text/plain", item.dataset.rowIndex || "");
-    });
-
-    weekPlan.addEventListener("dragover", (event) => {
-      const column = event.target.closest(".week-plan-column");
-      if (!column) return;
-
-      event.preventDefault();
-      column.dataset.dragOver = "true";
-    });
-
-    weekPlan.addEventListener("dragleave", (event) => {
-      const column = event.target.closest(".week-plan-column");
-      if (!column || column.contains(event.relatedTarget)) return;
-
-      column.dataset.dragOver = "false";
-    });
-
-    weekPlan.addEventListener("drop", (event) => {
-      const column = event.target.closest(".week-plan-column");
-      if (!column) return;
-
-      event.preventDefault();
-      column.dataset.dragOver = "false";
-
-      const rowIndex = event.dataTransfer.getData("text/plain");
-      const slot = Number(column.dataset.slot);
-
-      if (!rowIndex || Number.isNaN(slot)) return;
-
-      weekPlanState[rowIndex] = slot;
-      saveJson(WEEK_PLAN_STORAGE_KEY, weekPlanState);
-      renderAll();
-    });
-
-    weekPlanScrollButton.addEventListener("click", scrollWeekPlanToOppositeSide);
-
-    weekPlanCopyButton.addEventListener("click", async () => {
-      try {
-        await navigator.clipboard.writeText(buildWeekPlanClipboardText());
-        weekPlanCopyButton.title = "Kopiert";
-        window.setTimeout(() => {
-          weekPlanCopyButton.title = "10-Tage-Plan kopieren";
-        }, 1200);
-      } catch (error) {
-        weekPlanCopyButton.title = "Kopieren fehlgeschlagen";
-        window.setTimeout(() => {
-          weekPlanCopyButton.title = "10-Tage-Plan kopieren";
-        }, 1200);
-      }
-    });
-
-    window.addEventListener("resize", updateWeekPlanScrollButton);
-
-    init();
-  </script>
-
-
-</body></html>
