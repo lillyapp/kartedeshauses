@@ -333,6 +333,47 @@
       gap: 6px;
     }
 
+    .week-plan-bucket-toggle {
+      margin-left: auto;
+      display: inline-flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+      min-width: 122px;
+      min-height: 34px;
+      padding: 0 12px;
+      border: 1px solid #d9d9d6;
+      border-radius: 10px;
+      background: #f3f3f1;
+      color: var(--fg);
+      box-shadow: none;
+      white-space: nowrap;
+    }
+
+    .week-plan-bucket-toggle:hover,
+    .week-plan-bucket-toggle:focus-visible {
+      background: #ececea;
+    }
+
+    .week-plan-bucket-toggle[data-active="false"] {
+      opacity: 0.45;
+    }
+
+    .week-plan-bucket-toggle svg {
+      width: 15px;
+      height: 15px;
+      stroke-width: 2;
+      flex: none;
+    }
+
+    .week-plan-bucket-toggle-label {
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+      line-height: 1;
+    }
+
     .week-plan-portion-toggle {
       display: inline-flex;
       align-items: center;
@@ -387,9 +428,8 @@
       text-align: left;
       font-size: 13px;
       line-height: 1.25;
-      cursor: pointer;
+      cursor: grab;
       box-shadow: none;
-      transition: background 140ms ease, color 140ms ease, opacity 140ms ease;
     }
 
     .week-plan-item:hover,
@@ -399,12 +439,6 @@
 
     .week-plan-item:active {
       cursor: grabbing;
-    }
-
-    .week-plan-item[data-active="false"] {
-      background: #fafaf9;
-      color: var(--muted);
-      opacity: 0.6;
     }
 
     .week-plan-randomize {
@@ -917,15 +951,24 @@
       white-space: nowrap;
     }
 
-    .week-plan-column[data-active="false"] .week-plan-title,
-    .week-plan-column[data-active="false"] .week-plan-kcal-wrap,
-    .week-plan-column[data-active="false"] .week-plan-randomize {
-      opacity: 0.45;
+    .week-plan-column[data-active="false"] {
+      opacity: 0.46;
+    }
+
+    .week-plan-column[data-active="false"] .week-plan-title {
+      opacity: 0.72;
     }
 
     @media (prefers-color-scheme: dark) {
-      .week-plan-item[data-active="false"] {
-        background: #121212;
+      .week-plan-bucket-toggle {
+        background: #1a1a1a;
+        border-color: #353535;
+        color: var(--fg);
+      }
+
+      .week-plan-bucket-toggle:hover,
+      .week-plan-bucket-toggle:focus-visible {
+        background: #232323;
       }
     }
 
@@ -1838,7 +1881,6 @@
 
       weekBucketState[slot] = !isWeekBucketEnabled(slot);
       saveWeekBucketState();
-      syncWeekPlanCodeToUrl();
     }
 
     function getWeekPlanSlotForRow(rowIndex) {
@@ -2487,20 +2529,23 @@
                   <span class="week-plan-kcal-badge">${planLabel}</span>
                 ` : ""}
               </div>
+              <button
+                type="button"
+                class="week-plan-bucket-toggle"
+                data-action="toggle-week-bucket"
+                data-slot="${slot}"
+                data-active="${bucketEnabled ? "true" : "false"}"
+                aria-label="${bucketEnabled ? `${title} deaktivieren` : `${title} aktivieren`}"
+                title="${bucketEnabled ? `${title} deaktivieren` : `${title} aktivieren`}"
+              >
+                <span class="week-plan-bucket-toggle-label">${title}</span>
+                <i data-lucide="${bucketEnabled ? "check-square" : "square"}" aria-hidden="true"></i>
+              </button>
             </div>
             <div class="week-plan-items">
               ${slotEntries.map(({ row, rowIndex }) => `
                 <div class="week-plan-item-row">
-                  <button
-                    class="week-plan-item"
-                    type="button"
-                    draggable="true"
-                    data-row-index="${rowIndex}"
-                    data-active="${bucketEnabled ? "true" : "false"}"
-                    aria-pressed="${bucketEnabled ? "true" : "false"}"
-                    aria-label="${row[0]} - ${bucketEnabled ? `${title} deaktivieren` : `${title} aktivieren`}"
-                    title="${bucketEnabled ? `${title} deaktivieren` : `${title} aktivieren`}"
-                  >
+                  <button class="week-plan-item" type="button" draggable="true" data-row-index="${rowIndex}">
                     ${row[0]}
                   </button>
                   <button
@@ -2595,16 +2640,6 @@
       };
 
       return `P1-${toBase64Url(JSON.stringify(payload))}`;
-    }
-
-    function syncWeekPlanCodeToUrl() {
-      if (Object.keys(cartState).length === 0) {
-        return;
-      }
-
-      const url = new URL(window.location.href);
-      url.searchParams.set("c", buildWeekPlanCode());
-      window.history.replaceState(null, "", url.toString());
     }
 
     function getWeekPlanCodeFromUrl() {
@@ -3829,6 +3864,17 @@
     });
 
     weekPlan.addEventListener("click", (event) => {
+      const bucketToggle = event.target.closest(".week-plan-bucket-toggle");
+      if (bucketToggle) {
+        const slot = Number(bucketToggle.dataset.slot);
+        if (Number.isInteger(slot)) {
+          toggleWeekBucket(slot);
+          renderWeekPlan();
+          renderCurrentTable();
+        }
+        return;
+      }
+
       const portionToggle = event.target.closest('[data-action="toggle-portion-display"]');
       if (portionToggle) {
         showWeekPlanPortionCount = !showWeekPlanPortionCount;
@@ -3847,12 +3893,12 @@
 
       const item = event.target.closest(".week-plan-item");
       if (item) {
-        const column = item.closest(".week-plan-column");
-        const slot = column ? Number(column.dataset.slot) : Number.NaN;
-        if (Number.isInteger(slot) && slot >= 0 && slot < WEEK_BUCKET_TITLES.length) {
-          toggleWeekBucket(slot);
-          renderWeekPlan();
-          renderCurrentTable();
+        const rowIndex = Number(item.dataset.rowIndex);
+        const linkIndex = allHeaders.indexOf("Link");
+        const row = allRows[rowIndex];
+        const link = row && linkIndex !== -1 ? extractCellLink(row[linkIndex] || "") : null;
+        if (link) {
+          window.open(link.href, "_blank", "noopener,noreferrer");
         }
         return;
       }
