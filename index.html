@@ -16,106 +16,6 @@
       --page-gutter: 24px;
     }
 
-    @media (prefers-color-scheme: dark) {
-      :root {
-        --bg: #0a0a0a;
-        --fg: #f3f3f3;
-        --muted: #a8a8a8;
-        --line: #2e2e2e;
-        --panel-bg: #141414;
-        --success: #41c97f;
-      }
-
-      html,
-      body {
-        color-scheme: dark;
-      }
-
-      table,
-      .table-wrap,
-      .week-plan-column,
-      .summary-card,
-      .summary-panel,
-      .product-helper,
-      .basket-prompt,
-      .product-helper-export,
-      .product-helper-input {
-        background: var(--panel-bg) !important;
-        color: var(--fg) !important;
-        border-color: var(--line) !important;
-      }
-
-      th,
-      td,
-      thead th,
-      tbody td,
-      tbody tr {
-        border-color: var(--line) !important;
-      }
-
-      button,
-      .filter-button,
-      .ingredient-action,
-      .ingredient-main,
-      .cart-toggle,
-      #summaryButton,
-      .week-plan-copy,
-      .week-plan-scroll,
-      .week-plan-randomize,
-      #quickActionsToggle {
-        color: var(--fg) !important;
-        border-color: var(--line) !important;
-      }
-
-      button:hover,
-      .filter-button:hover,
-      .ingredient-action:hover,
-      .ingredient-main:hover,
-      .cart-toggle:hover,
-      #summaryButton:hover,
-      #summaryButton:focus-visible,
-      .week-plan-copy:hover,
-      .week-plan-scroll:hover,
-      .week-plan-randomize:hover,
-      #quickActionsToggle:hover {
-        background: rgba(255, 255, 255, 0.08) !important;
-      }
-
-      .week-plan-item,
-      .filter-popover,
-      .summary-tools {
-        background: #1d1d1d !important;
-        border-color: var(--line) !important;
-      }
-
-      .week-plan-column[data-drag-over="true"] {
-        background: rgba(65, 201, 127, 0.14) !important;
-      }
-
-      .week-plan-kcal-badge,
-      .status,
-      .meta,
-      .product-helper-meta,
-      .product-helper-status,
-      .summary-subtitle {
-        color: var(--muted) !important;
-      }
-
-      .summary-filter-button {
-        color: var(--fg) !important;
-      }
-
-      .summary-filter-button:hover,
-      .summary-filter-button:focus-visible {
-        background: rgba(255, 255, 255, 0.08) !important;
-      }
-
-      a,
-      a:visited {
-        color: var(--fg) !important;
-      }
-    }
-
     *,
     *::before,
     *::after {
@@ -312,7 +212,7 @@
       align-items: center;
       justify-content: space-between;
       margin: 0 0 10px;
-      gap: 8px;
+      gap: 6px;
     }
 
     .week-plan-title-row .week-plan-title {
@@ -331,47 +231,6 @@
       display: inline-flex;
       align-items: center;
       gap: 6px;
-    }
-
-    .week-plan-bucket-toggle {
-      margin-left: auto;
-      display: inline-flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 8px;
-      min-width: 122px;
-      min-height: 34px;
-      padding: 0 12px;
-      border: 1px solid #d9d9d6;
-      border-radius: 10px;
-      background: #f3f3f1;
-      color: var(--fg);
-      box-shadow: none;
-      white-space: nowrap;
-    }
-
-    .week-plan-bucket-toggle:hover,
-    .week-plan-bucket-toggle:focus-visible {
-      background: #ececea;
-    }
-
-    .week-plan-bucket-toggle[data-active="false"] {
-      opacity: 0.45;
-    }
-
-    .week-plan-bucket-toggle svg {
-      width: 15px;
-      height: 15px;
-      stroke-width: 2;
-      flex: none;
-    }
-
-    .week-plan-bucket-toggle-label {
-      font-size: 11px;
-      font-weight: 700;
-      letter-spacing: 0.04em;
-      text-transform: uppercase;
-      line-height: 1;
     }
 
     .week-plan-portion-toggle {
@@ -405,17 +264,75 @@
       stroke-width: 2;
     }
 
+    .week-plan-extras {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      margin: 8px 0 0;
+      padding-top: 8px;
+      border-top: 1px dashed rgba(0,0,0,0.15);
+    }
+
+    .week-plan-wheat-btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 26px;
+      height: 26px;
+      border: 0;
+      border-radius: 999px;
+      background: transparent;
+      color: var(--muted);
+      padding: 0;
+      cursor: pointer;
+      box-shadow: none;
+      flex: none;
+    }
+
+    .week-plan-wheat-btn:hover,
+    .week-plan-wheat-btn:focus-visible {
+      background: rgba(0,0,0,0.07);
+      color: var(--fg);
+    }
+
+    .week-plan-wheat-btn[data-active="true"] {
+      background: #fff8e7;
+      color: #b8860b;
+    }
+
+    .week-plan-wheat-btn svg {
+      width: 15px;
+      height: 15px;
+      stroke-width: 1.8;
+      fill: none;
+      stroke: currentColor;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+    }
+
+    .week-plan-extra-input {
+      width: 52px;
+      padding: 3px 5px;
+      border: 1px solid rgba(0,0,0,0.18);
+      border-radius: 5px;
+      font: inherit;
+      font-size: 11px;
+      text-align: center;
+      background: #fff;
+      color: var(--fg);
+      margin-left: auto;
+    }
+
+    .week-plan-extra-input:focus {
+      outline: 2px solid var(--fg);
+      outline-offset: 1px;
+    }
+
     .week-plan-items {
       display: grid;
       gap: 7px;
       flex: 1;
       align-content: start;
-    }
-
-    .week-plan-item-row {
-      display: flex;
-      align-items: center;
-      gap: 6px;
     }
 
     .week-plan-item {
@@ -439,54 +356,6 @@
 
     .week-plan-item:active {
       cursor: grabbing;
-    }
-
-    .week-plan-randomize {
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      width: 26px;
-      height: 26px;
-      border: 0;
-      border-radius: 999px;
-      background: transparent;
-      color: var(--muted);
-      padding: 0;
-      flex: none;
-      box-shadow: none;
-      line-height: 0;
-    }
-
-    .week-plan-randomize:hover,
-    .week-plan-randomize:focus-visible {
-      background: rgba(0, 0, 0, 0.07);
-      color: var(--fg);
-    }
-
-    .week-plan-randomize svg {
-      display: block;
-      width: 14px;
-      height: 14px;
-      stroke-width: 2;
-    }
-
-    .breakfast-table-wrap {
-      margin: 0 0 14px;
-    }
-
-    .breakfast-actions-col {
-      text-align: right;
-    }
-
-    .breakfast-filter-button[disabled] {
-      opacity: 1;
-      cursor: default;
-    }
-
-    .breakfast-add {
-      padding: 6px 10px;
-      min-height: 28px;
-      font-size: 12px;
     }
 
     .top-actions {
@@ -622,13 +491,6 @@
     #summaryButton:hover,
     #summaryButton:focus-visible {
       background: rgba(0, 0, 0, 0.06);
-    }
-
-    @media (prefers-color-scheme: dark) {
-      #summaryButton:hover,
-      #summaryButton:focus-visible {
-        background: rgba(255, 255, 255, 0.08);
-      }
     }
 
     .basket-prompt {
@@ -878,13 +740,6 @@
       line-height: 1;
     }
 
-    .recipe-link[data-enabled="false"] {
-      opacity: 0.3;
-      filter: grayscale(1);
-      pointer-events: none;
-      cursor: default;
-    }
-
     .recipe-link:hover {
       background: #f5f5f5;
     }
@@ -897,16 +752,9 @@
 
     .recipe-actions {
       display: inline-flex;
-      flex-direction: column;
-      align-items: flex-end;
-      gap: 6px;
-      white-space: nowrap;
-    }
-
-    .recipe-actions-row {
-      display: inline-flex;
       align-items: center;
       gap: 6px;
+      white-space: nowrap;
     }
 
     .recipe-text-link {
@@ -920,19 +768,10 @@
       line-height: 1.2;
     }
 
-    .recipe-text-link[data-enabled="false"] {
-      opacity: 0.32;
-      filter: grayscale(1);
-      pointer-events: none;
-      cursor: default;
-    }
-
     .recipe-text-link:hover,
     .recipe-text-link:focus-visible {
-      border-color: transparent;
-      background: transparent;
-      box-shadow: none;
-      outline: none;
+      border-color: #d7d7d3;
+      background: #f4f4f2;
     }
 
     .recipe-text-link svg {
@@ -948,41 +787,6 @@
       align-items: center;
       justify-content: flex-end;
       width: 100%;
-      white-space: nowrap;
-    }
-
-    .week-plan-column[data-active="false"] {
-      opacity: 0.46;
-    }
-
-    .week-plan-column[data-active="false"] .week-plan-title {
-      opacity: 0.72;
-    }
-
-    @media (prefers-color-scheme: dark) {
-      .week-plan-bucket-toggle {
-        background: #1a1a1a;
-        border-color: #353535;
-        color: var(--fg);
-      }
-
-      .week-plan-bucket-toggle:hover,
-      .week-plan-bucket-toggle:focus-visible {
-        background: #232323;
-      }
-    }
-
-    .col-index {
-      width: 44px;
-    }
-
-    .col-kcal {
-      width: 120px;
-      white-space: nowrap;
-    }
-
-    .col-actions {
-      width: 96px;
       white-space: nowrap;
     }
 
@@ -1631,32 +1435,6 @@
     </section>
     <div id="status" class="status"></div>
     <div id="error" class="error" hidden></div>
-    <h2 id="breakfastCollectionHeading" class="section-heading table-heading">BASIS</h2>
-    <div id="breakfastTableWrap" class="table-wrap breakfast-table-wrap">
-      <table aria-label="Basis Rezepte">
-        <thead>
-          <tr>
-            <th class="col-index">#</th>
-            <th>Rezept</th>
-            <th class="col-kcal">kcal pro Tag</th>
-            <th class="breakfast-actions-col col-actions">
-              <div class="recipe-header">
-                <button
-                  type="button"
-                  class="filter-button breakfast-filter-button"
-                  aria-label="Basis-Filter"
-                  title="Basis-Filter"
-                  disabled
-                >
-                  <i data-lucide="list-filter" aria-hidden="true"></i>
-                </button>
-              </div>
-            </th>
-          </tr>
-        </thead>
-        <tbody id="breakfastTableBody"></tbody>
-      </table>
-    </div>
     <h2 id="recipeCollectionHeading" class="section-heading table-heading">REZEPTSAMMLUNG</h2>
     <div id="recipeTableWrap" class="table-wrap">
       <table aria-label="Markdown Tabelle">
@@ -1673,8 +1451,6 @@
     const sourceUrl = new URLSearchParams(window.location.search).get("source") || DEFAULT_SOURCE;
     const CART_STORAGE_KEY = "recipe-cart-state-v1";
     const WEEK_PLAN_STORAGE_KEY = "recipe-week-plan-v1";
-    const WEEK_BUCKET_STATE_STORAGE_KEY = "recipe-week-bucket-state-v1";
-    const WEEK_BUCKET_TITLES = ["TAG 1 · 2", "TAG 3 · 4", "TAG 5 · 6", "TAG 7 · 8", "TAG 9 · 10"];
 
     const randomRowsEl = document.getElementById("randomRows");
     const filterToggle = document.getElementById("filterToggle");
@@ -1683,9 +1459,6 @@
     const errorEl = document.getElementById("error");
     const tableHead = document.getElementById("tableHead");
     const tableBody = document.getElementById("tableBody");
-    const breakfastCollectionHeading = document.getElementById("breakfastCollectionHeading");
-    const breakfastTableWrap = document.getElementById("breakfastTableWrap");
-    const breakfastTableBody = document.getElementById("breakfastTableBody");
     const recipeCollectionHeading = document.getElementById("recipeCollectionHeading");
     const recipeTableWrap = document.getElementById("recipeTableWrap");
     const quickActionsToggle = document.getElementById("quickActionsToggle");
@@ -1725,7 +1498,7 @@
     const SPICE_FILTER_STORAGE_KEY = "recipe-cart-spice-filter-v1";
     const PURCHASED_STORAGE_KEY = "recipe-cart-purchased-v1";
     const EXCLUDED_STORAGE_KEY = "recipe-cart-excluded-v1";
-    const BREAKFAST_STORAGE_KEY = "recipe-breakfast-state-v1";
+    const EXTRA_KCAL_STORAGE_KEY = "recipe-week-extra-kcal-v1";
     const PRODUCT_LINK_STORAGE_KEY = "recipe-product-links-v1";
     const REWE_SEARCH_BASE_URL = "https://www.rewe.de/shop/productList?sorting=PRICE_ASC&search=";
     const REWE_PROXY_BASE_URL = "https://r.jina.ai/http://www.rewe.de/shop/productList?search=";
@@ -1739,7 +1512,6 @@
     const WARM_COLD_END_INDEX = 28;
     let cartState = loadCartState();
     let weekPlanState = loadWeekPlanState();
-    let weekBucketState = loadWeekBucketState();
     let isSummaryOpen = false;
     let isCombineAll = true;
     let isSummaryFilterOpen = false;
@@ -1749,7 +1521,9 @@
     let purchasedState = loadBooleanMap(PURCHASED_STORAGE_KEY);
     let excludedState = loadBooleanMap(EXCLUDED_STORAGE_KEY);
 
-    let breakfastState = loadBreakfastState();
+    // Extra kcal per slot (for generic Frühstück/Abendessen)
+    // slotExtraKcal[slot] = { active: bool, kcal: number }
+    let slotExtraKcal = loadSlotExtraKcal();
     let reweBasketSnapshot = {
       text: "",
       fetchedAt: 0,
@@ -1842,58 +1616,6 @@
           .map(([key, url]) => [key, String(url || "").trim()])
           .filter(([key, url]) => key && /^https?:\/\//i.test(url))
       );
-    }
-
-    function normalizeBucketState(value) {
-      const defaults = [true, true, true, true, true];
-      if (!Array.isArray(value)) {
-        return defaults;
-      }
-
-      return defaults.map((fallback, index) => {
-        const candidate = value[index];
-        return typeof candidate === "boolean" ? candidate : fallback;
-      });
-    }
-
-    function loadWeekBucketState() {
-      try {
-        const raw = localStorage.getItem(WEEK_BUCKET_STATE_STORAGE_KEY);
-        const parsed = raw ? JSON.parse(raw) : null;
-        return normalizeBucketState(parsed);
-      } catch (error) {
-        return [true, true, true, true, true];
-      }
-    }
-
-    function saveWeekBucketState() {
-      localStorage.setItem(WEEK_BUCKET_STATE_STORAGE_KEY, JSON.stringify(weekBucketState));
-    }
-
-    function isWeekBucketEnabled(slot) {
-      return weekBucketState[slot] !== false;
-    }
-
-    function toggleWeekBucket(slot) {
-      if (!Number.isInteger(slot) || slot < 0 || slot >= WEEK_BUCKET_TITLES.length) {
-        return;
-      }
-
-      weekBucketState[slot] = !isWeekBucketEnabled(slot);
-      saveWeekBucketState();
-    }
-
-    function getWeekPlanSlotForRow(rowIndex) {
-      const slot = Number(weekPlanState[String(rowIndex)]);
-      return Number.isInteger(slot) && slot >= 0 && slot < WEEK_BUCKET_TITLES.length ? slot : null;
-    }
-
-    function isRecipeLinkEnabled(rowIndex) {
-      const slot = getWeekPlanSlotForRow(rowIndex);
-      if (slot === null) {
-        return true;
-      }
-      return isWeekBucketEnabled(slot);
     }
 
     function extractCellLink(cell) {
@@ -2143,112 +1865,18 @@
       localStorage.setItem(storageKey, JSON.stringify(value));
     }
 
-    function loadBreakfastState() {
+    function loadSlotExtraKcal() {
       try {
-        const raw = localStorage.getItem(BREAKFAST_STORAGE_KEY);
+        const raw = localStorage.getItem(EXTRA_KCAL_STORAGE_KEY);
         const parsed = raw ? JSON.parse(raw) : {};
-        if (!parsed || typeof parsed !== "object") {
-          return {
-            overnightOats: { active: false, kcal: 420 },
-            brotzeit: { active: false, kcal: 360 }
-          };
-        }
-        return {
-          overnightOats: {
-            active: Boolean(parsed.overnightOats?.active),
-            kcal: Number.isFinite(Number(parsed.overnightOats?.kcal)) ? Math.max(0, Number(parsed.overnightOats.kcal)) : 420
-          },
-          brotzeit: {
-            active: Boolean(parsed.brotzeit?.active),
-            kcal: Number.isFinite(Number(parsed.brotzeit?.kcal)) ? Math.max(0, Number(parsed.brotzeit.kcal)) : 360
-          }
-        };
+        return parsed && typeof parsed === "object" ? parsed : {};
       } catch (error) {
-        return {
-          overnightOats: { active: false, kcal: 420 },
-          brotzeit: { active: false, kcal: 360 }
-        };
+        return {};
       }
     }
 
-    function saveBreakfastState() {
-      localStorage.setItem(BREAKFAST_STORAGE_KEY, JSON.stringify(breakfastState));
-    }
-
-    function getBreakfastKcalPerDay() {
-      const overnight = breakfastState.overnightOats.active ? Number(breakfastState.overnightOats.kcal || 0) : 0;
-      const brotzeit = breakfastState.brotzeit.active ? Number(breakfastState.brotzeit.kcal || 0) : 0;
-      return overnight + brotzeit;
-    }
-
-    function findOvernightOatsRecipeLink() {
-      const match = allRows.find((row) => /overnight\s*oats/i.test(row[0] || ""));
-      if (!match) {
-        return "";
-      }
-      const link = extractCellLink(match[1] || "");
-      return link ? link.href : "";
-    }
-
-    function renderBreakfastPanel() {
-      const link = findOvernightOatsRecipeLink();
-      const title = "Overnight Oats";
-      const brotzeitTitle = "Brotzeit (2 Scheiben Brot mit Belag)";
-      const brotzeitLink = "https://www.kitchenstories.com/de/rezepte";
-
-      breakfastTableBody.innerHTML = `
-        <tr>
-          <td class="col-index">1</td>
-          <td>${title}</td>
-          <td class="col-kcal">${Math.round(Number(breakfastState.overnightOats.kcal || 0))}</td>
-          <td class="breakfast-actions-col col-actions">
-            <div class="recipe-actions">
-              ${link ? `
-                <a class="recipe-text-link" href="${link}" target="_blank" rel="noopener noreferrer" aria-label="Rezept öffnen: Overnight Oats" title="Rezept öffnen: Overnight Oats">
-                  <i data-lucide="link-2" aria-hidden="true"></i>
-                </a>
-              ` : ""}
-              <button
-                type="button"
-                class="cart-toggle breakfast-add"
-                data-action="toggle-breakfast"
-                data-breakfast-key="overnightOats"
-                data-active="${breakfastState.overnightOats.active ? "true" : "false"}"
-                aria-label="${breakfastState.overnightOats.active ? "Basis entfernen: Overnight Oats" : "Basis hinzubuchen: Overnight Oats"}"
-                title="${breakfastState.overnightOats.active ? "Basis entfernen" : "Basis hinzubuchen"}"
-              >
-                <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><circle cx="8" cy="21" r="1.5"></circle><circle cx="18" cy="21" r="1.5"></circle><path d="M2.5 3h2l2.2 12.2a2 2 0 0 0 2 1.6h8.5a2 2 0 0 0 2-1.5L21 7H6.2"></path></svg>
-              </button>
-            </div>
-          </td>
-        </tr>
-        <tr>
-          <td class="col-index">2</td>
-          <td>${brotzeitTitle}</td>
-          <td class="col-kcal">${Math.round(Number(breakfastState.brotzeit.kcal || 0))}</td>
-          <td class="breakfast-actions-col col-actions">
-            <div class="recipe-actions">
-              <a class="recipe-text-link" href="${brotzeitLink}" target="_blank" rel="noopener noreferrer" aria-label="Rezept öffnen: Brotzeit" title="Rezept öffnen: Brotzeit">
-                <i data-lucide="link-2" aria-hidden="true"></i>
-              </a>
-              <button
-                type="button"
-                class="cart-toggle breakfast-add"
-                data-action="toggle-breakfast"
-                data-breakfast-key="brotzeit"
-                data-active="${breakfastState.brotzeit.active ? "true" : "false"}"
-                aria-label="${breakfastState.brotzeit.active ? "Basis entfernen: Brotzeit" : "Basis hinzubuchen: Brotzeit"}"
-                title="${breakfastState.brotzeit.active ? "Basis entfernen" : "Basis hinzubuchen"}"
-              >
-                <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><circle cx="8" cy="21" r="1.5"></circle><circle cx="18" cy="21" r="1.5"></circle><path d="M2.5 3h2l2.2 12.2a2 2 0 0 0 2 1.6h8.5a2 2 0 0 0 2-1.5L21 7H6.2"></path></svg>
-              </button>
-            </div>
-          </td>
-        </tr>
-      `;
-      if (window.lucide && typeof window.lucide.createIcons === "function") {
-        window.lucide.createIcons();
-      }
+    function saveSlotExtraKcal() {
+      localStorage.setItem(EXTRA_KCAL_STORAGE_KEY, JSON.stringify(slotExtraKcal));
     }
 
     function isPurchased(key) {
@@ -2344,7 +1972,6 @@
         delete cartState[key];
       }
       saveCartState();
-      syncSelectionWithCart();
       if (wasActive !== active) {
         animateCartCount(active ? "add" : "remove");
       }
@@ -2420,31 +2047,6 @@
         .sort((a, b) => a.rowIndex - b.rowIndex);
     }
 
-    function getCartRowIndexesSortedForSelection() {
-      return Object.entries(cartState)
-        .filter(([, active]) => active)
-        .map(([rowIndex]) => Number(rowIndex))
-        .filter((rowIndex) => Number.isInteger(rowIndex) && rowIndex >= 0 && rowIndex < allRows.length)
-        .sort((a, b) => {
-          const slotA = Number.isInteger(weekPlanState[String(a)]) ? Number(weekPlanState[String(a)]) : 999;
-          const slotB = Number.isInteger(weekPlanState[String(b)]) ? Number(weekPlanState[String(b)]) : 999;
-          if (slotA !== slotB) {
-            return slotA - slotB;
-          }
-          return a - b;
-        });
-    }
-
-    function syncSelectionWithCart() {
-      const cartIndexes = getCartRowIndexesSortedForSelection();
-      if (cartIndexes.length === 0) {
-        return;
-      }
-
-      selectedRowIndexes = cartIndexes;
-      renderRandomRows(selectedRowIndexes);
-    }
-
     function syncWeekPlanState(entries) {
       const activeKeys = new Set(entries.map(({ rowIndex }) => String(rowIndex)));
       Object.keys(weekPlanState).forEach((key) => {
@@ -2478,7 +2080,7 @@
       }
 
       syncWeekPlanState(entries);
-      const titles = WEEK_BUCKET_TITLES;
+      const titles = ["TAG 1 · 2", "TAG 3 · 4", "TAG 5 · 6", "TAG 7 · 8", "TAG 9 · 10"];
       const kcalIndex = allHeaders.indexOf("kcal pro Portion");
       const rawPortionDisplayCount = portionScale / 2;
       const recipePortionFactor = rawPortionDisplayCount > 0 ? rawPortionDisplayCount : 1;
@@ -2489,7 +2091,6 @@
 
       weekPlanGrid.innerHTML = titles.map((title, slot) => {
         const slotEntries = entries.filter(({ rowIndex }) => weekPlanState[String(rowIndex)] === slot);
-        const bucketEnabled = isWeekBucketEnabled(slot);
 
         // Sum kcal from recipes in this slot
         let kcalSum = 0;
@@ -2505,19 +2106,21 @@
           });
         }
 
-        const breakfastKcal = getBreakfastKcalPerDay();
-        const totalKcal = Math.round((kcalSum * recipePortionFactor) + breakfastKcal);
-        const hasLabel = hasKcal || breakfastKcal > 0;
+        // Add extra kcal if active for this slot (×2 for Frühstück + Abendessen)
+        const extra = slotExtraKcal[slot] || { active: false, kcal: 400 };
+        const extraKcal = extra.active ? (Number(extra.kcal) || 0) * 2 : 0;
+        const totalKcal = Math.round((kcalSum * recipePortionFactor) + extraKcal);
+        const hasLabel = hasKcal || extra.active;
         const planLabel = showWeekPlanPortionCount
           ? String(portionDisplayCount)
           : `${totalKcal} kcal`;
 
         return `
-          <section class="week-plan-column" data-slot="${slot}" data-active="${bucketEnabled ? "true" : "false"}">
+          <section class="week-plan-column" data-slot="${slot}">
             <div class="week-plan-title-row">
               <h2 class="week-plan-title">${title}</h2>
-              <div class="week-plan-kcal-wrap">
-                ${hasLabel ? `
+              ${hasLabel ? `
+                <div class="week-plan-kcal-wrap">
                   <button
                     type="button"
                     class="week-plan-portion-toggle"
@@ -2527,37 +2130,36 @@
                     aria-label="${showWeekPlanPortionCount ? "kcal anzeigen" : "Portionen anzeigen"}"
                   ><i data-lucide="user" aria-hidden="true"></i></button>
                   <span class="week-plan-kcal-badge">${planLabel}</span>
-                ` : ""}
-              </div>
-              <button
-                type="button"
-                class="week-plan-bucket-toggle"
-                data-action="toggle-week-bucket"
-                data-slot="${slot}"
-                data-active="${bucketEnabled ? "true" : "false"}"
-                aria-label="${bucketEnabled ? `${title} deaktivieren` : `${title} aktivieren`}"
-                title="${bucketEnabled ? `${title} deaktivieren` : `${title} aktivieren`}"
-              >
-                <span class="week-plan-bucket-toggle-label">${title}</span>
-                <i data-lucide="${bucketEnabled ? "check-square" : "square"}" aria-hidden="true"></i>
-              </button>
+                </div>
+              ` : ""}
             </div>
             <div class="week-plan-items">
               ${slotEntries.map(({ row, rowIndex }) => `
-                <div class="week-plan-item-row">
-                  <button class="week-plan-item" type="button" draggable="true" data-row-index="${rowIndex}">
-                    ${row[0]}
-                  </button>
-                  <button
-                    type="button"
-                    class="week-plan-randomize"
-                    data-action="randomize-one"
-                    data-row-index="${rowIndex}"
-                    aria-label="Rezept neu randomisieren"
-                    title="Rezept neu randomisieren"
-                  ><i data-lucide="shuffle" aria-hidden="true"></i></button>
-                </div>
+                <button class="week-plan-item" type="button" draggable="true" data-row-index="${rowIndex}">
+                  ${row[0]}
+                </button>
               `).join("")}
+            </div>
+            <div class="week-plan-extras">
+              <button
+                type="button"
+                class="week-plan-wheat-btn"
+                data-slot="${slot}"
+                data-active="${extra.active ? "true" : "false"}"
+                title="Frühstück &amp; Abendessen einrechnen (je 1×)"
+                aria-label="Frühstück &amp; Abendessen einrechnen"
+              ><i data-lucide="wheat" aria-hidden="true"></i></button>
+              <input
+                type="number"
+                class="week-plan-extra-input"
+                data-slot="${slot}"
+                value="${extra.kcal || 400}"
+                min="0"
+                step="10"
+                title="Kcal pro Mahlzeit (wird ×2 gerechnet)"
+                aria-label="Kcal für Frühstück &amp; Abendessen"
+              >
+              <span style="font-size:11px;color:var(--muted)">kcal</span>
             </div>
           </section>
         `;
@@ -2582,7 +2184,6 @@
       const kcalIndex = allHeaders.indexOf("kcal pro Portion");
       const rawPortionDisplayCount = portionScale / 2;
       const recipePortionFactor = rawPortionDisplayCount > 0 ? rawPortionDisplayCount : 1;
-      const breakfastKcalPerDay = getBreakfastKcalPerDay();
       const lines = [`10-Tage Plan ab ${formatGermanDate()}`];
 
       titles.forEach((title, slot) => {
@@ -2600,7 +2201,9 @@
           });
         }
 
-        const totalKcal = Math.round((kcalSum * recipePortionFactor) + breakfastKcalPerDay);
+        const extra = slotExtraKcal[slot] || { active: false, kcal: 400 };
+        const extraKcal = extra.active ? (Number(extra.kcal) || 0) * 2 : 0;
+        const totalKcal = Math.round((kcalSum * recipePortionFactor) + extraKcal);
         const recipeText = recipeNames.length > 0 ? recipeNames.join(", ") : "-";
         lines.push(`${title} - ${recipeText} (insg. ${totalKcal} kcal/d)`);
       });
@@ -2634,9 +2237,8 @@
               return Number.isInteger(index) && index >= 0 && Number.isInteger(slot) && slot >= 0 && slot <= 4;
             })
         ),
-        b: weekBucketState,
         p: Number.isFinite(portionScale) && portionScale > 0 ? portionScale : 1,
-        e: breakfastState
+        e: slotExtraKcal
       };
 
       return `P1-${toBase64Url(JSON.stringify(payload))}`;
@@ -2662,7 +2264,6 @@
       const payload = JSON.parse(decoded);
       const selectedRaw = Array.isArray(payload?.s) ? payload.s : payload?.selected;
       const slotsRaw = payload?.t && typeof payload.t === "object" ? payload.t : payload?.slots;
-      const bucketRaw = Array.isArray(payload?.b) ? payload.b : payload?.buckets;
       const portionRaw = payload?.p ?? payload?.portionScale;
       const extraRaw = payload?.e ?? payload?.extra;
       if (!Array.isArray(selectedRaw) || !slotsRaw || typeof slotsRaw !== "object") {
@@ -2691,37 +2292,34 @@
         ? Math.round(nextPortionScale)
         : 1;
 
-      const nextBreakfast = {
-        overnightOats: {
-          active: Boolean(extraRaw?.overnightOats?.active),
-          kcal: Number.isFinite(Number(extraRaw?.overnightOats?.kcal)) ? Math.max(0, Number(extraRaw.overnightOats.kcal)) : 420
-        },
-        brotzeit: {
-          active: Boolean(extraRaw?.brotzeit?.active),
-          kcal: Number.isFinite(Number(extraRaw?.brotzeit?.kcal)) ? Math.max(0, Number(extraRaw.brotzeit.kcal)) : 360
+      const nextExtra = {};
+      Object.entries(extraRaw || {}).forEach(([slotKey, rawConfig]) => {
+        const slot = Number(slotKey);
+        const config = rawConfig && typeof rawConfig === "object" ? rawConfig : {};
+        if (!Number.isInteger(slot) || slot < 0 || slot > 4) {
+          return;
         }
-      };
 
-      const nextBucketState = normalizeBucketState(bucketRaw);
+        nextExtra[slot] = {
+          active: Boolean(config.active),
+          kcal: Number.isFinite(Number(config.kcal)) ? Math.max(0, Number(config.kcal)) : 400
+        };
+      });
 
       cartState = nextCartState;
       weekPlanState = nextWeekPlanState;
-      weekBucketState = nextBucketState;
-      breakfastState = nextBreakfast;
+      slotExtraKcal = nextExtra;
       portionScale = normalizedPortionScale;
       portionScaleInput.value = String(portionScale);
 
       saveCartState();
       saveWeekPlanState();
-      saveWeekBucketState();
-      saveBreakfastState();
+      saveSlotExtraKcal();
       savePortionScale();
 
-      syncSelectionWithCart();
       renderCurrentTable();
       renderWeekPlan();
       renderSummary();
-      renderBreakfastPanel();
     }
 
     function updateWeekPlanScrollButton() {
@@ -3333,45 +2931,8 @@
       return getCartRecipeEntries();
     }
 
-    function getBreakfastSummaryEntries() {
-      const entries = [];
-
-      if (breakfastState.overnightOats.active) {
-        const overnightIndex = allRows.findIndex((row) => /overnight\s*oats/i.test(row[0] || ""));
-        if (overnightIndex >= 0) {
-          entries.push({ row: allRows[overnightIndex], rowIndex: overnightIndex });
-        } else {
-          entries.push({
-            row: [
-              "Overnight Oats",
-              "",
-              "50 g Haferflocken<br>150 ml Milch<br>100 g Joghurt<br>1 EL Chiasamen<br>1 Stück Banane",
-              "",
-              String(Math.round(Number(breakfastState.overnightOats.kcal || 420)))
-            ],
-            rowIndex: -1001
-          });
-        }
-      }
-
-      if (breakfastState.brotzeit.active) {
-        entries.push({
-          row: [
-            "Brotzeit",
-            "",
-            "2 Stück Scheiben Brot<br>30 g Frischkäse<br>30 g Käse<br>40 g Gurke<br>40 g Tomate",
-            "",
-            String(Math.round(Number(breakfastState.brotzeit.kcal || 360)))
-          ],
-          rowIndex: -1002
-        });
-      }
-
-      return entries;
-    }
-
     function setSummaryVisibility(visible) {
-      const fadeTargets = [breakfastCollectionHeading, breakfastTableWrap, recipeCollectionHeading, recipeTableWrap, weekPlan];
+      const fadeTargets = [recipeCollectionHeading, recipeTableWrap, weekPlan];
       const clearFadeClasses = () => {
         fadeTargets.forEach((element) => {
           if (!element) return;
@@ -3402,8 +2963,6 @@
           recipeCollectionHeading.hidden = true;
           recipeTableWrap.hidden = true;
           weekPlan.hidden = true;
-          breakfastCollectionHeading.hidden = true;
-          breakfastTableWrap.hidden = true;
           clearFadeClasses();
         }, 170);
 
@@ -3426,8 +2985,6 @@
         isBasketLoading = false;
         recipeCollectionHeading.hidden = false;
         recipeTableWrap.hidden = false;
-        breakfastCollectionHeading.hidden = false;
-        breakfastTableWrap.hidden = false;
         clearFadeClasses();
         recipeCollectionHeading.classList.add("ui-fade-in");
         recipeTableWrap.classList.add("ui-fade-in");
@@ -3443,10 +3000,7 @@
 
     function renderSummary() {
       const renderToken = ++summaryRenderToken;
-      const selected = [
-        ...getSelectedRecipeEntries(),
-        ...getBreakfastSummaryEntries()
-      ];
+      const selected = getSelectedRecipeEntries();
       summaryCount.hidden = selected.length === 0;
       summaryCount.textContent = String(selected.length);
       summaryMeta.textContent = "";
@@ -3635,9 +3189,6 @@
             const wrapper = document.createElement("div");
             wrapper.className = "recipe-actions";
 
-            const rowButtons = document.createElement("div");
-            rowButtons.className = "recipe-actions-row";
-
             const a = document.createElement("a");
             a.href = link.href;
             a.target = "_blank";
@@ -3645,12 +3196,6 @@
             a.className = "recipe-text-link";
             a.setAttribute("aria-label", `Rezept öffnen: ${row[0]}`);
             a.setAttribute("title", `Rezept öffnen: ${row[0]}`);
-            a.dataset.enabled = isRecipeLinkEnabled(rowIndex) ? "true" : "false";
-            if (a.dataset.enabled === "false") {
-              a.setAttribute("aria-disabled", "true");
-              a.tabIndex = -1;
-              a.setAttribute("title", `Link deaktiviert: ${row[0]}`);
-            }
             a.innerHTML = '<i data-lucide="link-2" aria-hidden="true"></i>';
 
             const cartButton = document.createElement("button");
@@ -3664,9 +3209,8 @@
               ? '<svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><circle cx="8" cy="21" r="1.5"></circle><circle cx="18" cy="21" r="1.5"></circle><path d="M2.5 3h2l2.2 12.2a2 2 0 0 0 2 1.6h8.5a2 2 0 0 0 2-1.5L21 7H6.2"></path></svg><span class="sr-only">Im Warenkorb</span>'
               : '<svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><circle cx="8" cy="21" r="1.5"></circle><circle cx="18" cy="21" r="1.5"></circle><path d="M2.5 3h2l2.2 12.2a2 2 0 0 0 2 1.6h8.5a2 2 0 0 0 2-1.5L21 7H6.2"></path></svg><span class="sr-only">Zum Warenkorb hinzufügen</span>';
 
-            rowButtons.appendChild(a);
-            rowButtons.appendChild(cartButton);
-            wrapper.appendChild(rowButtons);
+            wrapper.appendChild(a);
+            wrapper.appendChild(cartButton);
             td.appendChild(wrapper);
           } else {
             td.innerHTML = cell;
@@ -3733,39 +3277,6 @@
       renderCurrentTable();
     }
 
-    function randomizeSingleRecipe(rowIndex) {
-      const currentKey = String(rowIndex);
-      const slot = Number(weekPlanState[currentKey]);
-      if (!Number.isInteger(slot) || slot < 0 || slot > 4) {
-        return;
-      }
-
-      const selectedKeys = new Set(
-        Object.entries(cartState)
-          .filter(([, active]) => active)
-          .map(([key]) => key)
-      );
-      selectedKeys.delete(currentKey);
-      const pool = getSelectionPool().filter((index) => !selectedKeys.has(String(index)));
-      if (pool.length === 0) {
-        return;
-      }
-
-      const replacementIndex = pool[Math.floor(Math.random() * pool.length)];
-      delete cartState[currentKey];
-      cartState[String(replacementIndex)] = true;
-      delete weekPlanState[currentKey];
-      weekPlanState[String(replacementIndex)] = slot;
-      saveCartState();
-      saveWeekPlanState();
-      syncSelectionWithCart();
-      renderCurrentTable();
-      renderWeekPlan();
-      if (isSummaryOpen) {
-        renderSummary();
-      }
-    }
-
     async function init() {
       try {
         const response = await fetch(sourceUrl, { cache: "no-store" });
@@ -3786,7 +3297,6 @@
         renderWeekPlan();
         renderSummary();
         validateProductLinks();
-        renderBreakfastPanel();
 
         const codeFromUrl = getWeekPlanCodeFromUrl();
         if (codeFromUrl) {
@@ -3863,31 +3373,12 @@
       toggleCart(rowIndex);
     });
 
+    // Wheat button toggle
     weekPlan.addEventListener("click", (event) => {
-      const bucketToggle = event.target.closest(".week-plan-bucket-toggle");
-      if (bucketToggle) {
-        const slot = Number(bucketToggle.dataset.slot);
-        if (Number.isInteger(slot)) {
-          toggleWeekBucket(slot);
-          renderWeekPlan();
-          renderCurrentTable();
-        }
-        return;
-      }
-
       const portionToggle = event.target.closest('[data-action="toggle-portion-display"]');
       if (portionToggle) {
         showWeekPlanPortionCount = !showWeekPlanPortionCount;
         renderWeekPlan();
-        return;
-      }
-
-      const randomizeButton = event.target.closest('[data-action="randomize-one"]');
-      if (randomizeButton) {
-        const rowIndex = Number(randomizeButton.dataset.rowIndex);
-        if (!Number.isNaN(rowIndex)) {
-          randomizeSingleRecipe(rowIndex);
-        }
         return;
       }
 
@@ -3903,20 +3394,26 @@
         return;
       }
 
+      const btn = event.target.closest(".week-plan-wheat-btn");
+      if (!btn) return;
+      const slot = Number(btn.dataset.slot);
+      if (Number.isNaN(slot)) return;
+      const existing = slotExtraKcal[slot] || { active: false, kcal: 400 };
+      slotExtraKcal[slot] = { ...existing, active: !existing.active };
+      saveSlotExtraKcal();
+      renderWeekPlan();
     });
 
-    breakfastTableBody.addEventListener("click", (event) => {
-      const button = event.target.closest('[data-action="toggle-breakfast"]');
-      if (!button) {
-        return;
-      }
-      const key = button.dataset.breakfastKey;
-      if (key !== "overnightOats" && key !== "brotzeit") {
-        return;
-      }
-      breakfastState[key].active = !breakfastState[key].active;
-      saveBreakfastState();
-      renderBreakfastPanel();
+    // Extra kcal input change
+    weekPlan.addEventListener("change", (event) => {
+      const input = event.target.closest(".week-plan-extra-input");
+      if (!input) return;
+      const slot = Number(input.dataset.slot);
+      if (Number.isNaN(slot)) return;
+      const val = Math.max(0, Number(input.value) || 0);
+      const existing = slotExtraKcal[slot] || { active: false, kcal: 400 };
+      slotExtraKcal[slot] = { ...existing, kcal: val };
+      saveSlotExtraKcal();
       renderWeekPlan();
     });
 
@@ -3966,8 +3463,6 @@
 
       weekPlanState[rowIndex] = slot;
       saveWeekPlanState();
-      syncSelectionWithCart();
-      renderCurrentTable();
       renderWeekPlan();
     });
 
@@ -4201,10 +3696,7 @@
       weekPlanState = {};
       purchasedState = {};
       excludedState = {};
-      breakfastState = {
-        overnightOats: { active: false, kcal: 420 },
-        brotzeit: { active: false, kcal: 360 }
-      };
+      slotExtraKcal = {};
       activeBasketText = "";
       isBasketLoading = false;
       reweBasketSnapshot.text = "";
@@ -4214,11 +3706,10 @@
       saveWeekPlanState();
       saveBooleanMap(PURCHASED_STORAGE_KEY, purchasedState);
       saveBooleanMap(EXCLUDED_STORAGE_KEY, excludedState);
-      saveBreakfastState();
+      saveSlotExtraKcal();
       renderCurrentTable();
       renderWeekPlan();
       renderSummary();
-      renderBreakfastPanel();
     });
 
     init();
