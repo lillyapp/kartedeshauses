@@ -1,6 +1,4 @@
-<!doctype html>
-<html lang="de">
-<head>
+<html lang="de"><head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>KARTE DES HAUSES</title>
@@ -1346,7 +1344,7 @@
           <button id="selectionCartButton" class="icon-button" type="button" aria-label="Auswahl in den Warenkorb legen" title="Auswahl in den Warenkorb legen">
             <i data-lucide="wand-sparkles" aria-hidden="true"></i>
           </button>
-          <a class="icon-button" href="https://account.rewe.de/realms/sso/protocol/openid-connect/auth?response_type=code&client_id=ecom&scope=openid%20profile&state=6pX-affIVEX-YblZbZXGS1k16wcIwiqp0Q24jo8llV0%3D&redirect_uri=https://www.rewe.de/login/oauth2/code/sso&nonce=5a0WIhTJB9LhN0L8jHdRabYR_By2KLcZrACfKT7ENow&code_challenge=SznV9eLZlrdAvYyxbZnDQVewk7q0lBBnoLiV6Yq-w3I&code_challenge_method=S256" aria-label="REWE Login öffnen" title="REWE Login öffnen">
+          <a class="icon-button" href="https://account.rewe.de/realms/sso/protocol/openid-connect/auth?response_type=code&amp;client_id=ecom&amp;scope=openid%20profile&amp;state=6pX-affIVEX-YblZbZXGS1k16wcIwiqp0Q24jo8llV0%3D&amp;redirect_uri=https://www.rewe.de/login/oauth2/code/sso&amp;nonce=5a0WIhTJB9LhN0L8jHdRabYR_By2KLcZrACfKT7ENow&amp;code_challenge=SznV9eLZlrdAvYyxbZnDQVewk7q0lBBnoLiV6Yq-w3I&amp;code_challenge_method=S256" aria-label="REWE Login öffnen" title="REWE Login öffnen">
             <i data-lucide="arrow-up-right" aria-hidden="true"></i>
           </a>
         </div>
@@ -1354,11 +1352,11 @@
       <button id="summaryButton" class="icon-button" type="button" aria-label="Warenkorb öffnen" aria-expanded="false" title="Warenkorb öffnen">
         <i data-lucide="receipt-text" aria-hidden="true"></i>
       </button>
-      <span id="summaryCount" class="icon-badge" hidden>0</span>
-      <div id="randomRows" class="random-row" hidden></div>
+      <span id="summaryCount" class="icon-badge" hidden="">0</span>
+      <div id="randomRows" class="random-row" hidden=""></div>
     </div>
-    <div id="basketPrompt" class="basket-prompt" hidden></div>
-    <section id="productLinkHelper" class="product-helper" hidden aria-label="Produktlink-Helper">
+    <div id="basketPrompt" class="basket-prompt" hidden=""></div>
+    <section id="productLinkHelper" class="product-helper" hidden="" aria-label="Produktlink-Helper">
       <div class="product-helper-header">
         <div>
           <h2 class="product-helper-title">Produktlink-Helper</h2>
@@ -1375,20 +1373,20 @@
         <button id="productHelperSkip" type="button">Weiter</button>
         <button id="productHelperCopy" type="button">Markdown kopieren</button>
       </div>
-      <textarea id="productHelperExport" class="product-helper-export" readonly aria-label="Markdown-Block für data.md"></textarea>
+      <textarea id="productHelperExport" class="product-helper-export" readonly="" aria-label="Markdown-Block für data.md"></textarea>
       <p id="productHelperStatus" class="product-helper-status"></p>
     </section>
     <div class="controls">
       <label class="toggle">
-        <input id="filterToggle" type="checkbox" checked>
+        <input id="filterToggle" type="checkbox" checked="">
         Nur Auswahl anzeigen
       </label>
       <label class="toggle">
-        <input id="cardToggle" type="checkbox" checked>
+        <input id="cardToggle" type="checkbox" checked="">
         Warme / kalte Speisen
       </label>
     </div>
-    <section id="weekPlan" class="week-plan" hidden aria-label="Wochenplanübersicht">
+    <section id="weekPlan" class="week-plan" hidden="" aria-label="Wochenplanübersicht">
       <div class="week-plan-header">
         <div class="week-plan-heading">
           <h2 class="section-heading">10-TAGE PLAN</h2>
@@ -1398,7 +1396,7 @@
             </button>
           </div>
         </div>
-        <button id="weekPlanScrollButton" class="week-plan-scroll" type="button" aria-label="Wochenplan verschieben" title="Wochenplan verschieben">
+        <button id="weekPlanScrollButton" class="week-plan-scroll" type="button" aria-label="Wochenplan verschieben" title="Wochenplan verschieben" hidden="">
           <i data-lucide="arrow-left-right" aria-hidden="true"></i>
         </button>
       </div>
@@ -1406,7 +1404,7 @@
         <div id="weekPlanGrid" class="week-plan-grid"></div>
       </div>
     </section>
-    <section id="summaryPanel" class="summary-panel" hidden aria-label="Warenkorb">
+    <section id="summaryPanel" class="summary-panel" hidden="" aria-label="Warenkorb">
       <div class="summary-header">
         <div>
           <h2 class="summary-title">Warenkorb</h2>
@@ -1416,16 +1414,16 @@
           <i data-lucide="list-filter" aria-hidden="true"></i>
         </button>
       </div>
-      <div id="summaryTools" class="summary-tools" hidden>
+      <div id="summaryTools" class="summary-tools" hidden="">
         <label class="summary-toggle">
-          <input id="combineToggle" type="checkbox" checked>
+          <input id="combineToggle" type="checkbox" checked="">
           Alles zusammenfassen
         </label>
         <label class="summary-toggle">
-          <input id="spiceToggle" type="checkbox" checked>
+          <input id="spiceToggle" type="checkbox" checked="">
           Gewürze ausblenden
         </label>
-        <label id="portionScaleWrap" class="summary-portion" hidden>
+        <label id="portionScaleWrap" class="summary-portion" hidden="">
           Portionen
           <input id="portionScale" type="number" min="1" step="1" value="1" inputmode="numeric">
         </label>
@@ -1433,8 +1431,10 @@
       </div>
       <div id="summaryContent" class="summary-list"></div>
     </section>
-    <div id="status" class="status"></div>
-    <div id="error" class="error" hidden></div>
+    <div id="status" class="status">Fehler beim Laden.</div>
+    <div id="error" class="error">Markdown konnte nicht geladen werden (0).
+
+Lege eine Markdown-Datei unter ./data.md ab oder übergib eine URL mit ?source=https://...</div>
     <h2 id="recipeCollectionHeading" class="section-heading table-heading">REZEPTSAMMLUNG</h2>
     <div id="recipeTableWrap" class="table-wrap">
       <table aria-label="Markdown Tabelle">
@@ -1644,6 +1644,67 @@
         .replace(/</g, "&lt;")
         .replace(/>/g, "&gt;")
         .replace(/"/g, "&quot;");
+    }
+
+    function normalizeHeaderName(value) {
+      return String(value || "")
+        .toLowerCase()
+        .replace(/\s+/g, " ")
+        .trim();
+    }
+
+    function getColumnIndexByHeader(headerNames, fallbackIndex = -1) {
+      const names = Array.isArray(headerNames) ? headerNames : [headerNames];
+      const normalizedTargets = names.map(normalizeHeaderName);
+
+      const foundIndex = allHeaders.findIndex((header) =>
+        normalizedTargets.includes(normalizeHeaderName(header))
+      );
+
+      if (foundIndex !== -1) {
+        return foundIndex;
+      }
+
+      return Number.isInteger(fallbackIndex) ? fallbackIndex : -1;
+    }
+
+    function getRecipeTitle(row) {
+      const index = getColumnIndexByHeader(["Rezept", "Titel", "Name"], 0);
+      return row[index] || "";
+    }
+
+    function getRecipeLinkCell(row) {
+      const index = getColumnIndexByHeader(["Link", "URL", "Rezeptlink"], 1);
+      return row[index] || "";
+    }
+
+    function getIngredientCell(row) {
+      const index = getColumnIndexByHeader([
+        "Zutaten für 1 Portion",
+        "Zutaten",
+        "Zutaten pro Portion",
+        "Zutatenliste"
+      ], 2);
+      return row[index] || "";
+    }
+
+    function getKcalCell(row) {
+      const index = getColumnIndexByHeader(["kcal pro Portion", "Kalorien", "kcal"], 3);
+      return row[index] || "";
+    }
+
+    function getKcalValue(row) {
+      const raw = String(getKcalCell(row)).replace(/[^\d]/g, "");
+      const value = Number(raw);
+      return Number.isFinite(value) && value > 0 ? value : 0;
+    }
+
+    function splitIngredientCell(cell) {
+      return String(cell || "")
+        .replace(/<br\s*\/?>/gi, "\n")
+        .split(/\n+/)
+        .map((part) => part.trim())
+        .filter(Boolean);
     }
 
     const INGREDIENT_ALIASES = new Map([
@@ -2081,7 +2142,6 @@
 
       syncWeekPlanState(entries);
       const titles = ["TAG 1 · 2", "TAG 3 · 4", "TAG 5 · 6", "TAG 7 · 8", "TAG 9 · 10"];
-      const kcalIndex = allHeaders.indexOf("kcal pro Portion");
       const rawPortionDisplayCount = portionScale / 2;
       const recipePortionFactor = rawPortionDisplayCount > 0 ? rawPortionDisplayCount : 1;
       const portionDisplayCount = Number.isInteger(rawPortionDisplayCount)
@@ -2095,16 +2155,13 @@
         // Sum kcal from recipes in this slot
         let kcalSum = 0;
         let hasKcal = false;
-        if (kcalIndex !== -1) {
-          slotEntries.forEach(({ row }) => {
-            const raw = (row[kcalIndex] || "").replace(/[^\d]/g, "");
-            const val = Number(raw);
-            if (val > 0) {
-              kcalSum += val;
-              hasKcal = true;
-            }
-          });
-        }
+        slotEntries.forEach(({ row }) => {
+          const val = getKcalValue(row);
+          if (val > 0) {
+            kcalSum += val;
+            hasKcal = true;
+          }
+        });
 
         // Add extra kcal if active for this slot (×2 for Frühstück + Abendessen)
         const extra = slotExtraKcal[slot] || { active: false, kcal: 400 };
@@ -2136,7 +2193,7 @@
             <div class="week-plan-items">
               ${slotEntries.map(({ row, rowIndex }) => `
                 <button class="week-plan-item" type="button" draggable="true" data-row-index="${rowIndex}">
-                  ${row[0]}
+                  ${escapeHtml(getRecipeTitle(row))}
                 </button>
               `).join("")}
             </div>
@@ -2181,25 +2238,21 @@
     function buildWeekPlanClipboardText() {
       const entries = getCartRecipeEntries();
       const titles = ["Tag 1 . 2", "Tag 3 . 4", "Tag 5 . 6", "Tag 7 . 8", "Tag 9 . 10"];
-      const kcalIndex = allHeaders.indexOf("kcal pro Portion");
       const rawPortionDisplayCount = portionScale / 2;
       const recipePortionFactor = rawPortionDisplayCount > 0 ? rawPortionDisplayCount : 1;
       const lines = [`10-Tage Plan ab ${formatGermanDate()}`];
 
       titles.forEach((title, slot) => {
         const slotEntries = entries.filter(({ rowIndex }) => weekPlanState[String(rowIndex)] === slot);
-        const recipeNames = slotEntries.map(({ row }) => row[0]).filter(Boolean);
+        const recipeNames = slotEntries.map(({ row }) => getRecipeTitle(row)).filter(Boolean);
 
         let kcalSum = 0;
-        if (kcalIndex !== -1) {
-          slotEntries.forEach(({ row }) => {
-            const raw = (row[kcalIndex] || "").replace(/[^\d]/g, "");
-            const val = Number(raw);
-            if (val > 0) {
-              kcalSum += val;
-            }
-          });
-        }
+        slotEntries.forEach(({ row }) => {
+          const val = getKcalValue(row);
+          if (val > 0) {
+            kcalSum += val;
+          }
+        });
 
         const extra = slotExtraKcal[slot] || { active: false, kcal: 400 };
         const extraKcal = extra.active ? (Number(extra.kcal) || 0) * 2 : 0;
@@ -2732,11 +2785,9 @@
     }
 
     function getIngredientsForRow(row, rowIndex, scale = 1) {
-      const ingredientCell = row[2] || "";
-      return ingredientCell
-        .split(/<br\s*\/?>/i)
-        .map((part) => part.trim())
-        .filter(Boolean)
+      const ingredientCell = getIngredientCell(row);
+
+      return splitIngredientCell(ingredientCell)
         .map((line, ingredientIndex) => {
           const parsed = parseIngredientLine(line);
           return {
@@ -3061,7 +3112,7 @@
         const section = document.createElement("section");
         section.className = "summary-card";
         section.innerHTML = `
-          <h3>${row[0]}</h3>
+          <h3>${escapeHtml(getRecipeTitle(row))}</h3>
           <ul class="summary-ingredients">
             ${items.map((item) => `
               <li data-purchased="${isPurchased(item.globalKey) ? "true" : "false"}" data-excluded="${isExcluded(item.instanceKey) ? "true" : "false"}" data-basket="false">
@@ -3110,9 +3161,9 @@
       tableHead.innerHTML = "";
       tableBody.innerHTML = "";
 
-      const ingredientColumnIndex = headers.indexOf("Zutaten für 1 Portion");
-      const linkColumnIndex = headers.indexOf("Link");
-      const kcalColumnIndex = headers.indexOf("kcal pro Portion");
+      const ingredientColumnIndex = getColumnIndexByHeader(["Zutaten für 1 Portion", "Zutaten", "Zutaten pro Portion", "Zutatenliste"], 2);
+      const linkColumnIndex = getColumnIndexByHeader(["Link", "URL", "Rezeptlink"], 1);
+      const kcalColumnIndex = getColumnIndexByHeader(["kcal pro Portion", "Kalorien", "kcal"], 3);
       const visibleColumnIndexes = headers
         .map((_, index) => index)
         .filter((index) => index !== ingredientColumnIndex);
@@ -3194,8 +3245,8 @@
             a.target = "_blank";
             a.rel = "noopener noreferrer";
             a.className = "recipe-text-link";
-            a.setAttribute("aria-label", `Rezept öffnen: ${row[0]}`);
-            a.setAttribute("title", `Rezept öffnen: ${row[0]}`);
+            a.setAttribute("aria-label", `Rezept öffnen: ${escapeHtml(getRecipeTitle(row))}`);
+            a.setAttribute("title", `Rezept öffnen: ${escapeHtml(getRecipeTitle(row))}`);
             a.innerHTML = '<i data-lucide="link-2" aria-hidden="true"></i>';
 
             const cartButton = document.createElement("button");
@@ -3203,8 +3254,8 @@
             cartButton.className = "cart-toggle";
             cartButton.dataset.active = isInCart(rowIndex) ? "true" : "false";
             cartButton.dataset.rowIndex = String(rowIndex);
-            cartButton.setAttribute("aria-label", isInCart(rowIndex) ? `Aus Warenkorb entfernen: ${row[0]}` : `Zum Warenkorb hinzufügen: ${row[0]}`);
-            cartButton.setAttribute("title", isInCart(rowIndex) ? `Aus Warenkorb entfernen: ${row[0]}` : `Zum Warenkorb hinzufügen: ${row[0]}`);
+            cartButton.setAttribute("aria-label", isInCart(rowIndex) ? `Aus Warenkorb entfernen: ${escapeHtml(getRecipeTitle(row))}` : `Zum Warenkorb hinzufügen: ${escapeHtml(getRecipeTitle(row))}`);
+            cartButton.setAttribute("title", isInCart(rowIndex) ? `Aus Warenkorb entfernen: ${escapeHtml(getRecipeTitle(row))}` : `Zum Warenkorb hinzufügen: ${escapeHtml(getRecipeTitle(row))}`);
             cartButton.innerHTML = isInCart(rowIndex)
               ? '<svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><circle cx="8" cy="21" r="1.5"></circle><circle cx="18" cy="21" r="1.5"></circle><path d="M2.5 3h2l2.2 12.2a2 2 0 0 0 2 1.6h8.5a2 2 0 0 0 2-1.5L21 7H6.2"></path></svg><span class="sr-only">Im Warenkorb</span>'
               : '<svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><circle cx="8" cy="21" r="1.5"></circle><circle cx="18" cy="21" r="1.5"></circle><path d="M2.5 3h2l2.2 12.2a2 2 0 0 0 2 1.6h8.5a2 2 0 0 0 2-1.5L21 7H6.2"></path></svg><span class="sr-only">Zum Warenkorb hinzufügen</span>';
@@ -3385,9 +3436,8 @@
       const item = event.target.closest(".week-plan-item");
       if (item) {
         const rowIndex = Number(item.dataset.rowIndex);
-        const linkIndex = allHeaders.indexOf("Link");
         const row = allRows[rowIndex];
-        const link = row && linkIndex !== -1 ? extractCellLink(row[linkIndex] || "") : null;
+        const link = row ? extractCellLink(getRecipeLinkCell(row)) : null;
         if (link) {
           window.open(link.href, "_blank", "noopener,noreferrer");
         }
@@ -3714,5 +3764,6 @@
 
     init();
   </script>
-</body>
-</html>
+
+
+</body></html>
